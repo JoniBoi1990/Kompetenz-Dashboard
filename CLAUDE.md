@@ -6,13 +6,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Kompetenz-Dashboard — a Microsoft 365-connected student dashboard for chemistry competency tracking, personalized PDF test generation, and appointment booking.
 
-**Architecture decision (2026-03):** The original Docker Compose + PostgreSQL plan was replaced with a lean FastAPI + Jinja2 app that uses Microsoft 365 as the exclusive data layer. No database, no Docker, no React. Hosted on Uberspace or Hostinger via plain `uvicorn`.
+**Architecture decision (2026-03):** The original Docker Compose + PostgreSQL plan was replaced with a lean FastAPI + Jinja2 app that uses Microsoft 365 as the exclusive data layer. No database, no Docker, no React. Hosted on Uberspace via plain `uvicorn`.
+
+## Git Branch Strategy
+
+| Branch | Purpose |
+|--------|---------|
+| `main` | Stable production branch — deployed on Uberspace |
+| `agent-dev` | Development branch for AI agents |
+
+**Agents must only commit to `agent-dev`.** Merges to `main` are done by the user.
+
+Commit format: `agent: <short description>`
 
 ## Service Topology
 
 ```
-Uberspace / Hostinger
-└── FastAPI (uvicorn main:app)
+Uberspace (larissa.uberspace.de → bhof.uber.space)
+└── FastAPI (uvicorn main:app, port 8000, systemd user service)
     ├── Jinja2 HTML templates (no npm, no React)
     ├── MSAL Python (Azure AD auth + delegated Graph API calls)
     ├── pdf_engine.py (directly imported, synchronous)
@@ -25,6 +36,25 @@ Uberspace / Hostinger
 **Removed entirely:** Docker, PostgreSQL, Redis, Celery, pdf-worker microservice, React SPA, nginx, Traefik.
 
 Old files are archived in `_archiv/`.
+
+## Deployment
+
+**Production URL:** https://bhof.uber.space
+**Server:** bhof@larissa.uberspace.de
+**Service:** systemd user service `kompetenz`
+
+```bash
+# Deploy update
+ssh bhof@larissa.uberspace.de "cd ~/Kompetenz-Dashboard && git pull && systemctl --user restart kompetenz"
+
+# View logs
+ssh bhof@larissa.uberspace.de "journalctl --user -u kompetenz -f"
+
+# Service status
+ssh bhof@larissa.uberspace.de "systemctl --user status kompetenz"
+```
+
+The server tracks the `main` branch. Always merge `agent-dev` → `main` before deploying.
 
 ## Project Layout
 
@@ -39,17 +69,18 @@ Kompetenz-Dashboard/
 ├── questions.json       # Test questions per competency ID; created via /admin/upload
 ├── grading_scale.json   # Active grading scale (absent = use default preset)
 ├── static/
-│   ├── logo.png         # School logo (place here manually)
+│   ├── logo.png         # School logo (place here manually, not in git)
 │   └── style.css
 ├── templates/           # Jinja2 HTML templates
 │   ├── base.html
-│   ├── dashboard.html        # Student view: score + planning mode
-│   ├── teacher.html          # Teacher class overview + pending test notices
+│   ├── dashboard.html        # Student view: score + planning mode + Kompetenzanträge
+│   ├── teacher.html          # Teacher class overview + pending badges
 │   ├── class_detail.html
 │   ├── student_detail.html
 │   ├── test_builder.html     # Role-split: student request / teacher generate
 │   ├── test_preview.html     # Teacher: question-level preview before PDF download
 │   ├── pending_tests.html    # Teacher: review + confirm student test requests
+│   ├── antraege_pending.html # Teacher: review student competency claims
 │   ├── test_request_sent.html
 │   ├── grade_calculator.html
 │   ├── coverage.html
@@ -64,10 +95,12 @@ Kompetenz-Dashboard/
 │   ├── 2026-01-30_Testfragen Kopie.csv
 │   ├── Note-Dezimal-ProzentSchwelleab-Prozentbereichca-2.csv   # default preset (50%→3−4)
 │   └── Note-Dezimal-ProzentSchwelleab-Prozentbereichca.csv    # alt preset (50%→3−)
-├── grading_scales/      # Uploaded custom grading scale CSVs (auto-created)
+├── grading_scales/      # Uploaded custom grading scale CSVs (auto-created, not in git)
 ├── requirements.txt
 ├── .env.example
 ├── Procfile             # uvicorn main:app --host 0.0.0.0 --port $PORT
+├── AGENT_RULES.md       # Rules for AI agents working in this repo
+├── Project_Overview.md  # Non-technical feature overview
 └── _archiv/             # Old Docker/React/PostgreSQL code (do not edit)
 ```
 
@@ -77,6 +110,7 @@ Kompetenz-Dashboard/
 - **Session:** itsdangerous `URLSafeTimedSerializer`, 8h TTL, httponly + samesite=lax
 - **Role detection:** `roles` claim (`"Lehrer"`) or `@lehrer.` in UPN
 - **Cookie name:** `session`
+- **MSAL scopes:** `User.Read`, `GroupMember.Read.All`, `Sites.ReadWrite.All` — do NOT add `openid`, `profile`, or `email` (reserved, handled by MSAL internally)
 - **DEV_MODE:** `DEV_MODE=true` in `.env` enables a fake login form (`/dev-login`) — no Azure AD needed
 
 ## Routes
@@ -87,8 +121,8 @@ Kompetenz-Dashboard/
 | GET | /auth/callback | — | MSAL callback, sets cookie |
 | POST | /logout | session | Clears cookie |
 | GET | /auth/me | session | JSON user info |
-| GET | / | student | Dashboard: score (no grade), planning mode |
-| GET | /teacher | teacher | Class overview + pending test count |
+| GET | / | student | Dashboard: score (no grade), planning mode, Kompetenzanträge |
+| GET | /teacher | teacher | Class overview + pending test + antrag count badges |
 | GET | /teacher/class/{id} | teacher | Student list (Graph API) |
 | GET | /teacher/student/{id} | teacher | Competency grid + grade |
 | GET | /teacher/coverage | teacher | Set which competencies are in Unterrichtsstand |
@@ -102,6 +136,10 @@ Kompetenz-Dashboard/
 | POST | /tests/confirm/{req_id} | teacher | Create preview from student request |
 | GET | /tests/preview/{pid} | teacher | Question-level preview with per-question dropdowns |
 | POST | /tests/finalize/{pid} | teacher | Generate PDF from preview, mark request done |
+| POST | /antraege/submit | student | Submit competency claim |
+| GET | /antraege/pending | teacher | Review pending competency claims |
+| POST | /antraege/accept/{id} | teacher | Accept claim (writes record/nachweis) |
+| POST | /antraege/reject/{id} | teacher | Reject claim (with Begründung for niveau) |
 | GET | /api/class-students/{class_id} | teacher | AJAX: student list for a class |
 | GET | /api/student-competencies | teacher | AJAX: proven IDs for student name lookup |
 | GET | /grades/calculator | any | Grade calculator |
@@ -122,6 +160,12 @@ Kompetenz-Dashboard/
 | POST | /admin/grading-scale/save | teacher | Save threshold edits → grading_scale.json |
 | POST | /admin/grading-scale/reset | teacher | Delete grading_scale.json → revert to default preset |
 | POST | /admin/grading-scale/upload | teacher | Upload custom scale CSV → grading_scales/ |
+
+## Navigation (role-dependent)
+
+**Teacher:** Klassen | Unterrichtsstand | Notenrechner | Testanfragen | Kompetenzanträge | Testgenerator | Listen verwalten | Notenschlüssel
+
+**Student:** Meine Kompetenzen | Nachweis anfordern
 
 ## Competency Data Model (`kompetenzen.json`)
 
@@ -161,7 +205,23 @@ Niveau entries additionally have:
 - **Unterrichtsstand basis** includes both active_ids AND competencies the student has already proven (so self-taught competencies count toward the grade)
 - **Planungsmodus** (toggle, client-side JS only): interactive checkboxes/dropdowns, live score recalculation, grade letter shown here, basis toggle (Unterrichtsstand / Ganzes Schuljahr), reset button
 - Template receives `kompetenzen_json`, `current_state_json`, `active_ids_list`, `proven_ids_list`, `grading_scale_json` for JS
+- Template also receives `pending_antraege_by_comp`, `rejected_niveau_antraege_by_comp`, `antrag_ok` for Kompetenzanträge UI
 - Competency ID shown in all tables (muted, small)
+
+## Kompetenzanträge (student competency claims)
+
+Students can submit claims for competencies they believe they have already demonstrated:
+- **Einfach:** free-text description (hint: max 7 days old), form inline in dashboard read-only table
+- **Niveau:** evidence URL (OneDrive, OneNote etc.), form inline in dashboard niveau table
+- Pending antrag → badge "Antrag ausstehend" replaces the form
+- Rejected niveau antrag → rejection reason shown above re-submit form
+
+Teacher review at `GET /antraege/pending`:
+- Accept einfach → writes `achieved=True` to competency record
+- Accept niveau → teacher selects level 1–3, writes nachweis entry
+- Reject niveau → Begründung required, shown to student on next dashboard load
+
+Data stored in `_DEV_STORE["kompetenzantraege"]` (in-memory). Production would use a SharePoint list `Kompetenzantraege` via the stubs in `graph.py`.
 
 ## Test Generator: Role-Split Behaviour
 
@@ -189,12 +249,6 @@ Niveau entries additionally have:
 3. `GET /tests/pending`: cards per request with editable checkboxes
 4. `POST /tests/confirm/{req_id}` → preview → `POST /tests/finalize/{pid}` → PDF
 5. **Production note:** `_DEV_STORE["test_requests"]` and `_DEV_STORE["test_previews"]` are in-memory. A SharePoint list `Testanfragen` should be added for production persistence.
-
-## Navigation (role-dependent)
-
-**Teacher:** Klassen | Unterrichtsstand | Notenrechner | Testanfragen | Testgenerator | Listen verwalten | Notenschlüssel
-
-**Student:** Meine Kompetenzen | Nachweis anfordern
 
 ## Thema Grouping in Templates
 
@@ -234,6 +288,10 @@ Interactive views (coverage, test_builder teacher, grade_calculator, student_det
 
 Separate list for niveau-type competencies; each entry is one proof attempt with `niveau_level`, `evidence_url`, `evidence_name`.
 
+### `Kompetenzantraege` — student competency claims (production stub)
+
+Columns: `antrag_id`, `student_id`, `student_name`, `competency_id`, `typ`, `beschreibung`, `evidence_url`, `created_at`, `status`, `begruendung`, `niveau_level`. Graph helpers in `graph.py`: `ensure_kompetenzantraege_list()`, `add_kompetenzantrag()`, `get_kompetenzantraege()`, `update_kompetenzantrag()`.
+
 `graph.ensure_list_exists()` and `graph.ensure_nachweise_list()` auto-create lists on first use.
 
 ## DEV_MODE In-Memory Store
@@ -242,15 +300,20 @@ Separate list for niveau-type competencies; each entry is one proof attempt with
 
 ```python
 _DEV_STORE = {
-    "einfach":       {},   # {student_id: {competency_id: record}}
-    "nachweise":     {},   # {student_id: [nachweis, ...]}
-    "active_ids":    set(),
-    "test_requests": {},   # {req_id: request_dict}
-    "test_previews": {},   # {pid: preview_dict}
+    "einfach":           {},   # {student_id: {competency_id: record}}
+    "nachweise":         {},   # {student_id: [nachweis, ...]}
+    "active_ids":        set(),
+    "test_requests":     {},   # {req_id: request_dict}
+    "test_previews":     {},   # {pid: preview_dict}
+    "kompetenzantraege": {},   # {antrag_id: antrag_dict}
 }
 ```
 
 Dev student: `oid="dev-student-001"`, name="Anna Beispiel". Dev teacher: `oid="dev-teacher-001"`.
+
+**Pre-populated on startup** via `_init_dev_store()` (called at module load, after `_reload_kompetenzen()`):
+- `active_ids`: all einfach in Themen 1–3 + first 10 niveau competencies
+- Dev student: 80% of active einfach achieved; niveau: 5×Advanced, 3×Beginner, 2×Expert on first 10 niveau comps
 
 ## Grade Formula
 
@@ -318,8 +381,8 @@ Row 0 = competency IDs (column headers). Rows 1–N = question variants. Empty c
 ## Environment Variables (.env)
 
 ```
-DEV_MODE=false                  # true = fake login, in-memory store
-DOMAIN=localhost:8000           # or dashboard.schule.de in production
+DEV_MODE=false                  # true = fake login, in-memory store (pre-populated)
+DOMAIN=bhof.uber.space          # or localhost:8000 for local dev
 AZURE_CLIENT_ID=...
 AZURE_CLIENT_SECRET=...
 AZURE_TENANT_ID=...
@@ -340,15 +403,6 @@ uvicorn main:app --reload
 # → http://localhost:8000/login
 ```
 
-## Deployment (Uberspace)
-
-```bash
-pip install -r requirements.txt
-uberspace web backend set --http --port 8000
-# set env vars via uberspace config or .env file
-uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
 ## Implementation Phases
 
 | Phase | Status | Content |
@@ -362,4 +416,6 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 | 6 | done | Student test request workflow (pending → teacher review → PDF) |
 | 7 | done | CSV upload + admin editor (kompetenzen, questions); thema grouping; test preview |
 | 8 | done | Grading scale: CSV presets, upload, editable thresholds; proven-comps in Unterrichtsstand grade |
-| 9 | open | Production persistence for test_requests (SharePoint list `Testanfragen`) |
+| 9 | done | Kompetenzanträge: student claim workflow, teacher review, inline dashboard forms |
+| 10 | done | DEV_MODE pre-populated store; Git repo + Uberspace deployment |
+| 11 | open | Production persistence for test_requests + kompetenzantraege (SharePoint lists) |
