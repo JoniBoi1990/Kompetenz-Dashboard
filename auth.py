@@ -20,9 +20,6 @@ REDIRECT_URI = (
 )
 # Scopes needed for Graph API calls (Groups/Members, Sites, Lists)
 SCOPES = [
-    "openid",
-    "profile",
-    "email",
     "User.Read",
     "GroupMember.Read.All",
     "Sites.ReadWrite.All",
