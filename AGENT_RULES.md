@@ -193,3 +193,26 @@ If the correct implementation is unclear:
 1. Explain the uncertainty
 2. Propose multiple options
 3. Ask for clarification
+
+---
+
+# 13. GIT BRANCH STRATEGY
+
+The repository uses the following branches:
+
+**main**
+Stable production branch.
+
+**agent-dev**
+Development branch used by AI agents.
+
+Rules:
+
+1. Agents must only modify the branch `agent-dev`.
+2. Never commit directly to `main`.
+3. All commits must be created on `agent-dev`.
+4. Keep commits small and descriptive.
+
+Commit format:
+
+agent: <short description>
