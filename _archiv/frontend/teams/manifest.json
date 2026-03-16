@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.17",
+  "version": "1.0.0",
+  "id": "{{AZURE_CLIENT_ID}}",
+  "packageName": "de.schule.kompetenz-dashboard",
+  "developer": {
+    "name": "Schule",
+    "websiteUrl": "https://{{DOMAIN}}",
+    "privacyUrl": "https://{{DOMAIN}}/privacy",
+    "termsOfUseUrl": "https://{{DOMAIN}}/terms"
+  },
+  "name": {
+    "short": "Kompetenzen",
+    "full": "Kompetenz-Dashboard Chemie"
+  },
+  "description": {
+    "short": "Deine Kompetenzen in Chemie",
+    "full": "Dashboard zum Einsehen deiner Kompetenzen, Generieren von Übungstests und Buchen von Prüfungsterminen."
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "#0078D4",
+  "staticTabs": [
+    {
+      "entityId": "studentDashboard",
+      "name": "Meine Kompetenzen",
+      "contentUrl": "https://{{DOMAIN}}/student/dashboard?teams=1",
+      "websiteUrl": "https://{{DOMAIN}}/student/dashboard",
+      "scopes": ["personal"]
+    },
+    {
+      "entityId": "testBuilder",
+      "name": "Test erstellen",
+      "contentUrl": "https://{{DOMAIN}}/student/test-builder?teams=1",
+      "websiteUrl": "https://{{DOMAIN}}/student/test-builder",
+      "scopes": ["personal"]
+    },
+    {
+      "entityId": "appointments",
+      "name": "Termine",
+      "contentUrl": "https://{{DOMAIN}}/student/appointments?teams=1",
+      "websiteUrl": "https://{{DOMAIN}}/student/appointments",
+      "scopes": ["personal"]
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": ["{{DOMAIN}}", "login.microsoftonline.com"],
+  "webApplicationInfo": {
+    "id": "{{AZURE_CLIENT_ID}}",
+    "resource": "api://{{DOMAIN}}/{{AZURE_CLIENT_ID}}"
+  }
+}

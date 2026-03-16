@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Dev-Login</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f5f5f5; }
+    .login-box { background: #fff; border: 1px solid #d0d0d0; border-radius: 4px; padding: 2rem; width: 340px; }
+    .login-box h1 { font-size: 1.2rem; margin-bottom: 1.25rem; }
+    .dev-badge { background: #fffbe6; border: 1px solid #e6b800; border-radius: 3px; padding: 0.3rem 0.6rem; font-size: 0.8rem; margin-bottom: 1.25rem; display: block; }
+    .quick-buttons { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .quick-btn { padding: 0.5rem; border: 1px solid #d0d0d0; border-radius: 4px; background: #f5f5f5; cursor: pointer; font-size: 0.875rem; text-align: left; }
+    .quick-btn:hover { background: #e8e8e8; }
+    .divider { text-align: center; color: #888; font-size: 0.8rem; margin: 0.75rem 0; }
+    label { display: block; font-size: 0.875rem; margin-bottom: 0.75rem; }
+    input, select { width: 100%; padding: 0.4rem 0.5rem; margin-top: 0.25rem; border: 1px solid #d0d0d0; border-radius: 4px; box-sizing: border-box; }
+  </style>
+</head>
+<body>
+<div class="login-box">
+  <span class="dev-badge">⚠️ Dev-Modus — kein echtes Azure AD</span>
+  <h1>Kompetenz-Dashboard</h1>
+
+  <p style="font-size:.8rem;color:#666;margin-bottom:.75rem">Schnellanmeldung:</p>
+  <div class="quick-buttons">
+    <form action="/dev-login" method="post">
+      <input type="hidden" name="display_name" value="Lehrkraft (Dev)">
+      <input type="hidden" name="role" value="teacher">
+      <button type="submit" class="quick-btn">👩‍🏫 Als <strong>Lehrkraft</strong> anmelden</button>
+    </form>
+    <form action="/dev-login" method="post">
+      <input type="hidden" name="display_name" value="Anna Beispiel">
+      <input type="hidden" name="role" value="student">
+      <button type="submit" class="quick-btn">🎓 Als <strong>Anna Beispiel</strong> (Schülerin) anmelden</button>
+    </form>
+  </div>
+
+  <div class="divider">oder eigenen Namen eingeben</div>
+
+  <form action="/dev-login" method="post">
+    <label>
+      Name
+      <input type="text" name="display_name" placeholder="Vor- und Nachname" required>
+    </label>
+    <label>
+      Rolle
+      <select name="role">
+        <option value="teacher">Lehrkraft</option>
+        <option value="student">Schüler/in (= Anna Beispiel)</option>
+      </select>
+    </label>
+    <button type="submit" class="btn-primary" style="width:100%;margin-top:.5rem">Anmelden</button>
+  </form>
+</div>
+</body>
+</html>

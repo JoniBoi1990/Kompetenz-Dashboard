@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Notenrechner{% endblock %}
+{% block content %}
+<h1>Notenrechner</h1>
+
+<form action="/grades/calculate" method="post" id="calc-form">
+
+  {# Toggle: Berechnungsgrundlage #}
+  <div class="basis-toggle">
+    <span style="font-size:.875rem;font-weight:600">Berechnungsgrundlage:</span>
+    <label class="basis-label {% if basis == 'unterricht' %}basis-active{% endif %}">
+      <input type="radio" name="basis" value="unterricht"
+        {% if basis == 'unterricht' %}checked{% endif %}
+        onchange="this.form.submit()">
+      Unterrichtsstand
+    </label>
+    <label class="basis-label {% if basis == 'jahr' %}basis-active{% endif %}">
+      <input type="radio" name="basis" value="jahr"
+        {% if basis == 'jahr' %}checked{% endif %}
+        onchange="this.form.submit()">
+      Ganzes Schuljahr
+    </label>
+  </div>
+
+  {% if no_active_warning %}
+  <div class="dev-hint" style="margin-bottom:1rem">
+    Noch keine Kompetenzen als „im Unterricht behandelt" markiert.
+    {% if user.is_teacher %}
+    <a href="/teacher/coverage">Jetzt festlegen &rarr;</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if grade %}
+  <section class="grade-card">
+    <h2>Ergebnis</h2>
+    <div class="grade-big">{{ grade.note }}</div>
+    <p>{{ grade.gesamtpunkte }} / {{ grade.max_punkte }} Punkte ({{ grade.prozent }} %)</p>
+    <p class="muted" style="font-size:.8rem;margin-top:.25rem">
+      Basis: {% if basis == 'unterricht' %}Unterrichtsstand ({{ active_ids | length }} Kompetenzen){% else %}Ganzes Schuljahr{% endif %}
+    </p>
+  </section>
+  {% endif %}
+
+  <div class="two-columns">
+
+    <div>
+      <h2>Einfache Kompetenzen</h2>
+      {% if basis == 'unterricht' and active_ids %}
+      <p class="muted legend-hint">
+        <span class="comp-dot covered"></span> behandelt &nbsp;
+        <span class="comp-dot not-covered"></span> noch nicht behandelt
+      </p>
+      {% endif %}
+      <div class="filter-row" style="margin-bottom:0.25rem;">
+        <button type="button" onclick="selectAll(true)">Alle</button>
+        <button type="button" onclick="selectAll(false)">Keine</button>
+      </div>
+      <table class="kompetenz-table">
+        <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Erreicht</th></tr></thead>
+        <tbody>
+          {% set ns = namespace(last_thema=None) %}
+          {% for k in einfach_kompetenzen %}
+          {% set r = record_map.get(k.id) if record_map else none %}
+          {% if k.thema != ns.last_thema %}
+          {% set ns.last_thema = k.thema %}
+          <tr class="thema-header">
+            <td colspan="3">
+              Thema {{ k.thema or "–" }}
+              <button type="button" class="btn-thema" onclick="selectThema({{ k.thema or 0 }}, true)">Alle</button>
+              <button type="button" class="btn-thema" onclick="selectThema({{ k.thema or 0 }}, false)">Keine</button>
+            </td>
+          </tr>
+          {% endif %}
+          <tr class="{% if active_ids and basis == 'unterricht' %}{% if k.id in active_ids %}comp-covered{% else %}comp-not-covered{% endif %}{% endif %}" data-thema="{{ k.thema or 0 }}">
+            <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
+            <td>{{ k.name }}</td>
+            <td class="center">
+              <input type="checkbox" name="achieved_{{ k.id }}" value="on"
+                {% if r and r.achieved %}checked{% endif %}>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <h2>Niveau-Kompetenzen</h2>
+      <table class="kompetenz-table">
+        <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Niveau</th></tr></thead>
+        <tbody>
+          {% for k in niveau_kompetenzen %}
+          {% set r = record_map.get(k.id) if record_map else none %}
+          <tr class="{% if active_ids and basis == 'unterricht' %}{% if k.id in active_ids %}comp-covered{% else %}comp-not-covered{% endif %}{% endif %}">
+            <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
+            <td>{{ k.name }}</td>
+            <td>
+              <select name="niveau_{{ k.id }}">
+                {% for lvl, label in NIVEAU_LABELS.items() %}
+                <option value="{{ lvl }}" {% if r and r.niveau_level == lvl %}selected{% endif %}>
+                  {{ label }}
+                </option>
+                {% endfor %}
+              </select>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  <button type="submit" class="btn-primary">Note berechnen</button>
+</form>
+<script>
+function selectAll(state) {
+  document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = state);
+}
+function selectThema(thema, state) {
+  document.querySelectorAll(`tr[data-thema="${thema}"] input[type=checkbox]`)
+    .forEach(cb => { if (!cb.disabled) cb.checked = state; });
+}
+</script>
+{% endblock %}

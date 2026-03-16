@@ -1,0 +1,1044 @@
+[
+  {
+    "id": 1,
+    "name": "Die Grundbausteine eines Atoms (Proton, Neutron, Elektron) und deren Eigenschaften benennen",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32125"
+  },
+  {
+    "id": 2,
+    "name": "Atome im Schalenmodell darstellen",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32125"
+  },
+  {
+    "id": 3,
+    "name": "Die Definition des Begriffs Periode (Periodensystem der Elemente) nennen",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32127"
+  },
+  {
+    "id": 4,
+    "name": "Die Definition des Begriffs Hauptgruppe (Periodensystem der Elemente) nennen",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32127"
+  },
+  {
+    "id": 5,
+    "name": "Die Definition des Begriffs Ordnungszahl (Periodensystem der Elemente) nennen",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32127"
+  },
+  {
+    "id": 6,
+    "name": "Die Definition des Begriffs Ionisierungsenergie  nennen",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32125"
+  },
+  {
+    "id": 7,
+    "name": "Die Definition des Begriffs Außenelektronen / Valenzelektronen  nennen",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32125"
+  },
+  {
+    "id": 8,
+    "name": "Die Größe von Atomkern und Atomhülle vergleichen",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32125"
+  },
+  {
+    "id": 9,
+    "name": "Den Rutherford'schen Streuversuch beschreiben",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32126"
+  },
+  {
+    "id": 10,
+    "name": "Den Aufbau eines Atoms im Rutherford'schen \"Kern-Hülle-Modell\" erläutern (erläutern bedeutet: anhand von Beispielen wie einer Skizze erklären)",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32126"
+  },
+  {
+    "id": 11,
+    "name": "Die Entwicklung des \"Kern-Hülle-Modells\" anhand der Versuchsergebnisse des Streuversuchs erläutern",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32126"
+  },
+  {
+    "id": 12,
+    "name": "Die Größe von Teilchen (Atome, Moleküle, Ionen) und sichtbaren Objekten vergleichen",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32126"
+  },
+  {
+    "id": 13,
+    "name": "mit dem Schalenmodell und dem Energiestufenmodell die Atomhülle beschreiben",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32125"
+  },
+  {
+    "id": 14,
+    "name": "den Zusammenhang zwischen Atombau und Stellung der Atome im Periodensystem der Elemente erklären",
+    "typ": "einfach",
+    "thema": 1,
+    "anmerkungen": "",
+    "bp_nummer": "32127"
+  },
+  {
+    "id": 15,
+    "name": "Eigenschaften von Salzen nennen (u.a. Kochsalz, Natriumhydroxid, Magnesiumoxid)",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "SuS würden für jedes Salz \"Wasserlöslichkeit\" angeben",
+    "bp_nummer": "32112"
+  },
+  {
+    "id": 16,
+    "name": "Eigenschaften der Halogene nennen (u.a. Chlor)",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32112"
+  },
+  {
+    "id": 17,
+    "name": "Die Oxidation als Elektronenabgabe benennen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32215"
+  },
+  {
+    "id": 18,
+    "name": "Die Reduktion als Elektronenaufnahme benennen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32215"
+  },
+  {
+    "id": 19,
+    "name": "Die Redoxreaktion als Elektronenübergangsreaktion benennen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32215"
+  },
+  {
+    "id": 20,
+    "name": "Ein Reduktionsmittel als Elektronendonator benennen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32215"
+  },
+  {
+    "id": 21,
+    "name": "Ein Oxidationsmittel als Elektronenakzeptor benennen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32215"
+  },
+  {
+    "id": 22,
+    "name": "Einen Versuch beschreiben, mit dem man eine Eigenschaft von Salzen untersuchen kann",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32131"
+  },
+  {
+    "id": 23,
+    "name": "Die Edelgasregel (Oktettregel) beschreiben",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32127"
+  },
+  {
+    "id": 24,
+    "name": "Mithilfe der Edelgasregel das Schalenmodell geladener Atome (Ionen) von Hauptgruppenelementen aufstellen",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32127"
+  },
+  {
+    "id": 25,
+    "name": "Die Ladung eines Ions mithilfe der Edelgasregel erklären.",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32127"
+  },
+  {
+    "id": 26,
+    "name": "Die Definition von Kationen und Anionen nennen",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "1"
+  },
+  {
+    "id": 27,
+    "name": "Die Benennung von Kationen erläutern (Metalle)",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32127"
+  },
+  {
+    "id": 28,
+    "name": "Die Benennung von Anionen erläutern (Oxide und Halogenide)",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32127"
+  },
+  {
+    "id": 29,
+    "name": "Atome und Ionen von Hauptgruppenelementen mithilfe der Lewisformel darstellen",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "1"
+  },
+  {
+    "id": 30,
+    "name": "Mithilfe eines geeigneten Modells (Schalenmodell, Lewis-Formel, Energiestufenmodell) die Bildung eines Salzes aus einem Alkalimetall und einem Halogen erläutern.",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32131"
+  },
+  {
+    "id": 31,
+    "name": "Die Bildung eines Salzes in einem Energiediagramm beschreiben",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "1"
+  },
+  {
+    "id": 32,
+    "name": "Mithilfe der Edelgasregel die Ladungen der Ionen eines Salzes aus der Angabe einer Verhältnisformel (z.B. NaCl, CaCl2usw.) ermitteln",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "ZusatzKompetenz für Nebengruppensalze",
+    "bp_nummer": "32224"
+  },
+  {
+    "id": 33,
+    "name": "Einen Nachweis für Halogenid-Ionen beschreiben",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32216"
+  },
+  {
+    "id": 34,
+    "name": "Erklären, wie Ionen eines Salzes im Feststoff angeordnet sind",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32131"
+  },
+  {
+    "id": 35,
+    "name": "Die Verhältnisformel eines Salzes aus den Ladungen seiner Ionen ermitteln",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32225"
+  },
+  {
+    "id": 36,
+    "name": "Die Verhältnisformel eines Salzes aus seinem Namen ermitteln",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32225"
+  },
+  {
+    "id": 37,
+    "name": "Die Ladungen der Ionen aus dem Namen eines Salzes ermitteln",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32225"
+  },
+  {
+    "id": 38,
+    "name": "Salze anhand ihrer Verhältnisformel benennen",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "1"
+  },
+  {
+    "id": 39,
+    "name": "Salze anhand ihrer Ionen benennen",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "1"
+  },
+  {
+    "id": 40,
+    "name": "Erklären, warum Salze spröde sind",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32131"
+  },
+  {
+    "id": 41,
+    "name": "Erklären, warum Salze so hohe Schmelztemperaturen haben",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32131"
+  },
+  {
+    "id": 42,
+    "name": "Begründen, warum manche Salze schlechter wasserlöslich sind als andere",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "1"
+  },
+  {
+    "id": 43,
+    "name": "Salzen aufgrund ihrer Stoffeigenschaften die richtigen Stoffteilchen (Verhältnisformeln) und Bindungstypen (Ionenbindung) zuordnen aufgrund ihrer Stoffeigenschaften Stoffteilchen und Bindungstypen zuordnen",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "32137"
+  },
+  {
+    "id": 44,
+    "name": "Begründen, warum Salze  als Feststoff keinen Strom leiten, aber in Wasser gelöst und geschmolzen dagegen schon",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "321212"
+  },
+  {
+    "id": 45,
+    "name": "Die Teilgleichungen für Oxidation und Reduktion bei der Synthese eines Salzes aufstellen und daraus die Gesamtgleichung aufstellen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32215"
+  },
+  {
+    "id": 46,
+    "name": "Mithilfe von Ionenradien und Ionenladung die unterschiedlichen Schmelztemperaturen von verschiedenen Salzen begründen",
+    "typ": "einfach",
+    "thema": 2,
+    "anmerkungen": "",
+    "bp_nummer": "321311"
+  },
+  {
+    "id": 47,
+    "name": "Begründen, warum man an einer Redoxreaktion das Donator-Akzeptor-Prinzip deutlich machen kann",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32215"
+  },
+  {
+    "id": 48,
+    "name": "Eigenschaften der Alkalimetalle nennen (u.a. Natrium)",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32112"
+  },
+  {
+    "id": 49,
+    "name": "flüchtigen Stoffen aufgrund ihrer Stoffeigenschaften die richtigen Stoffteilchen (einzelne Atome oder Moleküle) und Bindungstypen (Elektronenpaarbindung) zuordnen",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32137"
+  },
+  {
+    "id": 50,
+    "name": "Atome und Moleküle mithilfe der Lewis-Schreibweise darstellen",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32133"
+  },
+  {
+    "id": 51,
+    "name": "Die Definition eines bindenden Elektronenpaars nennen",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32133"
+  },
+  {
+    "id": 52,
+    "name": "Die Definition eines nicht-bindenden Elektronenpaars nennen",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32133"
+  },
+  {
+    "id": 53,
+    "name": "Beispiele für Moleküle mit Einfach- und Mehrfachbindungen nennen",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32133"
+  },
+  {
+    "id": 54,
+    "name": "Die Definition der Elektronegativität nennen",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32134"
+  },
+  {
+    "id": 55,
+    "name": "Strukturformeln (Lewis-Formeln) von Molekülen mithilfe der Edelgasregel erläutern",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32133"
+  },
+  {
+    "id": 56,
+    "name": "Die Bindungswinkel im CH4-Molekül, im NH3-Molekül, im CO2-Molekül und im H2O-Molekül erklären",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32135"
+  },
+  {
+    "id": 57,
+    "name": "Erklären, was man unter einer polaren Elektronenpaarbindung versteht.",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32134"
+  },
+  {
+    "id": 58,
+    "name": "erklären, wie Teilladungen/Partialladungen in einem Molekül zustande kommen.",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": ""
+  },
+  {
+    "id": 59,
+    "name": "beschreiben, was Teilladungen/Partialladungen in einem Molekül sind.",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32134"
+  },
+  {
+    "id": 60,
+    "name": "anhand der Strukturformel erläutern, ob ein Molekül ein Dipol-Molekül ist oder nicht.",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32136"
+  },
+  {
+    "id": 61,
+    "name": "zwischenmolekulare Wechselwirkungen erklären (Wechselwirkungen zwischen temporären Dipolen, Wechselwirkungen zwischen permanenten Dipolen, Wasserstoffbrücken)",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32138"
+  },
+  {
+    "id": 62,
+    "name": "zwei Typen von zwischenmolekularen Kräften beschreiben und vergleichen.",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32138"
+  },
+  {
+    "id": 63,
+    "name": "Den Zusammenhang zwischen zwischenmolekularen Wechselwirkungen und der Siedetemperatur erläuterrn",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "1"
+  },
+  {
+    "id": 64,
+    "name": "den Lösungsvorgang von Salzen in Wasser im Teilchenmodell beschreiben",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "321212"
+  },
+  {
+    "id": 65,
+    "name": "begründen, weshalb ein Wasserstrahl von einem elektrisch geladenen Stab abgelenkt wird.",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "32138"
+  },
+  {
+    "id": 66,
+    "name": "Den Satz von Avogadro beschreiben",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "1"
+  },
+  {
+    "id": 67,
+    "name": "Erklären, warum man bei Gasen direkt vom Volumen direkt Teilchenanzahl schließen kann (unabhängig vom Stoff)",
+    "typ": "einfach",
+    "thema": 3,
+    "anmerkungen": "",
+    "bp_nummer": "1"
+  },
+  {
+    "id": 68,
+    "name": "Metallen aufgrund ihrer Stoffeigenschaften die richtigen Stoffteilchen (Atome im Gitter) und Bindungstypen (Metallbindung) zuordnen",
+    "typ": "einfach",
+    "thema": 4,
+    "anmerkungen": "",
+    "bp_nummer": "32137"
+  },
+  {
+    "id": 69,
+    "name": "Die Metallbindung erklären",
+    "typ": "einfach",
+    "thema": 4,
+    "anmerkungen": "",
+    "bp_nummer": "32132"
+  },
+  {
+    "id": 70,
+    "name": "elektrische Leitfähigkeit als typische Eigenschaft von Metallen begründen",
+    "typ": "einfach",
+    "thema": 4,
+    "anmerkungen": "",
+    "bp_nummer": "32132"
+  },
+  {
+    "id": 71,
+    "name": "Duktilität (Verformbarkeit) als typische Eigenschaft von Metallen begründen",
+    "typ": "einfach",
+    "thema": 4,
+    "anmerkungen": "",
+    "bp_nummer": "32132"
+  },
+  {
+    "id": 72,
+    "name": "Mithilfe geeigneter Darstellungen begründen, wie Metallatome in Metallen die Edelgasregel erfüllen",
+    "typ": "einfach",
+    "thema": 4,
+    "anmerkungen": "",
+    "bp_nummer": "32132"
+  },
+  {
+    "id": 73,
+    "name": "Die bei einer Elektrolyse ablaufenden chemischen Prozesse erklären",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32234"
+  },
+  {
+    "id": 74,
+    "name": "Beschreiben, wie ein chemischer Energiespeicher (Batterie) funktioniert",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32234"
+  },
+  {
+    "id": 75,
+    "name": "Die Teilchen nennen, die für die alkalischen Eigenschaften einer Lösung verantwortlich sind",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32128"
+  },
+  {
+    "id": 76,
+    "name": "Die Teilchen nennen, die für die sauren Eigenschaften einer sauren Lösung verantwortlich sind",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32128"
+  },
+  {
+    "id": 77,
+    "name": "pH-Werte von 0-14 dem Begriffen sauer, neutral und alkalisch zuordnen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32118"
+  },
+  {
+    "id": 78,
+    "name": "Die Lewis-Formeln der Molekülionen Ammonium-Ion, Hydroxid-Ion und Oxonium-Ion darstellen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32133"
+  },
+  {
+    "id": 79,
+    "name": "Beschreiben, was man unter einer Säure-Base-Reaktion versteht",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32215"
+  },
+  {
+    "id": 80,
+    "name": "Die Reaktion zwischen einer Säure und einer Lauge benennen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32215"
+  },
+  {
+    "id": 81,
+    "name": "Einen Versuch beschreiben, mit dem man zeigen kann, dass Hydroxid-Ionen in wässriger Lösung für alkalische Eigenschaften verantwortlich sind",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32216"
+  },
+  {
+    "id": 82,
+    "name": "Erklären, warum alkalische Lösungen elektrisch leitfähig sind",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32118"
+  },
+  {
+    "id": 83,
+    "name": "Die Formalladung von Atomen in Molekülen ermitteln",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32133"
+  },
+  {
+    "id": 84,
+    "name": "Mithilfe von Formalladungen ermitteln, ob ein Molekül geladen ist (Molekül-Ion) oder nicht (neutrales Molekül)",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32133"
+  },
+  {
+    "id": 85,
+    "name": "Protononenübergangsreaktionen von Wasser mit Ammoniak und Chlorwasserstoff aufstellen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32223"
+  },
+  {
+    "id": 86,
+    "name": "Die Reaktionsgleichung einer Neutralisationsreaktionen aufstellen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32223"
+  },
+  {
+    "id": 87,
+    "name": "Mithilfe des Stoffteilchens einem Stoff typische Eigenschaften (wie Schmelz- und Siedetemperaturen oder Löslichkeiten) zuordnen und die Zuordnung begründen",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32122"
+  },
+  {
+    "id": 88,
+    "name": "Die Strukturformel komplexer Teilchen darstellen, die aus Molekülionen aufgebaut sind.",
+    "typ": "einfach",
+    "thema": 5,
+    "anmerkungen": "",
+    "bp_nummer": "32133"
+  },
+  {
+    "id": 89,
+    "name": "aus Einzelerkenntnissen Regeln ableiten und deren Gültigkeit überprüfen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "218",
+    "moeglichkeiten": [
+      "Protokoll Alkalimetalle"
+    ]
+  },
+  {
+    "id": 90,
+    "name": "Modellvorstellungen nachvollziehen und einfache Modelle entwickeln",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "219",
+    "moeglichkeiten": [
+      "Stopp-Motion-Video Salze auflösen",
+      "Stopp-Motion-Video Elektrostatik"
+    ]
+  },
+  {
+    "id": 91,
+    "name": "Modelle und Simulationen nutzen, um sich naturwissenschaftliche Sachverhalte zu erschließen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "2110",
+    "moeglichkeiten": [
+      "Stopp-Motion-Video Salze auflösen",
+      "Stopp-Motion-Video Elektrostatik"
+    ]
+  },
+  {
+    "id": 92,
+    "name": "die Grenzen von Modellen aufzeigen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "2111",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 93,
+    "name": "quantitative Betrachtungen und Berechnungen zur Deutung und Vorhersage chemischer Phänomene einsetzen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "2112",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 94,
+    "name": "in unterschiedlichen analogen und digitalen Medien zu chemischen Sachverhalten und in diesem Zusammenhang gegebenenfalls zu bedeutenden Forscherpersönlichkeiten recherchieren",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "221",
+    "moeglichkeiten": [
+      "ChatGPT Text zu Batterie-Bau"
+    ]
+  },
+  {
+    "id": 95,
+    "name": "Informationen themenbezogen und aussagekräftig auswählen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "222",
+    "moeglichkeiten": [
+      "Concept-Map"
+    ]
+  },
+  {
+    "id": 96,
+    "name": "Informationen in Form von Tabellen, Diagrammen, Bildern und Texten darstellen und Darstellungsformen ineinander überführen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "223",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 97,
+    "name": "chemische Sachverhalte unter Verwendung der Fachsprache und gegebenenfalls mithilfe von Modellen und Darstellungen beschreiben, veranschaulichen oder erklären",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "Zusammenhang Tabelle Ionisierungsenergien",
+    "bp_nummer": "224",
+    "moeglichkeiten": [
+      "Protokoll AlBr3"
+    ]
+  },
+  {
+    "id": 98,
+    "name": "fachlich korrekt und folgerichtig argumentieren",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "225",
+    "moeglichkeiten": [
+      "Protokolle",
+      "Erklärvideos"
+    ]
+  },
+  {
+    "id": 99,
+    "name": "Zusammenhänge zwischen Alltagserscheinungen und chemischen Sachverhalten herstellen und dabei Alltagssprache bewusst in Fachsprache übersetzen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "226",
+    "moeglichkeiten": [
+      "Protokoll Eigenschaften von Salzen"
+    ]
+  },
+  {
+    "id": 100,
+    "name": "den Verlauf und die Ergebnisse ihrer Arbeit dokumentieren sowie adressatenbezogen präsentieren",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "227",
+    "moeglichkeiten": [
+      "Protokolle",
+      "Präsentation Videos",
+      "Präsentation Aufgaben"
+    ]
+  },
+  {
+    "id": 101,
+    "name": "die Bedeutung der Wissenschaft Chemie und der chemischen Industrie, auch im Zusammenhang mit dem Besuch eines außerschulischen Lernorts, für eine nachhaltige Entwicklung exemplarisch darstellen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "228",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 102,
+    "name": "ihren Standpunkt in Diskussionen zu chemischen Themen fachlich begründet vertreten",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "229",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 103,
+    "name": "als Team ihre Arbeit planen, strukturieren, reflektieren und präsentieren",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "2210",
+    "moeglichkeiten": [
+      "Vertonung Erklärvideo",
+      "Erstellen Stopp-Motion-Video",
+      "Batterie-Bau"
+    ]
+  },
+  {
+    "id": 104,
+    "name": "in lebensweltbezogenen Ereignissen chemische Sachverhalte erkennen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "231",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 105,
+    "name": "Bezüge zu anderen Unterrichtsfächern aufzeigen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "232",
+    "moeglichkeiten": [
+      "Atombau"
+    ]
+  },
+  {
+    "id": 106,
+    "name": "die Wirksamkeit von Lösungsstrategien bewerten",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "233",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 107,
+    "name": "die Richtigkeit naturwissenschaftlicher Aussagen einschätzen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "234",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 108,
+    "name": "die Aussagekraft von Darstellungen in Medien bewerten",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "235",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 109,
+    "name": "Verknüpfungen zwischen persönlich oder gesellschaftlich relevanten Themen und Erkenntnissen der Chemie herstellen, aus unterschiedlichen Perspektiven diskutieren und bewerten",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "236",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 110,
+    "name": "fachtypische und vernetzte Kenntnisse und Fertigkeiten nutzen und sich dadurch lebenspraktisch bedeutsame Zusammenhänge erschließen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "237",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 111,
+    "name": "Anwendungsbereiche oder Berufsfelder darstellen, in denen chemische Kenntnisse bedeutsam sind",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "238",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 112,
+    "name": "ihr eigenes Handeln unter dem Aspekt der Nachhaltigkeit einschätzen",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "239",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 113,
+    "name": "Pro- und Kontra-Argumente unter Berücksichtigung ökologischer und ökonomischer Aspekte vergleichen und bewerten",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "2310",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 114,
+    "name": "ihr Fachwissen zur Beurteilung von Risiken und Sicherheitsmaßnahmen anwenden",
+    "typ": "niveau",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "2311",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 115,
+    "typ": "niveau",
+    "name": "Vergleichen als naturwissenschaftliche Methode nutzen",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "217",
+    "moeglichkeiten": [
+      "Protokoll Alkalimetalle",
+      "Protokoll Flammenfärbung",
+      "Protokoll Halogenid-Nachweis"
+    ]
+  },
+  {
+    "id": 116,
+    "typ": "niveau",
+    "name": "zu Ordnung und Sauberkeit der Arbeitsumgebung beitragen",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "215",
+    "moeglichkeiten": [
+      "Praktikum"
+    ]
+  },
+  {
+    "id": 117,
+    "typ": "niveau",
+    "name": "Laborgeräte sachgerecht einsetzen",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "216",
+    "moeglichkeiten": [
+      "Praktikum"
+    ]
+  },
+  {
+    "id": 118,
+    "typ": "niveau",
+    "name": "chemische Phänomene erkennen, beobachten und beschreiben",
+    "thema": null,
+    "anmerkungen": "Inhalt Beobachtung",
+    "bp_nummer": "211",
+    "moeglichkeiten": [
+      "Protokoll Alkalimetalle",
+      "Protokoll Flammenfärbung",
+      "Protokoll Halogenid-Nachweis"
+    ]
+  },
+  {
+    "id": 119,
+    "typ": "niveau",
+    "name": "Fragestellungen, gegebenenfalls mit Hilfsmitteln, erschließen",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "212",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 120,
+    "typ": "niveau",
+    "name": "Hypothesen bilden",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "213",
+    "moeglichkeiten": []
+  },
+  {
+    "id": 121,
+    "typ": "niveau",
+    "name": "Experimente zur Überprüfung von Hypothesen planen",
+    "thema": null,
+    "anmerkungen": "",
+    "bp_nummer": "214",
+    "moeglichkeiten": []
+  }
+]

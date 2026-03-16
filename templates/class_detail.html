@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Klasse{% endblock %}
+{% block content %}
+<h1>Schülerinnen &amp; Schüler</h1>
+<a href="/teacher">&larr; Zurück</a>
+
+{% if members %}
+<ul class="student-list">
+  {% for m in members %}
+  <li>
+    <a href="/teacher/student/{{ m.id }}?class_id={{ class_id }}&student_name={{ m.displayName }}">{{ m.displayName }}</a>
+    <span class="muted">{{ m.userPrincipalName }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Keine Mitglieder gefunden.</p>
+{% endif %}
+{% endblock %}

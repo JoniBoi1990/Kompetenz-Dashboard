@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}{{ student_name or "Schüler" }}{% endblock %}
+{% block content %}
+<a href="/teacher/class/{{ class_id }}">&larr; Zurück zur Klasse</a>
+
+<h1>{{ student_name or student_id }}</h1>
+
+{% if grade %}
+<section class="grade-card">
+  <h2>Note</h2>
+  <div class="grade-big">{{ grade.note }}</div>
+  <p>{{ grade.gesamtpunkte }} / {{ grade.max_punkte }} Punkte ({{ grade.prozent }} %)</p>
+</section>
+{% endif %}
+
+<div class="two-columns">
+
+  {# --- Einfache Kompetenzen --- #}
+  <div>
+    <h2>Einfache Kompetenzen</h2>
+    <table class="kompetenz-table">
+      <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Erreicht</th></tr></thead>
+      <tbody>
+        {% set ns = namespace(last_thema=None) %}
+        {% for k in einfach_kompetenzen %}
+        {% set r = einfach_map.get(k.id) %}
+        {% if k.thema != ns.last_thema %}
+        {% set ns.last_thema = k.thema %}
+        <tr class="thema-header">
+          <td colspan="3">
+            Thema {{ k.thema or "–" }}
+            <button type="button" class="btn-thema" onclick="setThema({{ k.thema or 0 }}, true)">Alle</button>
+            <button type="button" class="btn-thema" onclick="setThema({{ k.thema or 0 }}, false)">Keine</button>
+          </td>
+        </tr>
+        {% endif %}
+        <tr class="{% if active_ids and k.id in active_ids %}comp-covered{% elif active_ids %}comp-not-covered{% endif %}" data-thema="{{ k.thema or 0 }}">
+          <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
+          <td>{{ k.name }}</td>
+          <td class="center">
+            <form action="/records/update" method="post" class="inline-form">
+              <input type="hidden" name="student_id" value="{{ student_id }}">
+              <input type="hidden" name="student_name" value="{{ student_name }}">
+              <input type="hidden" name="competency_id" value="{{ k.id }}">
+              <input type="hidden" name="class_id" value="{{ class_id }}">
+              <input type="checkbox" name="achieved" value="1"
+                {% if r and r.achieved %}checked{% endif %}>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# --- Niveau-Kompetenzen --- #}
+  <div>
+    <h2>Niveau-Kompetenzen</h2>
+    <table class="kompetenz-table">
+      <thead>
+        <tr>
+          <th style="width:2.5rem">#</th>
+          <th>Name</th>
+          <th>Aktuell</th>
+          <th>Nachweis hinzufügen</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for k in niveau_kompetenzen %}
+        {% set best = best_nachweis_by_comp.get(k.id) %}
+        {% set best_niveau = best.niveau_level if best else 0 %}
+        {% set entries = nachweise_by_comp.get(k.id, []) %}
+        <tr class="{% if active_ids and k.id in active_ids %}comp-covered{% elif active_ids %}comp-not-covered{% endif %}">
+          <td class="muted" style="font-size:.8rem;vertical-align:top;padding-top:.5rem">{{ k.id }}</td>
+          {# Name + Chronik #}
+          <td>
+            <details>
+              <summary class="comp-name">{{ k.name }}</summary>
+              {% if entries %}
+              <table class="chronik-table">
+                <thead><tr><th>Datum</th><th>Niveau</th><th>Nachweis</th><th>von</th></tr></thead>
+                <tbody>
+                  {% for n in entries %}
+                  <tr>
+                    <td>{{ n.updated_at[:10] if n.updated_at else "–" }}</td>
+                    <td><span class="niveau-badge niveau-{{ n.niveau_level }}">{{ NIVEAU_LABELS[n.niveau_level] }}</span></td>
+                    <td>
+                      {% if n.evidence_url %}
+                      <a href="{{ n.evidence_url }}" target="_blank" rel="noopener">
+                        {{ n.evidence_name or "Link" }}
+                      </a>
+                      {% else %}–{% endif %}
+                    </td>
+                    <td class="muted">{{ n.updated_by }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% else %}
+              <p class="muted" style="padding:.4rem 0">Noch kein Nachweis hinterlegt.</p>
+              {% endif %}
+            </details>
+          </td>
+
+          {# Bestes Niveau #}
+          <td>
+            {% if best_niveau > 0 %}
+            <span class="niveau-badge niveau-{{ best_niveau }}">{{ NIVEAU_LABELS[best_niveau] }}</span>
+            {% else %}
+            <span class="muted">–</span>
+            {% endif %}
+          </td>
+
+          {# Formular: Nachweis hinzufügen #}
+          <td>
+            <details class="nachweis-toggle">
+              <summary>+ Nachweis</summary>
+              <form action="/records/nachweis" method="post" class="nachweis-form">
+                <input type="hidden" name="student_id" value="{{ student_id }}">
+                <input type="hidden" name="student_name" value="{{ student_name }}">
+                <input type="hidden" name="competency_id" value="{{ k.id }}">
+                <input type="hidden" name="class_id" value="{{ class_id }}">
+                <label class="nachweis-label">
+                  Niveau
+                  <select name="niveau_level" class="nachweis-select">
+                    {% for lvl in [1, 2, 3] %}
+                    <option value="{{ lvl }}">{{ NIVEAU_LABELS[lvl] }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <label class="nachweis-label">
+                  Link / URL
+                  <input type="text" name="evidence_url" placeholder="https://…" class="nachweis-input">
+                </label>
+                <label class="nachweis-label">
+                  Bezeichnung
+                  <input type="text" name="evidence_name" placeholder="z. B. OneNote-Seite" class="nachweis-input">
+                </label>
+                <button type="submit" class="btn-primary" style="margin-top:.4rem">Speichern</button>
+              </form>
+            </details>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+function saveCheckbox(cb) {
+  const form = cb.closest('form');
+  const data = new FormData(form);
+  if (!cb.checked) data.delete('achieved');
+  const row = cb.closest('tr');
+  return fetch('/records/update', { method: 'POST', body: data, redirect: 'follow' })
+    .then(() => {
+      row.style.transition = 'background 0.4s';
+      row.style.background = '#dff6dd';
+      setTimeout(() => { row.style.background = ''; row.style.transition = ''; }, 700);
+    })
+    .catch(() => {
+      cb.checked = !cb.checked;
+      row.style.background = '#fde7e9';
+      setTimeout(() => { row.style.background = ''; }, 700);
+    });
+}
+
+// Single checkbox toggle
+document.querySelectorAll('.inline-form input[type=checkbox]').forEach(cb => {
+  cb.addEventListener('change', function () { saveCheckbox(this); });
+});
+
+// Bulk set all checkboxes in a thema group
+function setThema(thema, state) {
+  document.querySelectorAll(`tr[data-thema="${thema}"] .inline-form input[type=checkbox]`)
+    .forEach(cb => {
+      if (cb.checked !== state) {
+        cb.checked = state;
+        saveCheckbox(cb);
+      }
+    });
+}
+</script>
+{% endblock %}

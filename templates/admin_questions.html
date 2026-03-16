@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Fragen bearbeiten{% endblock %}
+{% block content %}
+<h1>Fragen bearbeiten</h1>
+<p class="muted" style="margin-bottom:1rem;">
+  Pro einfacher Kompetenz können mehrere Fragenvarianten gepflegt werden.
+  Im Testgenerator wird zufällig eine ausgewählt (Dropdown zum Tauschen).
+  <a href="/admin/upload">&larr; Zurück zur Übersicht</a>
+</p>
+
+{% set ns = namespace(last_thema=None) %}
+{% for k in einfach_kompetenzen %}
+{% set qs = questions.get(k.id | string, []) %}
+{% if k.thema != ns.last_thema %}
+{% set ns.last_thema = k.thema %}
+<h2 style="margin-top:1.5rem">Thema {{ k.thema or "–" }}</h2>
+{% endif %}
+
+<details id="{{ k.id }}" style="margin-bottom:.5rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);">
+  <summary style="padding:.5rem .75rem;cursor:pointer;font-size:.875rem;display:flex;gap:.75rem;align-items:center;">
+    <strong>#{{ k.id }}</strong>
+    <span>{{ k.name }}</span>
+    <span class="badge-count">{{ qs | length }} Frage{{ 'n' if qs | length != 1 else '' }}</span>
+  </summary>
+  <div style="padding:.5rem .75rem .75rem;">
+
+    {# Existing questions #}
+    {% if qs %}
+    <table class="kompetenz-table" style="margin-bottom:.5rem;">
+      <thead><tr><th>Frage</th><th style="width:5rem">Aktion</th></tr></thead>
+      <tbody>
+        {% for q in qs %}
+        <tr>
+          <td style="font-size:.875rem">{{ q }}</td>
+          <td>
+            <form action="/admin/questions/delete" method="post" class="inline-form">
+              <input type="hidden" name="comp_id" value="{{ k.id }}">
+              <input type="hidden" name="index" value="{{ loop.index0 }}">
+              <button type="submit" class="btn-sm" style="color:#c00;"
+                onclick="return confirm('Frage löschen?')">Löschen</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="muted" style="font-size:.85rem;margin-bottom:.5rem;">Noch keine Fragen — Kompetenzname wird als Fallback verwendet.</p>
+    {% endif %}
+
+    {# Add new question #}
+    <form action="/admin/questions/add" method="post" style="display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap;">
+      <input type="hidden" name="comp_id" value="{{ k.id }}">
+      <label style="flex:1;min-width:200px;font-size:.8rem;display:flex;flex-direction:column;gap:.2rem;">
+        Neue Frage
+        <input type="text" name="text" placeholder="Frage eingeben …"
+          style="padding:.3rem .5rem;border:1px solid var(--border);border-radius:var(--radius);font-size:.85rem;">
+      </label>
+      <button type="submit" class="btn-primary" style="margin-top:0;padding:.3rem .8rem;">Hinzufügen</button>
+    </form>
+
+  </div>
+</details>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Kompetenzen bearbeiten{% endblock %}
+{% block content %}
+<h1>Kompetenzen bearbeiten</h1>
+<p class="muted" style="margin-bottom:1rem;">
+  Typ, Thema, Name und Anmerkungen können hier geändert werden.
+  <a href="/admin/upload">&larr; Zurück zur Übersicht</a>
+</p>
+
+{# Main save form — wraps both tables #}
+<form id="save-form" action="/admin/kompetenzen/save" method="post">
+  <div style="margin-bottom:.75rem;">
+    <button type="submit" class="btn-primary" style="margin-top:0">Alle Änderungen speichern</button>
+  </div>
+
+  {# ---- Einfache Kompetenzen ---- #}
+  <h2 id="einfach">Einfache Kompetenzen ({{ einfach_kompetenzen | length }})</h2>
+  <table class="kompetenz-table" style="margin-bottom:.5rem;">
+    <thead>
+      <tr>
+        <th style="width:3rem">#</th>
+        <th style="width:7rem">Typ</th>
+        <th style="width:5rem">Thema</th>
+        <th>Name</th>
+        <th style="width:22%">Anmerkungen</th>
+        <th style="width:2.5rem"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set ns = namespace(last_thema=None) %}
+      {% for k in einfach_kompetenzen %}
+      {% if k.thema != ns.last_thema %}
+      {% set ns.last_thema = k.thema %}
+      <tr class="thema-header"><td colspan="6">Thema {{ k.thema or "–" }}</td></tr>
+      {% endif %}
+      <tr>
+        <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
+        <td>
+          <select name="typ_{{ k.id }}" style="width:100%">
+            <option value="einfach" selected>einfach</option>
+            <option value="niveau">niveau</option>
+          </select>
+        </td>
+        <td>
+          <select name="thema_{{ k.id }}" style="width:100%">
+            <option value="">–</option>
+            {% for t in range(1, 11) %}
+            <option value="{{ t }}" {% if k.thema == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td>
+          <input type="text" name="name_{{ k.id }}" value="{{ k.name }}"
+            style="width:100%;padding:0.2rem 0.4rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.85rem">
+        </td>
+        <td>
+          <input type="text" name="anmerkungen_{{ k.id }}" value="{{ k.anmerkungen or '' }}"
+            style="width:100%;padding:0.2rem 0.4rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.85rem">
+        </td>
+        <td class="center">
+          {# Delete button references an external micro-form via HTML5 form= attribute #}
+          <button type="submit" form="del-{{ k.id }}" class="btn-del"
+            onclick="return confirm('Kompetenz {{ k.id }} löschen?')" title="Löschen">✕</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {# ---- Niveau-Kompetenzen ---- #}
+  <h2 id="niveau" style="margin-top:1.5rem">Niveau-Kompetenzen ({{ niveau_kompetenzen | length }})</h2>
+  <table class="kompetenz-table" style="margin-bottom:.5rem;">
+    <thead>
+      <tr>
+        <th style="width:3rem">#</th>
+        <th style="width:7rem">Typ</th>
+        <th>Name</th>
+        <th style="width:18%">Anmerkungen / Hinweise</th>
+        <th style="width:24%">Möglichkeiten (Nachweis-Beispiele)</th>
+        <th style="width:2.5rem"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for k in niveau_kompetenzen %}
+      {% set m = k.moeglichkeiten if k.moeglichkeiten else [] %}
+      <tr>
+        <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
+        <td>
+          <select name="typ_{{ k.id }}" style="width:100%">
+            <option value="einfach">einfach</option>
+            <option value="niveau" selected>niveau</option>
+          </select>
+        </td>
+        <td>
+          <input type="text" name="name_{{ k.id }}" value="{{ k.name }}"
+            style="width:100%;padding:0.2rem 0.4rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.85rem">
+        </td>
+        <td>
+          <input type="text" name="anmerkungen_{{ k.id }}" value="{{ k.anmerkungen or '' }}"
+            style="width:100%;padding:0.2rem 0.4rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.85rem">
+        </td>
+        <td>
+          <input type="text" name="moeg1_{{ k.id }}" value="{{ m[0] if m | length > 0 else '' }}"
+            placeholder="Möglichkeit 1"
+            style="width:100%;padding:0.2rem 0.4rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.82rem;margin-bottom:2px">
+          <input type="text" name="moeg2_{{ k.id }}" value="{{ m[1] if m | length > 1 else '' }}"
+            placeholder="Möglichkeit 2"
+            style="width:100%;padding:0.2rem 0.4rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.82rem;margin-bottom:2px">
+          <input type="text" name="moeg3_{{ k.id }}" value="{{ m[2] if m | length > 2 else '' }}"
+            placeholder="Möglichkeit 3"
+            style="width:100%;padding:0.2rem 0.4rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.82rem">
+        </td>
+        <td class="center">
+          <button type="submit" form="del-{{ k.id }}" class="btn-del"
+            onclick="return confirm('Kompetenz {{ k.id }} löschen?')" title="Löschen">✕</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div style="margin-top:.75rem;">
+    <button type="submit" class="btn-primary">Alle Änderungen speichern</button>
+  </div>
+</form>
+
+{# ---- Delete micro-forms (one per competency, referenced via form= attribute) ---- #}
+{% for k in einfach_kompetenzen %}
+<form id="del-{{ k.id }}" action="/admin/kompetenzen/delete" method="post" style="display:none">
+  <input type="hidden" name="comp_id" value="{{ k.id }}">
+</form>
+{% endfor %}
+{% for k in niveau_kompetenzen %}
+<form id="del-{{ k.id }}" action="/admin/kompetenzen/delete" method="post" style="display:none">
+  <input type="hidden" name="comp_id" value="{{ k.id }}">
+</form>
+{% endfor %}
+
+{# ---- Add forms ---- #}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem;">
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;">
+    <h3 style="margin:0 0 .75rem">Einfache Kompetenz hinzufügen</h3>
+    <form action="/admin/kompetenzen/add" method="post">
+      <input type="hidden" name="typ" value="einfach">
+      <div class="form-row" style="align-items:flex-end;gap:.5rem;">
+        <label style="flex:1;min-width:0">Name
+          <input type="text" name="name" required placeholder="Kompetenztext …"
+            style="width:100%;padding:0.3rem 0.5rem;border:1px solid var(--border);border-radius:var(--radius);font-size:.875rem">
+        </label>
+        <label style="width:4.5rem">Thema
+          <select name="thema" style="width:100%">
+            <option value="">–</option>
+            {% for t in range(1, 11) %}
+            <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button type="submit" class="btn-primary" style="margin-top:0;white-space:nowrap">+ Hinzufügen</button>
+      </div>
+    </form>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;">
+    <h3 style="margin:0 0 .75rem">Niveau-Kompetenz hinzufügen</h3>
+    <form action="/admin/kompetenzen/add" method="post">
+      <input type="hidden" name="typ" value="niveau">
+      <div class="form-row" style="align-items:flex-end;gap:.5rem;">
+        <label style="flex:1;min-width:0">Name
+          <input type="text" name="name" required placeholder="Kompetenztext …"
+            style="width:100%;padding:0.3rem 0.5rem;border:1px solid var(--border);border-radius:var(--radius);font-size:.875rem">
+        </label>
+        <button type="submit" class="btn-primary" style="margin-top:0;white-space:nowrap">+ Hinzufügen</button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

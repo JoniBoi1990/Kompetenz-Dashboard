@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Terminbuchung{% endblock %}
+{% block content %}
+<h1>Terminbuchung</h1>
+
+{% if bookings_page_url %}
+<p style="margin-bottom:1.25rem;color:var(--muted);font-size:.9rem">
+  Microsoft Bookings lässt sich nicht direkt einbetten. Die Seite öffnet sich in einem neuen Tab.
+</p>
+<a href="{{ bookings_page_url }}" target="_blank" rel="noopener" class="btn-primary"
+   style="display:inline-block;text-decoration:none;">
+  Terminbuchung öffnen &rarr;
+</a>
+{% else %}
+<p>Keine Buchungsseite konfiguriert. Bitte <code>BOOKINGS_PAGE_URL</code> in der <code>.env</code>-Datei setzen.</p>
+{% endif %}
+{% endblock %}

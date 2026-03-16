@@ -1,0 +1,117 @@
+version: "3.9"
+
+services:
+  traefik:
+    image: traefik:v3.0
+    command:
+      - "--configFile=/etc/traefik/traefik.yml"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "./traefik/acme.json:/acme.json"
+    networks:
+      - public
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN}`) && !PathPrefix(`/api`) && !PathPrefix(`/auth`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+    networks:
+      - public
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:${POSTGRES_PASSWORD}@postgres:5432/kompetenz
+      - REDIS_URL=redis://redis:6379/0
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - DOMAIN=${DOMAIN}
+      - PDF_WORKER_URL=http://pdf-worker:8001
+      - PDF_STORAGE_PATH=/pdfs
+      - USE_BOOKINGS_API=${USE_BOOKINGS_API:-false}
+      - BOOKINGS_BUSINESS_ID=${BOOKINGS_BUSINESS_ID:-}
+    volumes:
+      - pdf_storage:/pdfs
+    depends_on:
+      - postgres
+      - redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`${DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/auth`))"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.api.loadbalancer.server.port=8000"
+    networks:
+      - public
+      - internal
+    restart: unless-stopped
+
+  pdf-worker:
+    build: ./pdf-worker
+    volumes:
+      - ./pdf-worker/static:/app/static:ro
+    networks:
+      - internal
+    restart: unless-stopped
+    # NOT exposed to public network
+
+  celery-worker:
+    build: ./api
+    command: celery -A celery_app worker --loglevel=info --concurrency=2
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:${POSTGRES_PASSWORD}@postgres:5432/kompetenz
+      - REDIS_URL=redis://redis:6379/0
+      - PDF_WORKER_URL=http://pdf-worker:8001
+      - PDF_STORAGE_PATH=/pdfs
+    volumes:
+      - pdf_storage:/pdfs
+    depends_on:
+      - postgres
+      - redis
+      - pdf-worker
+    networks:
+      - internal
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=kompetenz
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    restart: unless-stopped
+
+networks:
+  public:
+    driver: bridge
+  internal:
+    driver: bridge
+    internal: true
+
+volumes:
+  postgres_data:
+  redis_data:
+  pdf_storage:

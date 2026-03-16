@@ -1,0 +1,23 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Uploads / generated data (not source-controlled)
+grading_scales/*.csv
+static/logo.png
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Testanfragen{% endblock %}
+{% block content %}
+<h1>Testanfragen</h1>
+
+{% if not pending %}
+<p class="muted">Keine offenen Anfragen.</p>
+{% else %}
+<p class="muted">{{ pending | length }} offene Anfrage{{ "n" if pending | length != 1 else "" }} — Auswahl anpassen, dann als PDF herunterladen.</p>
+
+{% for req in pending %}
+<div class="request-card">
+  <div class="request-header">
+    <strong>{{ req.student_name }}</strong>
+    <span class="request-title">{{ req.title }}</span>
+    <span class="muted">{{ req.created_at[:10] }}</span>
+    <span class="badge-count">{{ req.competency_ids | length }} Komp.</span>
+  </div>
+
+  <form action="/tests/confirm/{{ req.id }}" method="post">
+    <details class="request-details">
+      <summary>Kompetenzen bearbeiten ({{ req.competency_ids | length }} vorausgewählt)</summary>
+      <div class="filter-row" style="margin:0.5rem 0;">
+        <button type="button" onclick="selectInForm(this, true)">Alle</button>
+        <button type="button" onclick="selectInForm(this, false)">Keine</button>
+      </div>
+      <table class="kompetenz-table" style="margin-bottom:0.5rem;">
+        <thead><tr><th></th><th>#</th><th>Name</th></tr></thead>
+        <tbody>
+          {% for k in einfach_kompetenzen %}
+          <tr>
+            <td><input type="checkbox" name="competency_ids" value="{{ k.id }}"
+              {% if k.id in req.competency_ids %}checked{% endif %}></td>
+            <td>{{ k.id }}</td>
+            <td>{{ k.name }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </details>
+    <button type="submit" class="btn-primary" style="margin-top:0.75rem;">PDF herunterladen &amp; drucken</button>
+  </form>
+</div>
+{% endfor %}
+{% endif %}
+
+<script>
+function selectInForm(btn, state) {
+  btn.closest('form').querySelectorAll('input[name=competency_ids]').forEach(cb => cb.checked = state);
+}
+</script>
+{% endblock %}

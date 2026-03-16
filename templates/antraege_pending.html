@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Kompetenzanträge{% endblock %}
+{% block content %}
+<h1>Kompetenzanträge</h1>
+
+{% if not antraege %}
+<p class="muted">Keine ausstehenden Anträge.</p>
+{% else %}
+<p class="muted">{{ antraege | length }} Antrag{{ "/" + (antraege | length)|string + " Anträge" if antraege | length != 1 else "" }} zur Prüfung.</p>
+
+{% for a in antraege %}
+<div class="antrag-card" style="border:1px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1rem;background:var(--card-bg,#fff)">
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:baseline;margin-bottom:.5rem">
+    <strong>{{ a.student_name }}</strong>
+    <span class="muted" style="font-size:.85rem">{{ a.competency_name }} (ID {{ a.competency_id }})</span>
+    <span class="muted" style="font-size:.8rem">eingereicht {{ a.created_at[:10] }}</span>
+    <span class="niveau-badge niveau-0" style="font-size:.75rem">{{ "einfach" if a.typ == "einfach" else "Niveau" }}</span>
+  </div>
+
+  {% if a.typ == "einfach" %}
+    <blockquote style="margin:.5rem 0;padding:.5rem .75rem;background:#f8f9fa;border-left:3px solid var(--border);font-size:.9rem">{{ a.beschreibung or "–" }}</blockquote>
+
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem">
+      <form method="post" action="/antraege/accept/{{ a.id }}" style="display:inline">
+        <button type="submit" class="btn-primary btn-sm">Akzeptieren</button>
+      </form>
+      <form method="post" action="/antraege/reject/{{ a.id }}" style="display:inline">
+        <button type="submit" class="btn-sm" style="background:#c00;color:#fff;border-color:#c00">Ablehnen</button>
+      </form>
+    </div>
+
+  {% else %}
+    <p style="margin:.25rem 0 .75rem;font-size:.9rem">
+      Nachweis: <a href="{{ a.evidence_url }}" target="_blank" rel="noopener">{{ a.evidence_url }}</a>
+    </p>
+
+    <form method="post" action="/antraege/accept/{{ a.id }}" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.5rem">
+      <div>
+        <label style="font-size:.85rem;font-weight:500">Niveau</label><br>
+        <select name="niveau_level" required style="font-size:.9rem">
+          <option value="">— wählen —</option>
+          <option value="1">1 — Beginner</option>
+          <option value="2">2 — Advanced</option>
+          <option value="3">3 — Expert</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:12rem">
+        <label style="font-size:.85rem;font-weight:500">Begründung (optional)</label><br>
+        <input type="text" name="begruendung" placeholder="z. B. Protokoll vollständig" style="width:100%;font-size:.9rem">
+      </div>
+      <button type="submit" class="btn-primary btn-sm">Akzeptieren</button>
+    </form>
+
+    <form method="post" action="/antraege/reject/{{ a.id }}" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:12rem">
+        <label style="font-size:.85rem;font-weight:500">Begründung der Ablehnung <span style="color:#c00">*</span></label><br>
+        <input type="text" name="begruendung" required placeholder="z. B. Link nicht zugänglich" style="width:100%;font-size:.9rem">
+      </div>
+      <button type="submit" class="btn-sm" style="background:#c00;color:#fff;border-color:#c00">Ablehnen</button>
+    </form>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

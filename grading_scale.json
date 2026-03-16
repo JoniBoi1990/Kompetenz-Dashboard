@@ -1,0 +1,97 @@
+[
+  {
+    "note": "1",
+    "dezimal": 1.0,
+    "min_percent": 96.0
+  },
+  {
+    "note": "1−",
+    "dezimal": 1.25,
+    "min_percent": 91.0
+  },
+  {
+    "note": "1−2",
+    "dezimal": 1.5,
+    "min_percent": 86.0
+  },
+  {
+    "note": "2+",
+    "dezimal": 1.75,
+    "min_percent": 81.0
+  },
+  {
+    "note": "2",
+    "dezimal": 2.0,
+    "min_percent": 76.0
+  },
+  {
+    "note": "2−",
+    "dezimal": 2.25,
+    "min_percent": 71.0
+  },
+  {
+    "note": "2−3",
+    "dezimal": 2.5,
+    "min_percent": 66.0
+  },
+  {
+    "note": "3+",
+    "dezimal": 2.75,
+    "min_percent": 61.0
+  },
+  {
+    "note": "3",
+    "dezimal": 3.0,
+    "min_percent": 56.0
+  },
+  {
+    "note": "3−",
+    "dezimal": 3.25,
+    "min_percent": 51.0
+  },
+  {
+    "note": "3−4",
+    "dezimal": 3.5,
+    "min_percent": 46.0
+  },
+  {
+    "note": "4+",
+    "dezimal": 3.75,
+    "min_percent": 41.0
+  },
+  {
+    "note": "4",
+    "dezimal": 4.0,
+    "min_percent": 36.0
+  },
+  {
+    "note": "4−",
+    "dezimal": 4.25,
+    "min_percent": 31.0
+  },
+  {
+    "note": "4−5",
+    "dezimal": 4.5,
+    "min_percent": 26.0
+  },
+  {
+    "note": "5+",
+    "dezimal": 4.75,
+    "min_percent": 21.0
+  },
+  {
+    "note": "5",
+    "dezimal": 5.0,
+    "min_percent": 16.0
+  },
+  {
+    "note": "5−",
+    "dezimal": 5.25,
+    "min_percent": 11.0
+  },
+  {
+    "note": "5−6",
+    "dezimal": 5.5,
+    "min_percent": 6.0
+  }
+]

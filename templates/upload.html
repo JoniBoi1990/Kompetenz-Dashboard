@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Listen verwalten{% endblock %}
+{% block content %}
+<h1>Listen verwalten</h1>
+
+{# Status messages #}
+{% if msg == 'kompetenzen_ok' %}
+<div class="dev-hint" style="background:#dff6dd;border-color:#107c10;margin-bottom:1rem;">
+  Einfach-CSV importiert — {{ updated }} Einträge aktualisiert.
+</div>
+{% elif msg == 'niveau_ok' %}
+<div class="dev-hint" style="background:#dff6dd;border-color:#107c10;margin-bottom:1rem;">
+  Niveau-CSV importiert — {{ updated }} Einträge aktualisiert.
+</div>
+{% elif msg == 'questions_ok' %}
+<div class="dev-hint" style="background:#dff6dd;border-color:#107c10;margin-bottom:1rem;">
+  Fragen-CSV importiert — {{ total_q }} Fragen gespeichert.
+</div>
+{% endif %}
+
+{# Status overview #}
+<div class="score-display" style="margin-bottom:1.5rem;gap:1.5rem;">
+  <span class="score-pts">{{ total_einfach }}</span>
+  <span class="score-pct">einfache Kompetenzen</span>
+  <span class="score-pts">{{ with_thema }}</span>
+  <span class="score-pct">davon mit Thema</span>
+  <span class="score-pts">{{ total_niveau }}</span>
+  <span class="score-pct">Niveau-Kompetenzen</span>
+  <span class="score-pts">{{ with_questions }}</span>
+  <span class="score-pct">mit Testfragen</span>
+</div>
+
+{# Upload cards #}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
+    <h2 style="margin-top:0">Einfache Kompetenzen (ibK)</h2>
+    <p class="muted" style="margin-bottom:.75rem;font-size:.85rem;">
+      Format: <code>ID;BP-Nummer;Kompetenz;Thema;Anmerkungen</code> (Semikolon, UTF-8)
+    </p>
+    <form action="/admin/upload/kompetenzen" method="post" enctype="multipart/form-data">
+      <div class="form-row" style="align-items:flex-end;">
+        <label style="flex:1">CSV-Datei
+          <input type="file" name="file" accept=".csv" required>
+        </label>
+        <button type="submit" class="btn-primary" style="margin-top:0">Hochladen</button>
+      </div>
+    </form>
+    <p style="margin-top:.75rem;font-size:.875rem;">
+      <a href="/admin/kompetenzen#einfach">Einfache Kompetenzen bearbeiten &rarr;</a>
+    </p>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
+    <h2 style="margin-top:0">Niveau-Kompetenzen (pbK)</h2>
+    <p class="muted" style="margin-bottom:.75rem;font-size:.85rem;">
+      Format: <code>ID;Nummer;pbk;Möglichkeit1;Möglichkeit2;Möglichkeit3;Hinweise</code> (Semikolon, UTF-8)
+    </p>
+    <form action="/admin/upload/niveau" method="post" enctype="multipart/form-data">
+      <div class="form-row" style="align-items:flex-end;">
+        <label style="flex:1">CSV-Datei
+          <input type="file" name="file" accept=".csv" required>
+        </label>
+        <button type="submit" class="btn-primary" style="margin-top:0">Hochladen</button>
+      </div>
+    </form>
+    <p style="margin-top:.75rem;font-size:.875rem;">
+      <a href="/admin/kompetenzen#niveau">Niveau-Kompetenzen bearbeiten &rarr;</a>
+    </p>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
+    <h2 style="margin-top:0">Testfragen</h2>
+    <p class="muted" style="margin-bottom:.75rem;font-size:.85rem;">
+      Zeile 1 = Kompetenz-IDs (Spaltenköpfe), Zeilen 2–N = Fragenvarianten (Semikolon, UTF-8)
+    </p>
+    <form action="/admin/upload/questions" method="post" enctype="multipart/form-data">
+      <div class="form-row" style="align-items:flex-end;">
+        <label style="flex:1">CSV-Datei
+          <input type="file" name="file" accept=".csv" required>
+        </label>
+        <button type="submit" class="btn-primary" style="margin-top:0">Hochladen</button>
+      </div>
+    </form>
+    <p style="margin-top:.75rem;font-size:.875rem;">
+      <a href="/admin/questions">Testfragen bearbeiten &rarr;</a>
+    </p>
+  </div>
+
+</div>
+{% endblock %}

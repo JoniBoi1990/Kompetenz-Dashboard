@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+{% block title %}Meine Kompetenzen{% endblock %}
+{% block content %}
+<h1>Hallo, {{ user.display_name }}</h1>
+
+{% if antrag_ok %}
+<div class="pending-notice" style="background:var(--green-light,#d4edda);border-color:var(--green,#28a745)">
+  Dein Antrag wurde eingereicht und wartet auf Prüfung durch die Lehrkraft.
+</div>
+{% endif %}
+
+{# --- Persistente Score-Karte (keine Note) --- #}
+<div class="score-display">
+  <span class="score-pts">{{ grade.gesamtpunkte }} von {{ grade.max_punkte }} Punkten</span>
+  <span class="score-pct">{{ grade.prozent }} %</span>
+  {% if active_ids %}
+    <span class="score-basis">· Unterrichtsstand ({{ active_ids | length }} Kompetenzen)</span>
+  {% else %}
+    <span class="score-basis">· Ganzes Schuljahr</span>
+  {% endif %}
+</div>
+{% if not active_ids %}
+<p class="muted" style="font-size:0.875rem; margin-bottom:1rem;">Noch kein Unterrichtsstand festgelegt — Basis: alle {{ grade.max_punkte }} Punkte.</p>
+{% endif %}
+
+<button id="btn-planmode" class="btn-secondary">Planungsmodus aktivieren</button>
+
+{# --- Planungsmodus (anfangs verborgen, komplett client-seitig) --- #}
+<div id="plan-section" style="display:none">
+
+  <div class="score-display plan-score">
+    <span class="score-pts" id="plan-pts">– von – Punkten</span>
+    <span class="score-pct" id="plan-pct">– %</span>
+    <span class="score-note" id="plan-note">Note: –</span>
+  </div>
+
+  <div class="basis-toggle" style="margin-top:0.75rem;">
+    <label class="basis-label basis-active" id="lbl-unterricht">
+      <input type="radio" name="plan-basis" value="unterricht" checked onchange="onBasisChange(this)">
+      Unterrichtsstand
+    </label>
+    <label class="basis-label" id="lbl-schuljahr">
+      <input type="radio" name="plan-basis" value="schuljahr" onchange="onBasisChange(this)">
+      Ganzes Schuljahr
+    </label>
+    <button type="button" class="btn-sm" onclick="resetPlan()" style="margin-left:auto;">Zurücksetzen</button>
+  </div>
+
+  <div class="two-columns" style="margin-top:1rem;">
+
+    <div>
+      <h2>Einfache Kompetenzen</h2>
+      <table class="kompetenz-table">
+        <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Erreicht</th></tr></thead>
+        <tbody>
+          {% set ns = namespace(last_thema=None) %}
+          {% for k in einfach_kompetenzen %}
+          {% set r = einfach_map.get(k.id) %}
+          {% if k.thema != ns.last_thema %}
+          {% set ns.last_thema = k.thema %}
+          <tr class="thema-header"><td colspan="3">Thema {{ k.thema or "–" }}</td></tr>
+          {% endif %}
+          <tr id="plan-row-{{ k.id }}" class="{% if active_ids and k.id in active_ids %}comp-covered{% elif active_ids %}comp-not-covered{% endif %}">
+            <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
+            <td>{{ k.name }}</td>
+            <td class="center">
+              <input type="checkbox" id="plan-cb-{{ k.id }}"
+                {% if r and r.achieved %}checked{% endif %}
+                onchange="planState[{{ k.id }}].achieved=this.checked; updateDisplay()">
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <h2>Niveau-Kompetenzen</h2>
+      <table class="kompetenz-table">
+        <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Niveau</th></tr></thead>
+        <tbody>
+          {% for k in niveau_kompetenzen %}
+          {% set best = best_nachweis_by_comp.get(k.id) %}
+          {% set best_niveau = best.niveau_level if best else 0 %}
+          <tr id="plan-row-{{ k.id }}" class="{% if active_ids and k.id in active_ids %}comp-covered{% elif active_ids %}comp-not-covered{% endif %}">
+            <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
+            <td>{{ k.name }}</td>
+            <td>
+              <select id="plan-sel-{{ k.id }}" onchange="planState[{{ k.id }}].niveau_level=+this.value; updateDisplay()">
+                <option value="0" {% if best_niveau == 0 %}selected{% endif %}>noch nicht nachgewiesen</option>
+                <option value="1" {% if best_niveau == 1 %}selected{% endif %}>Beginner</option>
+                <option value="2" {% if best_niveau == 2 %}selected{% endif %}>Advanced</option>
+                <option value="3" {% if best_niveau == 3 %}selected{% endif %}>Expert</option>
+              </select>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<hr style="margin:2rem 0; border:none; border-top:1px solid var(--border);">
+
+{# --- Read-only Ansicht --- #}
+<div class="two-columns">
+
+  <div>
+    <h2>Einfache Kompetenzen</h2>
+    <table class="kompetenz-table">
+      <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Erreicht</th><th></th></tr></thead>
+      <tbody>
+        {% set ns = namespace(last_thema=None) %}
+        {% for k in einfach_kompetenzen %}
+        {% set r = einfach_map.get(k.id) %}
+        {% if k.thema != ns.last_thema %}
+        {% set ns.last_thema = k.thema %}
+        <tr class="thema-header"><td colspan="4">Thema {{ k.thema or "–" }}</td></tr>
+        {% endif %}
+        <tr class="{% if active_ids and k.id in active_ids %}comp-covered{% elif active_ids %}comp-not-covered{% endif %}">
+          <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
+          <td>{{ k.name }}</td>
+          <td class="center">{% if r and r.achieved %}✓{% else %}–{% endif %}</td>
+          <td>
+            {% if not (r and r.achieved) %}
+              {% if k.id in pending_antraege_by_comp %}
+                <span class="badge-pending">Antrag ausstehend</span>
+              {% else %}
+                <details class="antrag-details">
+                  <summary>Nachweis bereits erbracht?</summary>
+                  <form method="post" action="/antraege/submit">
+                    <input type="hidden" name="competency_id" value="{{ k.id }}">
+                    <input type="hidden" name="typ" value="einfach">
+                    <p class="hint" style="margin:.25rem 0 .5rem;font-size:.8rem;color:var(--muted)">Nur Verweise auf die letzte Unterrichtsstunde (nicht älter als 7 Tage) werden geprüft.</p>
+                    <textarea name="beschreibung" required placeholder="Wie hast du diese Kompetenz nachgewiesen?" style="width:100%;min-height:4rem;font-size:.85rem"></textarea>
+                    <button type="submit" class="btn-sm" style="margin-top:.35rem">Antrag stellen</button>
+                  </form>
+                </details>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <h2>Niveau-Kompetenzen</h2>
+    <table class="kompetenz-table">
+      <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Niveau</th><th>Nachweis</th><th></th></tr></thead>
+      <tbody>
+        {% for k in niveau_kompetenzen %}
+        {% set best = best_nachweis_by_comp.get(k.id) %}
+        {% set best_niveau = best.niveau_level if best else 0 %}
+        {% set entries = nachweise_by_comp.get(k.id, []) %}
+        <tr class="{% if active_ids and k.id in active_ids %}comp-covered{% elif active_ids %}comp-not-covered{% endif %}">
+          <td class="muted" style="font-size:.8rem;vertical-align:top;padding-top:.5rem">{{ k.id }}</td>
+          <td>
+            {% if entries %}
+            <details>
+              <summary class="comp-name">{{ k.name }}</summary>
+              <table class="chronik-table">
+                <thead><tr><th>Datum</th><th>Niveau</th><th>Nachweis</th><th>Lehrkraft</th></tr></thead>
+                <tbody>
+                  {% for n in entries %}
+                  <tr>
+                    <td>{{ n.updated_at[:10] if n.updated_at else "–" }}</td>
+                    <td><span class="niveau-badge niveau-{{ n.niveau_level }}">{{ NIVEAU_LABELS[n.niveau_level] }}</span></td>
+                    <td>
+                      {% if n.evidence_url %}
+                      <a href="{{ n.evidence_url }}" target="_blank" rel="noopener">
+                        {{ n.evidence_name or "Link" }}
+                      </a>
+                      {% else %}–{% endif %}
+                    </td>
+                    <td class="muted">{{ n.updated_by }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </details>
+            {% else %}
+            {{ k.name }}
+            {% endif %}
+          </td>
+          <td>
+            {% if best_niveau > 0 %}
+            <span class="niveau-badge niveau-{{ best_niveau }}">{{ NIVEAU_LABELS[best_niveau] }}</span>
+            {% else %}
+            <span class="muted">–</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if best and best.evidence_url %}
+            <a href="{{ best.evidence_url }}" target="_blank" rel="noopener">
+              {{ best.evidence_name or "Link" }}
+            </a>
+            {% else %}–{% endif %}
+          </td>
+          <td>
+            {% if best_niveau == 0 %}
+              {% if k.id in pending_antraege_by_comp %}
+                <span class="badge-pending">Antrag ausstehend</span>
+              {% else %}
+                {% if k.id in rejected_niveau_antraege_by_comp %}
+                  <p class="hint" style="margin:0 0 .35rem;font-size:.8rem;color:#c00">Abgelehnt: {{ rejected_niveau_antraege_by_comp[k.id].begruendung or "kein Grund angegeben" }}</p>
+                {% endif %}
+                <details class="antrag-details">
+                  <summary>Nachweis bereits erbracht?</summary>
+                  <form method="post" action="/antraege/submit">
+                    <input type="hidden" name="competency_id" value="{{ k.id }}">
+                    <input type="hidden" name="typ" value="niveau">
+                    <input type="url" name="evidence_url" required placeholder="Link zu deiner Arbeit (OneDrive, OneNote …)" style="width:100%;font-size:.85rem">
+                    <button type="submit" class="btn-sm" style="margin-top:.35rem">Antrag stellen</button>
+                  </form>
+                </details>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+const KOMPETENZEN    = {{ kompetenzen_json | safe }};
+const ACTIVE_IDS     = new Set({{ active_ids_list | safe }});
+const PROVEN_IDS     = new Set({{ proven_ids_list | safe }});
+const INITIAL_STATE  = {{ current_state_json | safe }};
+const GRADING_SCALE  = {{ grading_scale_json | safe }};
+let   planState      = JSON.parse(JSON.stringify(INITIAL_STATE));
+
+function calcNote(pct) {
+    for (const e of GRADING_SCALE) {
+        if (pct >= e.min_percent) return e.note;
+    }
+    return '6';
+}
+
+function calcScore(basis) {
+    let comps;
+    if (basis === 'unterricht' && ACTIVE_IDS.size > 0) {
+        comps = KOMPETENZEN.filter(k => {
+            if (ACTIVE_IDS.has(k.id)) return true;
+            const r = planState[k.id] || {};
+            return k.typ === 'einfach' ? !!r.achieved : (r.niveau_level || 0) > 0;
+        });
+    } else {
+        comps = KOMPETENZEN;
+    }
+    const max = comps.reduce((s, k) => s + (k.typ === 'niveau' ? 3 : 1), 0);
+    const pts = comps.reduce((s, k) => {
+        const r = planState[k.id] || {};
+        return s + (k.typ === 'einfach' ? (r.achieved ? 1 : 0) : (r.niveau_level || 0));
+    }, 0);
+    const pct  = max > 0 ? Math.round(pts / max * 1000) / 10 : 0;
+    const note = calcNote(pct);
+    return { pts, max, pct, note };
+}
+
+function getBasis() {
+    const el = document.querySelector('input[name="plan-basis"]:checked');
+    return el ? el.value : 'unterricht';
+}
+
+function updateRowHighlight(basis) {
+    if (ACTIVE_IDS.size === 0) return;
+    KOMPETENZEN.forEach(k => {
+        const row = document.getElementById('plan-row-' + k.id);
+        if (!row) return;
+        if (basis === 'unterricht' && !ACTIVE_IDS.has(k.id)) {
+            row.classList.remove('comp-covered');
+            row.classList.add('comp-not-covered');
+        } else {
+            row.classList.remove('comp-not-covered');
+            row.classList.add('comp-covered');
+        }
+    });
+}
+
+function updateDisplay() {
+    const basis = getBasis();
+    const r = calcScore(basis);
+    document.getElementById('plan-pts').textContent  = `${r.pts} von ${r.max} Punkten`;
+    document.getElementById('plan-pct').textContent  = `${r.pct}\u2009%`;
+    document.getElementById('plan-note').textContent = `Note: ${r.note}`;
+    updateRowHighlight(basis);
+}
+
+function onBasisChange(radio) {
+    document.querySelectorAll('.basis-label').forEach(lbl => lbl.classList.remove('basis-active'));
+    radio.closest('.basis-label').classList.add('basis-active');
+    updateDisplay();
+}
+
+function resetPlan() {
+    planState = JSON.parse(JSON.stringify(INITIAL_STATE));
+    KOMPETENZEN.forEach(k => {
+        const s = planState[k.id] || {};
+        if (k.typ === 'einfach') {
+            const cb = document.getElementById('plan-cb-' + k.id);
+            if (cb) cb.checked = !!s.achieved;
+        } else {
+            const sel = document.getElementById('plan-sel-' + k.id);
+            if (sel) sel.value = s.niveau_level || 0;
+        }
+    });
+    updateDisplay();
+}
+
+document.getElementById('btn-planmode').addEventListener('click', () => {
+    const section = document.getElementById('plan-section');
+    const visible = section.style.display !== 'none';
+    section.style.display = visible ? 'none' : 'block';
+    document.getElementById('btn-planmode').textContent =
+        visible ? 'Planungsmodus aktivieren' : 'Planungsmodus schließen';
+    if (!visible) updateDisplay();
+});
+</script>
+{% endblock %}

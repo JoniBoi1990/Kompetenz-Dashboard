@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block title %}{% if user.is_teacher %}Testgenerator{% else %}Nachweis anfordern{% endif %}{% endblock %}
+{% block content %}
+
+{% if user.is_teacher %}
+{# ===================== LEHRKRAFT-ANSICHT ===================== #}
+<h1>Testgenerator</h1>
+<p class="muted">Nur einfache Kompetenzen — Niveau-Kompetenzen werden über Nachweise nachgewiesen.</p>
+
+<form action="/tests/generate" method="post">
+  <input type="hidden" name="student_name" id="student-name-hidden">
+
+  <div class="form-row" style="align-items:flex-end;">
+    <label>Titel
+      <input type="text" name="title" id="title-input" value="Kompetenztest" required>
+    </label>
+    <label>Klasse
+      <select id="class-select" onchange="loadStudents()">
+        <option value="">— Klasse wählen —</option>
+        {% for g in groups %}
+        <option value="{{ g.id }}">{{ g.displayName }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Schüler/in (aus Liste)
+      <select id="student-select" onchange="onStudentChange()" disabled>
+        <option value="">— erst Klasse wählen —</option>
+      </select>
+    </label>
+    <label>Oder: Name manuell
+      <input type="text" id="manual-name" placeholder="Name eingeben"
+        oninput="onManualName(this.value)">
+    </label>
+  </div>
+  <div id="student-hint" class="muted" style="font-size:0.85rem; margin-bottom:0.75rem; min-height:1.2em;"></div>
+
+  <h2>Kompetenzen auswählen</h2>
+  {% if active_ids %}
+  <div class="legend-hint">
+    <span class="comp-dot covered"></span> Im Unterricht behandelt &nbsp;
+    <span class="comp-dot not-covered"></span> Noch nicht im Unterricht
+  </div>
+  {% endif %}
+  <div class="filter-row">
+    <button type="button" onclick="selectAll(true)">Alle</button>
+    <button type="button" onclick="selectAll(false)">Keine</button>
+  </div>
+
+  <table class="kompetenz-table">
+    <thead><tr><th></th><th>#</th><th>Name</th></tr></thead>
+    <tbody>
+      {% set ns = namespace(last_thema=None) %}
+      {% for k in einfach_kompetenzen %}
+      {% if k.thema != ns.last_thema %}
+      {% set ns.last_thema = k.thema %}
+      <tr class="thema-header">
+        <td colspan="3">
+          Thema {{ k.thema or "–" }}
+          <button type="button" class="btn-thema" onclick="selectThema({{ k.thema or 0 }}, true)">Alle</button>
+          <button type="button" class="btn-thema" onclick="selectThema({{ k.thema or 0 }}, false)">Keine</button>
+        </td>
+      </tr>
+      {% endif %}
+      <tr class="{% if active_ids and k.id in active_ids %}comp-covered{% elif active_ids %}comp-not-covered{% endif %}" data-thema="{{ k.thema or 0 }}">
+        <td><input type="checkbox" name="competency_ids" value="{{ k.id }}"></td>
+        <td>{{ k.id }}</td>
+        <td>{{ k.name }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <button type="submit" class="btn-primary" id="btn-generate" disabled
+    title="Bitte zuerst eine Schüler/in auswählen">PDF generieren &amp; herunterladen</button>
+</form>
+
+<script>
+const ACTIVE_IDS_T = new Set({{ active_ids_list | safe }});
+
+function selectAll(state) {
+  document.querySelectorAll('input[name=competency_ids]').forEach(cb => cb.checked = state);
+}
+function selectThema(thema, state) {
+  document.querySelectorAll(`tr[data-thema="${thema}"] input[name=competency_ids]`)
+    .forEach(cb => { if (!cb.disabled) cb.checked = state; });
+}
+
+async function loadStudents() {
+  const classId = document.getElementById('class-select').value;
+  const sel = document.getElementById('student-select');
+  sel.innerHTML = '<option value="">Lade…</option>';
+  sel.disabled = true;
+  document.getElementById('student-name-hidden').value = '';
+  document.getElementById('btn-generate').disabled = true;
+  document.getElementById('student-hint').textContent = '';
+  selectAll(false);
+
+  if (!classId) {
+    sel.innerHTML = '<option value="">— erst Klasse wählen —</option>';
+    return;
+  }
+
+  const students = await fetch('/api/class-students/' + classId).then(r => r.json());
+  sel.innerHTML = '<option value="">— Schüler/in wählen —</option>';
+  students.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.displayName;
+    sel.appendChild(opt);
+  });
+  sel.disabled = false;
+}
+
+async function onStudentChange() {
+  const sel = document.getElementById('student-select');
+  const studentId = sel.value;
+  const studentName = sel.options[sel.selectedIndex]?.text || '';
+  const hint = document.getElementById('student-hint');
+
+  // Clear manual field — dropdown takes priority
+  document.getElementById('manual-name').value = '';
+  document.getElementById('student-name-hidden').value = studentName;
+  document.getElementById('btn-generate').disabled = !studentId;
+  selectAll(false);
+
+  if (!studentId) {
+    hint.textContent = '';
+    return;
+  }
+
+  hint.textContent = 'Lade Kompetenzen…';
+  const data = await fetch('/api/student-competencies?student_id=' + studentId).then(r => r.json());
+  const proven = new Set(data.proven_einfach_ids);
+
+  document.querySelectorAll('input[name=competency_ids]').forEach(cb => {
+    const id = parseInt(cb.value);
+    cb.checked = !proven.has(id) && (ACTIVE_IDS_T.size === 0 || ACTIVE_IDS_T.has(id));
+  });
+
+  const selected = document.querySelectorAll('input[name=competency_ids]:checked').length;
+  hint.textContent = `${studentName}: ${proven.size} nachgewiesen, ${selected} fehlend und im Unterricht behandelt vorausgewählt.`;
+}
+
+function onManualName(value) {
+  const hint = document.getElementById('student-hint');
+  if (value.trim()) {
+    // Manual entry overrides dropdown — reset dropdown, no pre-selection
+    document.getElementById('student-select').value = '';
+    document.getElementById('student-name-hidden').value = value.trim();
+    document.getElementById('btn-generate').disabled = false;
+    selectAll(false);
+    hint.textContent = 'Manueller Name — bitte Kompetenzen selbst auswählen.';
+  } else {
+    document.getElementById('student-name-hidden').value = '';
+    document.getElementById('btn-generate').disabled = true;
+    hint.textContent = '';
+  }
+}
+</script>
+
+{% else %}
+{# ===================== SCHÜLER-ANSICHT ===================== #}
+<h1>Nachweis anfordern</h1>
+<p class="muted">Wähle die Kompetenzen, die du nachweisen möchtest. Die Lehrkraft druckt den Test für dich aus.</p>
+
+<div class="score-display" style="margin-bottom:1.25rem;">
+  <span class="score-pts">{{ user.display_name }}</span>
+  <span class="score-pct">Kompetenznachweis Nr. {{ next_number }}</span>
+</div>
+
+{% if active_ids %}
+<div class="legend-hint" style="margin-bottom:0.75rem;">
+  <span class="comp-dot covered"></span> Im Unterricht behandelt &nbsp;
+  <span class="comp-dot not-covered"></span> Noch nicht im Unterricht &nbsp;
+  <span class="badge-proven-sm">✓ nachgewiesen</span> nicht auswählbar
+</div>
+{% endif %}
+
+<form action="/tests/request" method="post">
+  <div class="filter-row">
+    <button type="button" onclick="selectAll(true)">Alle verfügbaren</button>
+    <button type="button" onclick="selectAll(false)">Keine</button>
+  </div>
+
+  <table class="kompetenz-table">
+    <thead><tr><th></th><th>#</th><th>Name</th><th></th></tr></thead>
+    <tbody>
+      {% set ns = namespace(last_thema=None) %}
+      {% for k in einfach_kompetenzen %}
+      {% set proven = k.id in proven_ids %}
+      {% set covered = active_ids and k.id in active_ids %}
+      {% set beyond  = active_ids and k.id not in active_ids %}
+      {% if k.thema != ns.last_thema %}
+      {% set ns.last_thema = k.thema %}
+      <tr class="thema-header">
+        <td colspan="4">Thema {{ k.thema or "–" }}</td>
+      </tr>
+      {% endif %}
+      <tr class="{% if proven %}comp-proven{% elif covered %}comp-covered{% elif beyond %}comp-not-covered{% endif %}" data-thema="{{ k.thema or 0 }}">
+        <td>
+          {% if proven %}
+            <input type="checkbox" disabled title="Bereits nachgewiesen">
+          {% else %}
+            <input type="checkbox" name="competency_ids" value="{{ k.id }}"
+              {% if covered %}checked{% endif %}>
+          {% endif %}
+        </td>
+        <td class="{% if proven %}muted{% endif %}">{{ k.id }}</td>
+        <td class="{% if proven %}muted{% endif %}">{{ k.name }}</td>
+        <td>
+          {% if proven %}
+            <span class="badge-proven-sm">✓ nachgewiesen</span>
+          {% elif beyond %}
+            <span class="beyond-hint" title="Noch nicht im Unterricht behandelt — darf trotzdem gewählt werden">↑ voraus</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <button type="submit" class="btn-primary" style="margin-top:1rem;">Nachweis anfordern</button>
+</form>
+
+<script>
+function selectAll(state) {
+  document.querySelectorAll('input[name=competency_ids]').forEach(cb => cb.checked = state);
+}
+</script>
+
+{% endif %}
+{% endblock %}

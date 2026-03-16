@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Anfrage gesendet{% endblock %}
+{% block content %}
+<h1>Anfrage gesendet</h1>
+
+<div class="score-display" style="margin-bottom:1.25rem;">
+  <span class="score-pts">{{ req.title }}</span>
+  <span class="score-pct">{{ req.competency_ids | length }} Kompetenzen</span>
+</div>
+
+<p>Deine Anfrage wurde an die Lehrkraft weitergeleitet. Sie druckt den Test für dich aus.</p>
+
+{% if bookings_page_url %}
+<p style="margin-top:1.25rem;">
+  Jetzt einen Termin zur Abgabe des Nachweises vereinbaren:
+</p>
+<a href="{{ bookings_page_url }}" target="_blank" rel="noopener" class="btn-primary"
+   style="display:inline-block; margin-top:.5rem;">
+  Termin buchen &rarr;
+</a>
+{% endif %}
+
+<a href="/" style="display:inline-block; margin-top:1.25rem;">Zurück zum Dashboard</a>
+{% endblock %}

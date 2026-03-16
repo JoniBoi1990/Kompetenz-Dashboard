@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Klassenübersicht{% endblock %}
+{% block content %}
+{% if pending_count %}
+<div class="pending-notice">
+  <strong>{{ pending_count }} Testanfrage{{ "n" if pending_count != 1 else "" }}</strong> warte{{ "n" if pending_count != 1 else "t" }} auf Bearbeitung —
+  <a href="/tests/pending">Jetzt bearbeiten →</a>
+</div>
+{% endif %}
+{% if pending_antraege_count %}
+<div class="pending-notice">
+  <strong>{{ pending_antraege_count }} Kompetenzantrag{{ "/" + pending_antraege_count|string + " -anträge" if pending_antraege_count != 1 else "" }}</strong> zur Prüfung —
+  <a href="/antraege/pending">Jetzt prüfen →</a>
+</div>
+{% endif %}
+<h1>Klassen</h1>
+{% if groups %}
+<ul class="class-list">
+  {% for g in groups %}
+  <li>
+    <a href="/teacher/class/{{ g.id }}">{{ g.displayName }}</a>
+    {% if g.description %}<span class="muted">— {{ g.description }}</span>{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="muted">Keine Klassen gefunden.</p>
+{% endif %}
+
+{% if config.DEV_MODE %}
+<div class="dev-hint">
+  <strong>Dev-Modus</strong> — kein echtes Azure AD.
+  Test-Schülerin:
+  <a href="/teacher/student/dev-student-001?student_name=Anna+Beispiel&class_id=dev-class">
+    Anna Beispiel (Lehrersicht) →
+  </a>
+  &nbsp;|&nbsp;
+  <a href="/logout" style="color:#c00">Abmelden → als Anna einloggen</a>
+</div>
+{% endif %}
+{% endblock %}

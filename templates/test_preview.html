@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Testvorschau — {{ preview.title }}{% endblock %}
+{% block content %}
+<h1>Testvorschau</h1>
+
+<div class="score-display" style="margin-bottom:1.25rem;">
+  <span class="score-pts">{{ preview.student_name }}</span>
+  <span class="score-pct">{{ preview.title }}</span>
+</div>
+
+<p class="muted" style="margin-bottom:1rem;">
+  Wähle für jede Kompetenz die gewünschte Frage aus dem Dropdown.
+  Anschließend „PDF herunterladen" klicken.
+</p>
+
+<form action="/tests/finalize/{{ preview.id }}" method="post">
+  <table class="kompetenz-table">
+    <thead>
+      <tr>
+        <th style="width:3rem">#</th>
+        <th style="width:30%">Kompetenz</th>
+        <th>Frage</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for q in preview.questions %}
+      <tr>
+        <td>{{ q.competency_id }}</td>
+        <td>{{ q.competency_name }}</td>
+        <td>
+          {% if q.options | length > 1 %}
+            <select name="question_{{ q.competency_id }}" class="question-select">
+              {% for opt in q.options %}
+              <option {% if opt == q.selected %}selected{% endif %}>{{ opt }}</option>
+              {% endfor %}
+            </select>
+          {% else %}
+            {{ q.selected }}
+            <input type="hidden" name="question_{{ q.competency_id }}" value="{{ q.selected }}">
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if not preview.questions %}
+  <p class="muted" style="margin:1rem 0;">Keine Fragen vorhanden — bitte erneut generieren.</p>
+  {% else %}
+  <button type="submit" class="btn-primary">PDF herunterladen</button>
+  {% endif %}
+</form>
+
+<p style="margin-top:0.75rem;">
+  <a href="/tests/builder">&larr; Zurück zum Testgenerator</a>
+</p>
+{% endblock %}

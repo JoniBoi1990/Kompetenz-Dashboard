@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Kompetenz-Dashboard{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<nav>
+  <a href="{% if user.is_teacher %}/teacher{% else %}/{% endif %}" class="nav-brand">Kompetenz-Dashboard</a>
+  <div class="nav-links">
+    {% if user.is_teacher %}
+      <a href="/teacher">Klassen</a>
+      <a href="/teacher/coverage">Unterrichtsstand</a>
+      <a href="/grades/calculator">Notenrechner</a>
+      <a href="/tests/pending">Testanfragen</a>
+      <a href="/antraege/pending">Kompetenzanträge</a>
+      <a href="/tests/builder">Testgenerator</a>
+      <a href="/admin/upload">Listen verwalten</a>
+      <a href="/admin/grading-scale">Notenschlüssel</a>
+    {% else %}
+      <a href="/">Meine Kompetenzen</a>
+      <a href="/tests/builder">Nachweis anfordern</a>
+    {% endif %}
+    <span class="nav-user">{{ user.display_name }}</span>
+    <form action="/logout" method="post" style="display:inline">
+      <button type="submit" class="btn-link">Abmelden</button>
+    </form>
+  </div>
+</nav>
+<main>
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>
