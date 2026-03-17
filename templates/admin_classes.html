@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Klassen verwalten{% endblock %}
+{% block content %}
+<h1>Klassen verwalten</h1>
+<p class="muted">Klassen und Schülerlisten werden lokal gespeichert — kein Azure-Gruppenabgleich nötig.</p>
+
+{% if msg %}
+<div class="success-notice">{{ msg }}</div>
+{% endif %}
+
+<h2>Neue Klasse anlegen</h2>
+<form method="post" action="/admin/classes/add" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+  <input type="text" name="name" placeholder="Klassenname, z.B. 9a" required style="width:10rem">
+  <input type="text" name="description" placeholder="Beschreibung (optional)" style="width:16rem">
+  <button type="submit">Anlegen</button>
+</form>
+
+<h2 style="margin-top:2rem">Vorhandene Klassen</h2>
+{% if classes %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Beschreibung</th>
+      <th>Schüler:innen</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cls in classes %}
+    <tr>
+      <td><a href="/admin/classes/{{ cls.id }}">{{ cls.displayName }}</a></td>
+      <td class="muted">{{ cls.description or "–" }}</td>
+      <td>{{ cls.member_count }}</td>
+      <td>
+        <form method="post" action="/admin/classes/delete" style="display:inline"
+              onsubmit="return confirm('Klasse »{{ cls.displayName }}« und alle Mitglieder löschen?')">
+          <input type="hidden" name="class_id" value="{{ cls.id }}">
+          <button type="submit" class="btn-danger">Löschen</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">Noch keine Klassen angelegt.</p>
+{% endif %}
+{% endblock %}

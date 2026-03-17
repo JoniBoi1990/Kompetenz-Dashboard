@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ cls.displayName }} — Mitglieder{% endblock %}
+{% block content %}
+<h1>{{ cls.displayName }}{% if cls.description %} <span class="muted" style="font-size:.8em">— {{ cls.description }}</span>{% endif %}</h1>
+<a href="/admin/classes">&larr; Zurück zur Übersicht</a>
+
+{% if msg %}
+<div class="success-notice" style="margin-top:1rem">{{ msg }}</div>
+{% endif %}
+
+<h2 style="margin-top:1.5rem">Schüler:in hinzufügen</h2>
+<form method="post" action="/admin/classes/{{ cls.id }}/members/add"
+      style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+  <input type="text" name="student_name" placeholder="Name" required style="width:14rem">
+  <input type="text" name="upn" placeholder="E-Mail / UPN (optional)" style="width:18rem">
+  <button type="submit">Hinzufügen</button>
+</form>
+
+<h2 style="margin-top:1.5rem">CSV-Import</h2>
+<p class="muted" style="margin-top:0">
+  Spalten: <code>Name</code> (oder <code>Vorname</code> + <code>Nachname</code>), optional <code>UPN</code> oder <code>E-Mail</code>.
+  Trennzeichen Semikolon oder Komma, UTF-8.
+</p>
+<form method="post" action="/admin/classes/{{ cls.id }}/members/import"
+      enctype="multipart/form-data" style="display:flex;gap:.5rem;align-items:center">
+  <input type="file" name="file" accept=".csv" required>
+  <button type="submit">Importieren</button>
+</form>
+
+<h2 style="margin-top:1.5rem">Mitglieder ({{ members | length }})</h2>
+{% if members %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>UPN / E-Mail</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for m in members %}
+    <tr>
+      <td>
+        <a href="/teacher/student/{{ m.id }}?student_name={{ m.displayName }}&class_id={{ cls.id }}">
+          {{ m.displayName }}
+        </a>
+      </td>
+      <td class="muted">{{ m.userPrincipalName or "–" }}</td>
+      <td>
+        <form method="post" action="/admin/classes/{{ cls.id }}/members/delete" style="display:inline">
+          <input type="hidden" name="student_id" value="{{ m.id }}">
+          <button type="submit" class="btn-danger">Entfernen</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">Noch keine Mitglieder in dieser Klasse.</p>
+{% endif %}
+{% endblock %}

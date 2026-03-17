@@ -18,12 +18,8 @@ REDIRECT_URI = (
     if settings.DOMAIN.startswith("localhost")
     else f"https://{settings.DOMAIN}/auth/callback"
 )
-# Scopes needed for Graph API calls (Groups/Members, Sites, Lists)
-SCOPES = [
-    "User.Read",
-    "GroupMember.Read.All",
-    "Sites.ReadWrite.All",
-]
+# Only User.Read — identity + role detection.  No SharePoint or Group scopes needed.
+SCOPES = ["User.Read"]
 
 JWKS_URI = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}/discovery/v2.0/keys"
 ISSUER = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}/v2.0"

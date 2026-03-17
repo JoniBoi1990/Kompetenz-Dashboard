@@ -18,7 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 import auth
-import graph
+import db
 from config import settings
 from pdf_engine import create_pdf
 
@@ -168,56 +168,50 @@ _reload_grading_scale()
 # Schüler loggt sich als "dev-student-001" ein und sieht dieselben Daten.
 # ---------------------------------------------------------------------------
 
-_DEV_STORE: dict = {
-    "einfach":           {},   # {student_id: {competency_id: record_dict}}
-    "nachweise":         {},   # {student_id: [nachweis_dict, ...]}
-    "active_ids":        set(),  # set of int: competency IDs marked as covered in class
-    "test_requests":     {},   # {req_id: request_dict}
-    "test_previews":     {},   # {pid: preview_dict}
-    "kompetenzantraege": {},   # {antrag_id: antrag_dict}
-}
+# Ephemeral store for in-progress test previews (per-process, intentionally lost on restart)
+_TEST_PREVIEWS: dict = {}
 
 DEV_STUDENT_OID  = "dev-student-001"
 DEV_STUDENT_NAME = "Anna Beispiel"
 
 
-def _init_dev_store() -> None:
-    """Pre-populate _DEV_STORE with realistic dev data so the UI is non-trivial on restart."""
+def _init_dev_db() -> None:
+    """Pre-populate SQLite with sample data when in DEV_MODE and DB is empty."""
     if not settings.DEV_MODE:
         return
+    # Only populate once — skip if dev student data already exists
+    if db.get_einfach_records(DEV_STUDENT_OID):
+        return
+
+    # Dev class
+    db.add_class("9a (Dev)", "Beispielklasse", class_id="dev-class")
+    db.add_class_member("dev-class", DEV_STUDENT_OID, DEV_STUDENT_NAME, "anna@schule.de")
 
     # Unterrichtsstand: einfach Themen 1–3 + first 10 niveau competencies
     active_einfach = [k for k in _EINFACH if k.get("thema") in (1, 2, 3)]
     active_niveau  = _NIVEAU[:10]
-    _DEV_STORE["active_ids"] = {k["id"] for k in active_einfach} | {k["id"] for k in active_niveau}
+    db.set_active_ids({k["id"] for k in active_einfach} | {k["id"] for k in active_niveau})
 
-    # Dev student: 80 % of active einfach achieved (first 80 % in sorted order)
+    # Dev student: 80 % of active einfach achieved
     n_achieved = round(len(active_einfach) * 0.8)
-    achieved_ids = {k["id"] for k in active_einfach[:n_achieved]}
-    _DEV_STORE["einfach"][DEV_STUDENT_OID] = {
-        k["id"]: {"competency_id": k["id"], "achieved": k["id"] in achieved_ids, "niveau_level": 0}
-        for k in active_einfach
-    }
+    for k in active_einfach:
+        db.upsert_einfach(
+            DEV_STUDENT_OID, DEV_STUDENT_NAME, k["id"],
+            achieved=(k in active_einfach[:n_achieved]),
+            updated_by="lehrer@lehrer.schule.de",
+        )
 
-    # Dev student niveau: 5×Advanced, 3×Beginner, 2×Expert across first 10 niveau comps
-    niveau_assignment = [2, 2, 2, 2, 2, 1, 1, 1, 3, 3]
-    now = datetime.now(timezone.utc).isoformat()
-    _DEV_STORE["nachweise"][DEV_STUDENT_OID] = [
-        {
-            "student_id": DEV_STUDENT_OID,
-            "student_name": DEV_STUDENT_NAME,
-            "competency_id": k["id"],
-            "niveau_level": lvl,
-            "evidence_url": "https://example.com/nachweis",
-            "evidence_name": "Beispiel-Nachweis",
-            "updated_by": "lehrer@lehrer.schule.de",
-            "updated_at": now,
-        }
-        for k, lvl in zip(active_niveau, niveau_assignment)
-    ]
+    # Dev student niveau: 5×Advanced, 3×Beginner, 2×Expert
+    for k, lvl in zip(active_niveau, [2, 2, 2, 2, 2, 1, 1, 1, 3, 3]):
+        db.add_nachweis(
+            DEV_STUDENT_OID, DEV_STUDENT_NAME, k["id"], lvl,
+            "https://example.com/nachweis", "Beispiel-Nachweis",
+            "lehrer@lehrer.schule.de",
+        )
 
 
-_init_dev_store()
+db.init_db()
+_init_dev_db()
 
 
 # ---------------------------------------------------------------------------
@@ -225,28 +219,19 @@ _init_dev_store()
 # ---------------------------------------------------------------------------
 
 def _load_active_ids(token: str) -> set[int]:
-    if settings.DEV_MODE:
-        return set(_DEV_STORE["active_ids"])
-    if not settings.SHAREPOINT_SITE_ID:
-        return set()
-    return graph.get_active_competency_ids(token, settings.SHAREPOINT_SITE_ID)
+    return db.get_active_ids()
 
 
 def _save_active_ids(token: str, ids: set[int]) -> None:
-    if settings.DEV_MODE:
-        _DEV_STORE["active_ids"] = set(ids)
-        return
-    if settings.SHAREPOINT_SITE_ID:
-        graph.set_active_competency_ids(token, settings.SHAREPOINT_SITE_ID, ids)
+    db.set_active_ids(ids)
 
 
 def _get_test_requests() -> dict:
-    """Return all test requests (in-memory; production would read from SharePoint list)."""
-    return _DEV_STORE["test_requests"]
+    return db.get_test_requests()
 
 
 def _save_test_request(req: dict) -> None:
-    _DEV_STORE["test_requests"][req["id"]] = req
+    db.save_test_request(req)
 
 
 def _create_preview(student_name: str, title: str, competency_ids: list[int],
@@ -264,7 +249,7 @@ def _create_preview(student_name: str, title: str, competency_ids: list[int],
             "options": opts,
         })
     pid = str(uuid.uuid4())
-    _DEV_STORE["test_previews"][pid] = {
+    _TEST_PREVIEWS[pid] = {
         "id": pid, "student_name": student_name, "title": title,
         "request_id": request_id, "questions": questions,
     }
@@ -311,38 +296,19 @@ def calculate_grade(records: list[dict], competencies: list[dict] | None = None)
 def _load_student_data(token: str, student_id: str) -> tuple[dict, dict, dict, dict | None]:
     """
     Returns (einfach_record_map, nachweise_by_comp, best_nachweis_by_comp, grade).
-    In DEV_MODE reads from _DEV_STORE instead of Graph API.
+    Reads from local SQLite database.
     """
     einfach_map: dict = {}
     nachweise_by_comp: dict = {}
     best_nachweis_by_comp: dict = {}
     grade = None
 
-    if settings.DEV_MODE:
-        einfach_map = dict(_DEV_STORE["einfach"].get(student_id, {}))
-        for n in _DEV_STORE["nachweise"].get(student_id, []):
-            nachweise_by_comp.setdefault(n["competency_id"], []).append(n)
-        for cid, entries in nachweise_by_comp.items():
-            best_nachweis_by_comp[cid] = max(entries, key=lambda e: e.get("niveau_level", 0))
-        grade = calculate_grade(_build_grade_records(einfach_map, nachweise_by_comp))
-        return einfach_map, nachweise_by_comp, best_nachweis_by_comp, grade
-
-    if not settings.SHAREPOINT_SITE_ID:
-        return einfach_map, nachweise_by_comp, best_nachweis_by_comp, grade
-
     try:
-        list_id = graph.ensure_list_exists(token, settings.SHAREPOINT_SITE_ID, "Kompetenzbewertungen")
-        records = graph.get_records(token, settings.SHAREPOINT_SITE_ID, list_id, student_id=student_id)
-        einfach_map = {int(r["competency_id"]): r for r in records}
-
-        nw_list_id = graph.ensure_nachweise_list(token, settings.SHAREPOINT_SITE_ID)
-        nachweise = graph.get_nachweise(token, settings.SHAREPOINT_SITE_ID, nw_list_id, student_id=student_id)
-        for n in nachweise:
+        einfach_map = db.get_einfach_records(student_id)
+        for n in db.get_nachweise(student_id):
             nachweise_by_comp.setdefault(n["competency_id"], []).append(n)
-
         for cid, entries in nachweise_by_comp.items():
             best_nachweis_by_comp[cid] = max(entries, key=lambda e: e.get("niveau_level", 0))
-
         grade = calculate_grade(_build_grade_records(einfach_map, nachweise_by_comp))
     except Exception:
         pass
@@ -420,11 +386,6 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
     if user["is_teacher"]:
         return RedirectResponse("/teacher")
 
-    try:
-        groups = graph.get_my_groups(user["access_token"])
-    except Exception:
-        groups = []
-
     einfach_map, nachweise_by_comp, best_nachweis_by_comp, _ = _load_student_data(
         user["access_token"], user["oid"]
     )
@@ -462,7 +423,7 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
     # Build antrag lookup dicts for this student
     pending_antraege_by_comp: dict[int, dict] = {}
     rejected_niveau_antraege_by_comp: dict[int, dict] = {}
-    for a in _DEV_STORE["kompetenzantraege"].values():
+    for a in db.get_all_kompetenzantraege().values():
         if a["student_id"] != user["oid"]:
             continue
         cid = a["competency_id"]
@@ -478,7 +439,6 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "user": user,
-        "groups": groups,
         "einfach_map": einfach_map,
         "nachweise_by_comp": nachweise_by_comp,
         "best_nachweis_by_comp": best_nachweis_by_comp,
@@ -501,13 +461,10 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
 
 @app.get("/teacher", response_class=HTMLResponse)
 async def teacher_overview(request: Request, user: dict = Depends(auth.require_teacher_user)):
-    try:
-        groups = graph.get_my_groups(user["access_token"])
-    except Exception:
-        groups = []
+    groups = db.get_classes()
     pending_count = sum(1 for r in _get_test_requests().values() if r["status"] == "pending")
     pending_antraege_count = sum(
-        1 for a in _DEV_STORE["kompetenzantraege"].values() if a["status"] == "pending"
+        1 for a in db.get_all_kompetenzantraege().values() if a["status"] == "pending"
     )
     return templates.TemplateResponse("teacher.html", {
         "request": request, "user": user, "groups": groups,
@@ -517,10 +474,7 @@ async def teacher_overview(request: Request, user: dict = Depends(auth.require_t
 
 @app.get("/teacher/class/{class_id}", response_class=HTMLResponse)
 async def teacher_class(class_id: str, request: Request, user: dict = Depends(auth.require_teacher_user)):
-    try:
-        members = graph.get_group_members(user["access_token"], class_id)
-    except Exception:
-        members = []
+    members = db.get_class_members(class_id)
     return templates.TemplateResponse("class_detail.html", {
         "request": request, "user": user, "class_id": class_id, "members": members,
     })
@@ -562,30 +516,7 @@ async def update_record(
     user: dict = Depends(auth.require_teacher_user),
 ):
     is_achieved = achieved.lower() in ("1", "true", "on", "yes")
-    redirect = RedirectResponse(
-        url=f"/teacher/student/{student_id}?class_id={class_id}&student_name={student_name}",
-        status_code=302,
-    )
-    if settings.DEV_MODE:
-        _DEV_STORE["einfach"].setdefault(student_id, {})[competency_id] = {
-            "competency_id": competency_id, "achieved": is_achieved, "niveau_level": 0,
-        }
-        return redirect
-    if not settings.SHAREPOINT_SITE_ID:
-        raise HTTPException(status_code=503, detail="SHAREPOINT_SITE_ID not configured")
-    token = user["access_token"]
-    list_id = graph.ensure_list_exists(token, settings.SHAREPOINT_SITE_ID, "Kompetenzbewertungen")
-    graph.upsert_record(
-        access_token=token,
-        site_id=settings.SHAREPOINT_SITE_ID,
-        list_id=list_id,
-        student_id=student_id,
-        student_name=student_name,
-        competency_id=competency_id,
-        achieved=(achieved.lower() in ("1", "true", "on", "yes")),
-        niveau_level=0,
-        updated_by=user["upn"],
-    )
+    db.upsert_einfach(student_id, student_name, competency_id, is_achieved, user["upn"])
     return RedirectResponse(
         url=f"/teacher/student/{student_id}?class_id={class_id}&student_name={student_name}",
         status_code=302,
@@ -603,37 +534,9 @@ async def add_nachweis(
     class_id: str = Form(default=""),
     user: dict = Depends(auth.require_teacher_user),
 ):
-    redirect = RedirectResponse(
-        url=f"/teacher/student/{student_id}?class_id={class_id}&student_name={student_name}",
-        status_code=302,
-    )
-    if settings.DEV_MODE:
-        _DEV_STORE["nachweise"].setdefault(student_id, []).append({
-            "student_id": student_id,
-            "student_name": student_name,
-            "competency_id": competency_id,
-            "niveau_level": niveau_level,
-            "evidence_url": evidence_url.strip(),
-            "evidence_name": evidence_name.strip() or evidence_url.strip(),
-            "updated_by": user["upn"],
-            "updated_at": datetime.now(timezone.utc).isoformat(),
-        })
-        return redirect
-    if not settings.SHAREPOINT_SITE_ID:
-        raise HTTPException(status_code=503, detail="SHAREPOINT_SITE_ID not configured")
-    token = user["access_token"]
-    nw_list_id = graph.ensure_nachweise_list(token, settings.SHAREPOINT_SITE_ID)
-    graph.add_nachweis(
-        access_token=token,
-        site_id=settings.SHAREPOINT_SITE_ID,
-        list_id=nw_list_id,
-        student_id=student_id,
-        student_name=student_name,
-        competency_id=competency_id,
-        niveau_level=niveau_level,
-        evidence_url=evidence_url.strip(),
-        evidence_name=evidence_name.strip(),
-        updated_by=user["upn"],
+    db.add_nachweis(
+        student_id, student_name, competency_id, niveau_level,
+        evidence_url.strip(), evidence_name.strip() or evidence_url.strip(), user["upn"],
     )
     return RedirectResponse(
         url=f"/teacher/student/{student_id}?class_id={class_id}&student_name={student_name}",
@@ -673,12 +576,12 @@ async def antraege_submit(
             raise HTTPException(status_code=400, detail="Link erforderlich")
 
     # No existing pending antrag for this competency
-    for a in _DEV_STORE["kompetenzantraege"].values():
+    for a in db.get_all_kompetenzantraege().values():
         if a["student_id"] == user["oid"] and a["competency_id"] == competency_id and a["status"] == "pending":
             raise HTTPException(status_code=400, detail="Antrag bereits gestellt")
 
     antrag_id = str(uuid.uuid4())
-    _DEV_STORE["kompetenzantraege"][antrag_id] = {
+    antrag = {
         "id": antrag_id,
         "student_id": user["oid"],
         "student_name": user["display_name"],
@@ -691,6 +594,7 @@ async def antraege_submit(
         "begruendung": "",
         "niveau_level": None,
     }
+    db.save_kompetenzantrag(antrag)
     return RedirectResponse(url="/?antrag_ok=1", status_code=302)
 
 
@@ -698,7 +602,7 @@ async def antraege_submit(
 async def antraege_pending(request: Request, user: dict = Depends(auth.require_teacher_user)):
     antraege = [
         {**a, "competency_name": (_KOMPETENZ_MAP.get(a["competency_id"]) or {}).get("name", "?")}
-        for a in _DEV_STORE["kompetenzantraege"].values()
+        for a in db.get_all_kompetenzantraege().values()
         if a["status"] == "pending"
     ]
     antraege.sort(key=lambda a: a["created_at"])
@@ -714,7 +618,8 @@ async def antraege_accept(
     begruendung: str = Form(default=""),
     user: dict = Depends(auth.require_teacher_user),
 ):
-    a = _DEV_STORE["kompetenzantraege"].get(antrag_id)
+    antraege = db.get_all_kompetenzantraege()
+    a = antraege.get(antrag_id)
     if not a or a["status"] != "pending":
         raise HTTPException(status_code=404, detail="Antrag nicht gefunden")
 
@@ -723,47 +628,20 @@ async def antraege_accept(
     competency_id = a["competency_id"]
 
     if a["typ"] == "einfach":
-        if settings.DEV_MODE:
-            _DEV_STORE["einfach"].setdefault(student_id, {})[competency_id] = {
-                "competency_id": competency_id, "achieved": True, "niveau_level": 0,
-            }
-        else:
-            if settings.SHAREPOINT_SITE_ID:
-                token = user["access_token"]
-                list_id = graph.ensure_list_exists(token, settings.SHAREPOINT_SITE_ID, "Kompetenzbewertungen")
-                graph.upsert_record(
-                    access_token=token, site_id=settings.SHAREPOINT_SITE_ID, list_id=list_id,
-                    student_id=student_id, student_name=student_name,
-                    competency_id=competency_id, achieved=True, niveau_level=0,
-                    updated_by=user["upn"],
-                )
+        db.upsert_einfach(student_id, student_name, competency_id, True, user["upn"])
         a["status"] = "accepted"
     else:
         if niveau_level < 1 or niveau_level > 3:
             raise HTTPException(status_code=400, detail="Niveau 1–3 erforderlich")
-        if settings.DEV_MODE:
-            _DEV_STORE["nachweise"].setdefault(student_id, []).append({
-                "student_id": student_id, "student_name": student_name,
-                "competency_id": competency_id, "niveau_level": niveau_level,
-                "evidence_url": a["evidence_url"], "evidence_name": a["evidence_url"],
-                "updated_by": user["upn"],
-                "updated_at": datetime.now(timezone.utc).isoformat(),
-            })
-        else:
-            if settings.SHAREPOINT_SITE_ID:
-                token = user["access_token"]
-                nw_list_id = graph.ensure_nachweise_list(token, settings.SHAREPOINT_SITE_ID)
-                graph.add_nachweis(
-                    access_token=token, site_id=settings.SHAREPOINT_SITE_ID, list_id=nw_list_id,
-                    student_id=student_id, student_name=student_name,
-                    competency_id=competency_id, niveau_level=niveau_level,
-                    evidence_url=a["evidence_url"], evidence_name=a["evidence_url"],
-                    updated_by=user["upn"],
-                )
+        db.add_nachweis(
+            student_id, student_name, competency_id, niveau_level,
+            a["evidence_url"], a["evidence_url"], user["upn"],
+        )
         a["status"] = "accepted"
         a["niveau_level"] = niveau_level
         a["begruendung"] = begruendung.strip()
 
+    db.save_kompetenzantrag(a)
     return RedirectResponse(url="/antraege/pending", status_code=302)
 
 
@@ -773,11 +651,13 @@ async def antraege_reject(
     begruendung: str = Form(default=""),
     user: dict = Depends(auth.require_teacher_user),
 ):
-    a = _DEV_STORE["kompetenzantraege"].get(antrag_id)
+    antraege = db.get_all_kompetenzantraege()
+    a = antraege.get(antrag_id)
     if not a or a["status"] != "pending":
         raise HTTPException(status_code=404, detail="Antrag nicht gefunden")
     a["status"] = "rejected"
     a["begruendung"] = begruendung.strip()
+    db.save_kompetenzantrag(a)
     return RedirectResponse(url="/antraege/pending", status_code=302)
 
 
@@ -822,12 +702,7 @@ async def test_builder(request: Request, user: dict = Depends(auth.require_user)
             "next_number": next_number,
         })
 
-    try:
-        groups = graph.get_my_groups(user["access_token"])
-    except Exception:
-        groups = []
-    if settings.DEV_MODE and not groups:
-        groups = [{"id": "dev-class", "displayName": "9a (Dev)"}]
+    groups = db.get_classes()
 
     return templates.TemplateResponse("test_builder.html", {
         "request": request, "user": user,
@@ -920,7 +795,7 @@ async def confirm_test(req_id: str, request: Request, user: dict = Depends(auth.
 
 @app.get("/tests/preview/{pid}", response_class=HTMLResponse)
 async def test_preview(pid: str, request: Request, user: dict = Depends(auth.require_teacher_user)):
-    preview = _DEV_STORE["test_previews"].get(pid)
+    preview = _TEST_PREVIEWS.get(pid)
     if not preview:
         raise HTTPException(status_code=404, detail="Vorschau nicht gefunden oder abgelaufen")
     return templates.TemplateResponse("test_preview.html", {
@@ -930,7 +805,7 @@ async def test_preview(pid: str, request: Request, user: dict = Depends(auth.req
 
 @app.post("/tests/finalize/{pid}")
 async def finalize_test(pid: str, request: Request, user: dict = Depends(auth.require_teacher_user)):
-    preview = _DEV_STORE["test_previews"].get(pid)
+    preview = _TEST_PREVIEWS.get(pid)
     if not preview:
         raise HTTPException(status_code=404, detail="Vorschau nicht gefunden oder abgelaufen")
 
@@ -957,11 +832,9 @@ async def finalize_test(pid: str, request: Request, user: dict = Depends(auth.re
     # Mark linked request as done
     req_id = preview.get("request_id")
     if req_id:
-        req = _get_test_requests().get(req_id)
-        if req:
-            req["status"] = "done"
+        db.update_test_request_status(req_id, "done")
 
-    del _DEV_STORE["test_previews"][pid]
+    del _TEST_PREVIEWS[pid]
 
     safe_name = preview["student_name"].replace(" ", "_")
     return Response(
@@ -974,13 +847,10 @@ async def finalize_test(pid: str, request: Request, user: dict = Depends(auth.re
 @app.get("/api/class-students/{class_id}")
 async def api_class_students(class_id: str, user: dict = Depends(auth.require_teacher_user)):
     """AJAX: returns student list for a given class/group."""
-    if settings.DEV_MODE:
-        return [{"id": DEV_STUDENT_OID, "displayName": DEV_STUDENT_NAME}]
-    try:
-        members = graph.get_group_members(user["access_token"], class_id)
-        return [{"id": m["id"], "displayName": m["displayName"]} for m in members]
-    except Exception:
-        return []
+    return [
+        {"id": m["id"], "displayName": m["displayName"]}
+        for m in db.get_class_members(class_id)
+    ]
 
 
 @app.get("/api/student-competencies")
@@ -1419,3 +1289,94 @@ async def admin_grading_scale_upload(
     dest.write_bytes(content)
     msg = f"Hochgeladen: {dest.name} (50\u2009% \u2192 Note {note_50})"
     return RedirectResponse(f"/admin/grading-scale?msg={quote(msg)}", status_code=303)
+
+
+# ---------------------------------------------------------------------------
+# Admin: Klassenverwaltung (local SQLite — no Azure group permissions needed)
+# ---------------------------------------------------------------------------
+
+@app.get("/admin/classes", response_class=HTMLResponse)
+async def admin_classes(request: Request, user: dict = Depends(auth.require_teacher_user)):
+    classes = db.get_classes_with_counts()
+    return templates.TemplateResponse("admin_classes.html", {
+        "request": request, "user": user, "classes": classes,
+        "msg": request.query_params.get("msg", ""),
+    })
+
+
+@app.post("/admin/classes/add")
+async def admin_classes_add(
+    name: str = Form(...),
+    description: str = Form(default=""),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    if name.strip():
+        db.add_class(name.strip(), description.strip())
+    return RedirectResponse("/admin/classes", status_code=303)
+
+
+@app.post("/admin/classes/delete")
+async def admin_classes_delete(
+    class_id: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    db.delete_class(class_id)
+    return RedirectResponse("/admin/classes", status_code=303)
+
+
+@app.get("/admin/classes/{class_id}", response_class=HTMLResponse)
+async def admin_class_members(
+    class_id: str,
+    request: Request,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    classes = db.get_classes()
+    cls = next((c for c in classes if c["id"] == class_id), None)
+    if not cls:
+        raise HTTPException(status_code=404, detail="Klasse nicht gefunden")
+    members = db.get_class_members(class_id)
+    return templates.TemplateResponse("admin_class_members.html", {
+        "request": request, "user": user, "cls": cls, "members": members,
+        "msg": request.query_params.get("msg", ""),
+    })
+
+
+@app.post("/admin/classes/{class_id}/members/add")
+async def admin_class_member_add(
+    class_id: str,
+    student_name: str = Form(...),
+    upn: str = Form(default=""),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    if student_name.strip():
+        sid = upn.strip() or student_name.strip()
+        db.add_class_member(class_id, sid, student_name.strip(), upn.strip())
+    return RedirectResponse(f"/admin/classes/{class_id}", status_code=303)
+
+
+@app.post("/admin/classes/{class_id}/members/delete")
+async def admin_class_member_delete(
+    class_id: str,
+    student_id: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    db.delete_class_member(class_id, student_id)
+    return RedirectResponse(f"/admin/classes/{class_id}", status_code=303)
+
+
+@app.post("/admin/classes/{class_id}/members/import")
+async def admin_class_members_import(
+    class_id: str,
+    file: UploadFile = File(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    content = await file.read()
+    text = content.decode("utf-8-sig")
+    # Try semicolon first, then comma
+    delimiter = ";" if ";" in text.split("\n")[0] else ","
+    reader = csv.DictReader(io.StringIO(text), delimiter=delimiter)
+    count = db.import_class_members_csv(class_id, list(reader))
+    return RedirectResponse(
+        f"/admin/classes/{class_id}?msg={quote(f'{count} Schüler:innen importiert')}",
+        status_code=303,
+    )

@@ -14,6 +14,7 @@ build/
 # Uploads / generated data (not source-controlled)
 grading_scales/*.csv
 static/logo.png
+dashboard.db
 
 # macOS
 .DS_Store
