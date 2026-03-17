@@ -325,7 +325,7 @@ async def login(request: Request):
     if settings.DEV_MODE:
         return templates.TemplateResponse("dev_login.html", {"request": request})
     state = secrets.token_hex(16)
-    url = auth.get_auth_url(state)
+    url = auth.get_auth_url(state, auth._build_redirect_uri(request))
     return RedirectResponse(url)
 
 
@@ -355,7 +355,7 @@ async def auth_callback(request: Request, code: str = "", error: str = ""):
     if error or not code:
         return HTMLResponse(f"<h1>Login fehlgeschlagen</h1><p>{error}</p>", status_code=400)
     try:
-        token_response = auth.exchange_code(code)
+        token_response = auth.exchange_code(code, auth._build_redirect_uri(request))
     except ValueError as e:
         return HTMLResponse(f"<h1>Token-Fehler</h1><p>{e}</p>", status_code=400)
     user_info = auth.build_user_info(token_response)

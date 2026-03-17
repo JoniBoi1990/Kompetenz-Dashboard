@@ -13,13 +13,15 @@ from fastapi import Request, HTTPException, status
 from config import settings
 
 AUTHORITY = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}"
-REDIRECT_URI = (
-    f"http://{settings.DOMAIN}/auth/callback"
-    if settings.DOMAIN.startswith("localhost")
-    else f"https://{settings.DOMAIN}/auth/callback"
-)
 # Only User.Read — identity + role detection.  No SharePoint or Group scopes needed.
 SCOPES = ["User.Read"]
+
+
+def _build_redirect_uri(request) -> str:
+    """Build the redirect URI from the actual request host so multiple domains work."""
+    scheme = request.url.scheme
+    netloc = request.url.netloc
+    return f"{scheme}://{netloc}/auth/callback"
 
 JWKS_URI = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}/discovery/v2.0/keys"
 ISSUER = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}/v2.0"
@@ -41,19 +43,19 @@ def _msal_app() -> msal.ConfidentialClientApplication:
     )
 
 
-def get_auth_url(state: str) -> str:
+def get_auth_url(state: str, redirect_uri: str) -> str:
     return _msal_app().get_authorization_request_url(
         scopes=SCOPES,
         state=state,
-        redirect_uri=REDIRECT_URI,
+        redirect_uri=redirect_uri,
     )
 
 
-def exchange_code(code: str) -> dict:
+def exchange_code(code: str, redirect_uri: str) -> dict:
     result = _msal_app().acquire_token_by_authorization_code(
         code=code,
         scopes=SCOPES,
-        redirect_uri=REDIRECT_URI,
+        redirect_uri=redirect_uri,
     )
     if "error" in result:
         raise ValueError(
