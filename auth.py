@@ -101,9 +101,10 @@ def is_teacher(claims: dict) -> bool:
 
 def build_user_info(token_response: dict) -> dict:
     claims = _extract_claims(token_response.get("id_token", ""))
+    upn = claims.get("preferred_username", "")
     return {
-        "oid": claims.get("oid", ""),
-        "upn": claims.get("preferred_username", ""),
+        "oid": upn,  # UPN als eindeutige ID verwenden (statt Azure AD Object ID)
+        "upn": upn,
         "display_name": claims.get("name", ""),
         "roles": claims.get("roles", []),
         "is_teacher": is_teacher(claims),
