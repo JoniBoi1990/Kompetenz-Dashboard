@@ -17,12 +17,21 @@ AUTHORITY = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}"
 SCOPES = ["User.Read"]
 
 
-def _build_redirect_uri(request) -> str:
-    """Build the redirect URI from the actual request host so multiple domains work."""
-    scheme = request.url.scheme
-    netloc = request.url.netloc
-    return f"{scheme}://{netloc}/auth/callback"
+def _build_redirect_uri(request: Request) -> str:
+    """Build the redirect URI from the actual request host so multiple domains work.
 
+    Respects X-Forwarded-Proto for reverse-proxy setups (e.g. Uberspace).
+    Falls back to https for any non-localhost host.
+    """
+    netloc = request.url.netloc
+    forwarded_proto = request.headers.get("x-forwarded-proto")
+    if forwarded_proto:
+        scheme = forwarded_proto
+    elif netloc.startswith("localhost") or netloc.startswith("127."):
+        scheme = "http"
+    else:
+        scheme = "https"
+    return f"{scheme}://{netloc}/auth/callback"
 JWKS_URI = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}/discovery/v2.0/keys"
 ISSUER = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}/v2.0"
 
@@ -43,19 +52,19 @@ def _msal_app() -> msal.ConfidentialClientApplication:
     )
 
 
-def get_auth_url(state: str, redirect_uri: str) -> str:
+def get_auth_url(state: str, request: Request) -> str:
     return _msal_app().get_authorization_request_url(
         scopes=SCOPES,
         state=state,
-        redirect_uri=redirect_uri,
+        redirect_uri=_build_redirect_uri(request),
     )
 
 
-def exchange_code(code: str, redirect_uri: str) -> dict:
+def exchange_code(code: str, request: Request) -> dict:
     result = _msal_app().acquire_token_by_authorization_code(
         code=code,
         scopes=SCOPES,
-        redirect_uri=redirect_uri,
+        redirect_uri=_build_redirect_uri(request),
     )
     if "error" in result:
         raise ValueError(
