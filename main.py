@@ -171,7 +171,7 @@ _reload_grading_scale()
 # Ephemeral store for in-progress test previews (per-process, intentionally lost on restart)
 _TEST_PREVIEWS: dict = {}
 
-DEV_STUDENT_OID  = "dev-student-001"
+DEV_STUDENT_OID  = "dev@schule.de"  # Muss mit Dev-Login UPN übereinstimmen
 DEV_STUDENT_NAME = "Anna Beispiel"
 
 
@@ -337,9 +337,10 @@ async def dev_login(
     if not settings.DEV_MODE:
         raise HTTPException(status_code=403, detail="Nur im Dev-Modus verfügbar")
     is_teacher = role == "teacher"
+    upn = f"dev@lehrer.schule.de" if is_teacher else "dev@schule.de"
     user_info = {
-        "oid": "dev-teacher-001" if is_teacher else DEV_STUDENT_OID,
-        "upn": f"dev@{'lehrer.' if is_teacher else ''}schule.de",
+        "oid": upn,  # UPN als eindeutige ID verwenden
+        "upn": upn,
         "display_name": display_name,
         "roles": ["Lehrer"] if is_teacher else [],
         "is_teacher": is_teacher,
