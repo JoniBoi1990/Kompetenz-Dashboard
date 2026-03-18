@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Kompetenz-Dashboard — a Microsoft 365-connected student dashboard for chemistry competency tracking, personalized PDF test generation, and appointment booking.
 
-**Architecture decision (2026-03):** The original Docker Compose + PostgreSQL plan was replaced with a lean FastAPI + Jinja2 app that uses Microsoft 365 as the exclusive data layer. No database, no Docker, no React. Hosted on Uberspace via plain `uvicorn`.
+**Architecture decision (2026-03):** The original Docker Compose + PostgreSQL plan was replaced with a lean FastAPI + Jinja2 app. No Docker, no React. Hosted on Uberspace via plain `uvicorn`.
+
+**Data layer decision (2026-03):** Microsoft SharePoint Lists replaced by SQLite (`dashboard.db` via `db.py`). Azure AD is used for authentication only (`User.Read` scope). Classes and students are managed directly in SQLite instead of being fetched from MS Graph.
 
 ## Git Branch Strategy
 
@@ -25,12 +27,14 @@ Commit format: `agent: <short description>`
 Uberspace (larissa.uberspace.de → bhof.uber.space)
 └── FastAPI (uvicorn main:app, port 8000, systemd user service)
     ├── Jinja2 HTML templates (no npm, no React)
-    ├── MSAL Python (Azure AD auth + delegated Graph API calls)
+    ├── MSAL Python (Azure AD auth — User.Read only)
     ├── pdf_engine.py (directly imported, synchronous)
-    └── Microsoft 365 as data layer
-        ├── Azure AD → identity + roles (Lehrer / Schüler)
-        ├── MS Graph → class groups + student lists
-        └── Microsoft Lists (SharePoint) → competency records
+    ├── db.py → SQLite (dashboard.db) — all app data
+    │   ├── einfach_records, nachweise
+    │   ├── active_ids (Unterrichtsstand)
+    │   ├── test_requests, kompetenzantraege
+    │   └── classes, class_members
+    └── Azure AD → identity + roles (Lehrer / Schüler) only
 ```
 
 **Removed entirely:** Docker, PostgreSQL, Redis, Celery, pdf-worker microservice, React SPA, nginx, Traefik.
@@ -63,8 +67,10 @@ Kompetenz-Dashboard/
 ├── main.py              # FastAPI app + all routes
 ├── config.py            # Settings via pydantic-settings (.env)
 ├── auth.py              # MSAL + itsdangerous session cookies
-├── graph.py             # MS Graph API client (groups, lists)
+├── db.py                # SQLite persistence layer (replaces MS Lists)
+├── graph.py             # MS Graph API client (kept; auth only in production)
 ├── pdf_engine.py        # PDF generation (ported from app5.py, bug-fixed)
+├── dashboard.db         # SQLite database (auto-created; not in git)
 ├── kompetenzen.json     # Competency list (einfach + niveau); edited via /admin
 ├── questions.json       # Test questions per competency ID; created via /admin/upload
 ├── grading_scale.json   # Active grading scale (absent = use default preset)
@@ -88,7 +94,9 @@ Kompetenz-Dashboard/
 │   ├── upload.html               # CSV upload page (ibK, pbK, Testfragen)
 │   ├── admin_kompetenzen.html    # Edit/add/delete competencies
 │   ├── admin_questions.html      # Edit test questions per competency
-│   └── admin_grading_scale.html  # Edit grading scale + upload/preset selection
+│   ├── admin_grading_scale.html  # Edit grading scale + upload/preset selection
+│   ├── admin_classes.html        # Manage classes (add/delete)
+│   └── admin_class_members.html  # Manage class members (add/delete/CSV import)
 ├── _samples/            # Sample CSV files (not served)
 │   ├── ibK_9_alle Kopie.csv
 │   ├── pbK_9_alle Kopie.csv
@@ -110,8 +118,19 @@ Kompetenz-Dashboard/
 - **Session:** itsdangerous `URLSafeTimedSerializer`, 8h TTL, httponly + samesite=lax
 - **Role detection:** `roles` claim (`"Lehrer"`) or `@lehrer.` in UPN
 - **Cookie name:** `session`
-- **MSAL scopes:** `User.Read`, `GroupMember.Read.All`, `Sites.ReadWrite.All` — do NOT add `openid`, `profile`, or `email` (reserved, handled by MSAL internally)
+- **MSAL scopes:** `User.Read` only — do NOT add `openid`, `profile`, `email` (reserved), `GroupMember.Read.All`, or `Sites.ReadWrite.All` (no longer needed)
 - **DEV_MODE:** `DEV_MODE=true` in `.env` enables a fake login form (`/dev-login`) — no Azure AD needed
+
+### Student Identity (student_id)
+
+**Important:** The `student_id` stored in SQLite (`einfach_records`, `nachweise`, `class_members`, etc.) uses the **UPN** (`preferred_username`, i.e. the user's email) rather than the Azure AD Object ID (`oid`).
+
+**Rationale:** Teachers add students via email/UPN in the admin UI. Using UPN as the primary key ensures that teacher-created records match the student's login identity without requiring an OID-to-UPN mapping table.
+
+**Implementation:**
+- `auth.py`: `build_user_info()` sets `oid` to the UPN claim
+- `main.py`: `DEV_STUDENT_OID = "dev@schule.de"` matches the dev login UPN
+- Teachers must add students using the exact UPN/email the student uses to log in
 
 ## Routes
 
@@ -123,12 +142,12 @@ Kompetenz-Dashboard/
 | GET | /auth/me | session | JSON user info |
 | GET | / | student | Dashboard: score (no grade), planning mode, Kompetenzanträge |
 | GET | /teacher | teacher | Class overview + pending test + antrag count badges |
-| GET | /teacher/class/{id} | teacher | Student list (Graph API) |
+| GET | /teacher/class/{id} | teacher | Student list (SQLite) |
 | GET | /teacher/student/{id} | teacher | Competency grid + grade |
 | GET | /teacher/coverage | teacher | Set which competencies are in Unterrichtsstand |
 | POST | /teacher/coverage/update | teacher | Save Unterrichtsstand |
-| POST | /records/update | teacher | Save einfach record → MS List (also accepts AJAX) |
-| POST | /records/nachweis | teacher | Add niveau Nachweis → MS List |
+| POST | /records/update | teacher | Save einfach record → SQLite (also accepts AJAX) |
+| POST | /records/nachweis | teacher | Add niveau Nachweis → SQLite |
 | GET | /tests/builder | any | Role-split test form |
 | POST | /tests/generate | teacher | Create preview (→ redirect to /tests/preview/{pid}) |
 | POST | /tests/request | student | Submit test request (stored, no PDF yet) |
@@ -160,10 +179,17 @@ Kompetenz-Dashboard/
 | POST | /admin/grading-scale/save | teacher | Save threshold edits → grading_scale.json |
 | POST | /admin/grading-scale/reset | teacher | Delete grading_scale.json → revert to default preset |
 | POST | /admin/grading-scale/upload | teacher | Upload custom scale CSV → grading_scales/ |
+| GET | /admin/classes | teacher | List classes (SQLite) |
+| POST | /admin/classes/add | teacher | Add new class |
+| POST | /admin/classes/delete | teacher | Delete class + all members |
+| GET | /admin/classes/{class_id} | teacher | Class member management page |
+| POST | /admin/classes/{class_id}/members/add | teacher | Add student to class |
+| POST | /admin/classes/{class_id}/members/delete | teacher | Remove student from class |
+| POST | /admin/classes/{class_id}/members/import | teacher | Bulk import members from CSV |
 
 ## Navigation (role-dependent)
 
-**Teacher:** Klassen | Unterrichtsstand | Notenrechner | Testanfragen | Kompetenzanträge | Testgenerator | Listen verwalten | Notenschlüssel
+**Teacher:** Klassen | Unterrichtsstand | Notenrechner | Testanfragen | Kompetenzanträge | Testgenerator | Listen verwalten | Notenschlüssel | Klassen verwalten
 
 **Student:** Meine Kompetenzen | Nachweis anfordern
 
@@ -221,7 +247,7 @@ Teacher review at `GET /antraege/pending`:
 - Accept niveau → teacher selects level 1–3, writes nachweis entry
 - Reject niveau → Begründung required, shown to student on next dashboard load
 
-Data stored in `_DEV_STORE["kompetenzantraege"]` (in-memory). Production would use a SharePoint list `Kompetenzantraege` via the stubs in `graph.py`.
+Data stored in SQLite via `db.save_kompetenzantrag()` / `db.get_all_kompetenzantraege()` — persisted across restarts.
 
 ## Test Generator: Role-Split Behaviour
 
@@ -244,11 +270,11 @@ Data stored in `_DEV_STORE["kompetenzantraege"]` (in-memory). Production would u
 - `POST /tests/finalize/{pid}` generates PDF, marks linked request as `done`, deletes preview from store
 
 ### Student test request workflow
-1. Student submits → stored in `_DEV_STORE["test_requests"]`; confirmation page shows Bookings link
+1. Student submits → stored in SQLite (`db.save_test_request()`); confirmation page shows Bookings link
 2. Teacher sees count badge on `/teacher`
 3. `GET /tests/pending`: cards per request with editable checkboxes
 4. `POST /tests/confirm/{req_id}` → preview → `POST /tests/finalize/{pid}` → PDF
-5. **Production note:** `_DEV_STORE["test_requests"]` and `_DEV_STORE["test_previews"]` are in-memory. A SharePoint list `Testanfragen` should be added for production persistence.
+5. **Note:** `_TEST_PREVIEWS` (in-progress previews) is in-memory only — lost on restart. Test requests themselves are persisted in SQLite.
 
 ## Thema Grouping in Templates
 
@@ -270,50 +296,56 @@ Interactive views (coverage, test_builder teacher, grade_calculator, student_det
 
 `setThema(thema, state)` bulk-sets all checkboxes for a thema group via the same AJAX helper, one request per checkbox that needs to change.
 
-## Data: Microsoft Lists
+## Data: SQLite Database (`db.py`)
 
-### `Kompetenzbewertungen` — einfach competency records
+All app data is stored in `dashboard.db` (SQLite, created automatically). `db.init_db()` creates tables on startup.
+
+### `einfach_records`
 
 | Column | Type | Notes |
 |--------|------|-------|
-| student_id | Text | Azure AD object ID |
-| student_name | Text | Display name (cached) |
-| competency_id | Number | Competency ID |
-| achieved | Boolean | For `einfach` type |
-| niveau_level | Number 0–3 | For `niveau` type (unused here) |
-| updated_by | Text | Teacher UPN |
-| updated_at | DateTime | ISO timestamp |
+| student_id | TEXT PK | Azure AD object ID |
+| competency_id | INTEGER PK | Competency ID |
+| student_name | TEXT | Display name (cached) |
+| achieved | INTEGER | 0 or 1 |
+| updated_by | TEXT | Teacher UPN |
+| updated_at | TEXT | ISO timestamp |
 
-### `Nachweise` — niveau evidence records
+### `nachweise`
 
-Separate list for niveau-type competencies; each entry is one proof attempt with `niveau_level`, `evidence_url`, `evidence_name`.
+Each row is one niveau proof attempt: `id` (UUID), `student_id`, `competency_id`, `niveau_level` (1–3), `evidence_url`, `evidence_name`, `updated_by`, `updated_at`.
 
-### `Kompetenzantraege` — student competency claims (production stub)
+### `active_ids`
 
-Columns: `antrag_id`, `student_id`, `student_name`, `competency_id`, `typ`, `beschreibung`, `evidence_url`, `created_at`, `status`, `begruendung`, `niveau_level`. Graph helpers in `graph.py`: `ensure_kompetenzantraege_list()`, `add_kompetenzantrag()`, `get_kompetenzantraege()`, `update_kompetenzantrag()`.
+Single-column table (`competency_id`) — the current Unterrichtsstand set.
 
-`graph.ensure_list_exists()` and `graph.ensure_nachweise_list()` auto-create lists on first use.
+### `test_requests`
 
-## DEV_MODE In-Memory Store
+`id`, `student_id`, `student_name`, `title`, `competency_ids` (JSON array), `status` (`pending`/`done`), `created_at`.
 
-`_DEV_STORE` in `main.py` replaces all SharePoint calls when `DEV_MODE=true`:
+### `kompetenzantraege`
 
-```python
-_DEV_STORE = {
-    "einfach":           {},   # {student_id: {competency_id: record}}
-    "nachweise":         {},   # {student_id: [nachweis, ...]}
-    "active_ids":        set(),
-    "test_requests":     {},   # {req_id: request_dict}
-    "test_previews":     {},   # {pid: preview_dict}
-    "kompetenzantraege": {},   # {antrag_id: antrag_dict}
-}
-```
+`id` (UUID), `data` (JSON blob) — full antrag dict stored as JSON.
+
+### `classes` + `class_members`
+
+`classes`: `id`, `name`, `description`.
+`class_members`: `class_id`, `student_id`, `student_name`, `upn`. Primary key is `(class_id, student_id)`.
+
+**CSV import** (`db.import_class_members_csv()`): columns `Name` (or `Vorname`+`Nachname`), `UPN` (or `E-Mail` or `UserPrincipalName`).
+
+## DEV_MODE
+
+`DEV_MODE=true` enables fake login (`/dev-login`) — no Azure AD needed. All data goes into the same SQLite `dashboard.db`.
 
 Dev student: `oid="dev-student-001"`, name="Anna Beispiel". Dev teacher: `oid="dev-teacher-001"`.
 
-**Pre-populated on startup** via `_init_dev_store()` (called at module load, after `_reload_kompetenzen()`):
+**Pre-populated on first startup** via `_init_dev_db()` (skipped if dev student data already exists in SQLite):
+- Dev class `"9a (Dev)"` with Anna Beispiel as member
 - `active_ids`: all einfach in Themen 1–3 + first 10 niveau competencies
 - Dev student: 80% of active einfach achieved; niveau: 5×Advanced, 3×Beginner, 2×Expert on first 10 niveau comps
+
+**`_TEST_PREVIEWS`** (dict in `main.py`): in-memory only, lost on restart. Acceptable — previews are short-lived.
 
 ## Grade Formula
 
@@ -381,16 +413,16 @@ Row 0 = competency IDs (column headers). Rows 1–N = question variants. Empty c
 ## Environment Variables (.env)
 
 ```
-DEV_MODE=false                  # true = fake login, in-memory store (pre-populated)
+DEV_MODE=false                  # true = fake login, SQLite pre-populated with sample data
 DOMAIN=bhof.uber.space          # or localhost:8000 for local dev
 AZURE_CLIENT_ID=...
 AZURE_CLIENT_SECRET=...
 AZURE_TENANT_ID=...
 SESSION_SECRET=...              # python -c "import secrets; print(secrets.token_hex(32))"
-SHAREPOINT_SITE_ID=...          # GET /v1.0/sites?search=schule to find it
 USE_BOOKINGS_API=false
 BOOKINGS_BUSINESS_ID=
 BOOKINGS_PAGE_URL=https://outlook.office.com/book/Birklehof3@birklehof.de/
+# SHAREPOINT_SITE_ID no longer required (data is in SQLite)
 ```
 
 ## Running Locally
@@ -408,8 +440,8 @@ uvicorn main:app --reload
 | Phase | Status | Content |
 |-------|--------|---------|
 | 0 | done | FastAPI + MSAL login → /auth/me works, roles detected |
-| 1 | done | Graph API: class groups + student members displayed |
-| 2 | done | Microsoft Lists: read/write competency records + Nachweise |
+| 1 | done | Class groups + student lists (originally Graph API, now SQLite + admin UI) |
+| 2 | done | SQLite: read/write competency records + Nachweise (replaces MS Lists) |
 | 3 | done | PDF test generator (pdf_engine.py integrated) |
 | 4 | done | Grade calculator + student dashboard (score card + Planungsmodus) |
 | 5 | done | Bookings (BOOKINGS_PAGE_URL link after test request confirmation) |
@@ -417,5 +449,6 @@ uvicorn main:app --reload
 | 7 | done | CSV upload + admin editor (kompetenzen, questions); thema grouping; test preview |
 | 8 | done | Grading scale: CSV presets, upload, editable thresholds; proven-comps in Unterrichtsstand grade |
 | 9 | done | Kompetenzanträge: student claim workflow, teacher review, inline dashboard forms |
-| 10 | done | DEV_MODE pre-populated store; Git repo + Uberspace deployment |
-| 11 | open | Production persistence for test_requests + kompetenzantraege (SharePoint lists) |
+| 10 | done | DEV_MODE pre-populated SQLite; Git repo + Uberspace deployment |
+| 11 | done | SQLite persistence for all data (test_requests, kompetenzantraege, classes, members) |
+| 12 | done | Class management admin UI (/admin/classes): add/delete classes, manage + CSV-import members |
