@@ -23,7 +23,9 @@ The `agent-dev` branch has features that only work with `DEV_MODE=true`:
 - Multiple test users (Anna, Max, Lehrer)
 - Test classes (9a, 10a) with sample data
 - Class-specific competency lists (Klasse 9, 10)
+- **Multi-subject support** (Chemie, Physik, etc.) — students can have multiple subjects per class
 - CSV upload workflow for competency lists
+- Class-specific active_ids (Unterrichtsstand) per subject
 
 **DO NOT merge `agent-dev` → `main` directly!** The production app uses Azure AD and a different data model.
 
@@ -41,9 +43,10 @@ Uberspace (larissa.uberspace.de → bhof.uber.space)
     ├── pdf_engine.py (directly imported, synchronous)
     ├── db.py → SQLite (dashboard.db) — all app data
     │   ├── einfach_records, nachweise
-    │   ├── active_ids (Unterrichtsstand)
+    │   ├── active_ids (Unterrichtsstand per class_subject)
     │   ├── test_requests, kompetenzantraege
-    │   └── classes, class_members
+    │   ├── classes, class_members
+    │   ├── class_subjects, student_subjects (multi-subject support)
     └── Azure AD → identity + roles (Lehrer / Schüler) only
 ```
 
@@ -81,38 +84,49 @@ Kompetenz-Dashboard/
 ├── graph.py             # MS Graph API client (kept; auth only in production)
 ├── pdf_engine.py        # PDF generation (ported from app5.py, bug-fixed)
 ├── dashboard.db         # SQLite database (auto-created; not in git)
-├── kompetenzen.json     # Competency list (einfach + niveau); edited via /admin
-├── questions.json       # Test questions per competency ID; created via /admin/upload
+├── convert_csv_to_json.py  # CLI tool to convert CSV to JSON competency lists
 ├── grading_scale.json   # Active grading scale (absent = use default preset)
 ├── static/
 │   ├── logo.png         # School logo (place here manually, not in git)
 │   └── style.css
 ├── templates/           # Jinja2 HTML templates
 │   ├── base.html
-│   ├── dashboard.html        # Student view: score + planning mode + Kompetenzanträge
+│   ├── dashboard.html        # Student view: score + planning mode + Kompetenzanträge + subject selector
 │   ├── teacher.html          # Teacher class overview + pending badges
 │   ├── class_detail.html
-│   ├── student_detail.html
-│   ├── test_builder.html     # Role-split: student request / teacher generate
+│   ├── student_detail.html   # Now with subject selector for multi-subject support
+│   ├── test_builder.html     # Role-split: student request / teacher generate + subject selector
 │   ├── test_preview.html     # Teacher: question-level preview before PDF download
 │   ├── pending_tests.html    # Teacher: review + confirm student test requests
 │   ├── antraege_pending.html # Teacher: review student competency claims
 │   ├── test_request_sent.html
-│   ├── grade_calculator.html
-│   ├── coverage.html
+│   ├── grade_calculator.html # Now with subject/class selector
+│   ├── coverage.html         # Now with subject selector for multi-subject classes
 │   ├── bookings.html
 │   ├── upload.html               # CSV upload page (ibK, pbK, Testfragen)
+│   ├── teacher_competency_lists.html  # Manage class-subject assignments
 │   ├── admin_kompetenzen.html    # Edit/add/delete competencies
 │   ├── admin_questions.html      # Edit test questions per competency
 │   ├── admin_grading_scale.html  # Edit grading scale + upload/preset selection
 │   ├── admin_classes.html        # Manage classes (add/delete)
 │   └── admin_class_members.html  # Manage class members (add/delete/CSV import)
+├── kompetenzlisten/     # Class-specific competency lists (JSON format)
+│   ├── klasse-9-chemie.json              # Klasse 9 Chemie competencies
+│   ├── klasse-9-chemie-questions.json    # Klasse 9 Chemie test questions
+│   ├── klasse-10-chemie.json             # Klasse 10 Chemie competencies
+│   └── klasse-10-chemie-questions.json   # Klasse 10 Chemie test questions
 ├── _samples/            # Sample CSV files (not served)
-│   ├── ibK_9_alle Kopie.csv
-│   ├── pbK_9_alle Kopie.csv
-│   ├── 2026-01-30_Testfragen Kopie.csv
+│   ├── einfach_9_alle.csv
+│   ├── Niveau_9_alle.csv
+│   ├── einfach_10_alle.csv
+│   ├── vorlage-kompetenzen.csv
+│   ├── vorlage-fragen.csv
 │   ├── Note-Dezimal-ProzentSchwelleab-Prozentbereichca-2.csv   # default preset (50%→3−4)
 │   └── Note-Dezimal-ProzentSchwelleab-Prozentbereichca.csv    # alt preset (50%→3−)
+├── _archiv/             # Archived old files
+│   ├── docs/
+│   └── migration-20260319/   # Old kompetenzen.json, questions.json
+├── _backup/             # Database backups (not in git)
 ├── grading_scales/      # Uploaded custom grading scale CSVs (auto-created, not in git)
 ├── requirements.txt
 ├── .env.example
