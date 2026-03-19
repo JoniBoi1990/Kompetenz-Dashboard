@@ -7,7 +7,22 @@
   und für Schüler farblich hervorgehoben.
 </p>
 
+{% if classes|length > 1 %}
+<div style="margin-bottom:1rem;padding:.75rem;background:#f0f0f0;border-radius:4px;">
+  <label style="font-size:.9rem;font-weight:500">Klasse auswählen:
+    <select onchange="window.location.href='/teacher/coverage?class_id=' + this.value" style="margin-left:.5rem;padding:.25rem .5rem;">
+      {% for cls in classes %}
+      <option value="{{ cls.id }}" {% if cls.id == selected_class_id %}selected{% endif %}>
+        {{ cls.displayName }}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+</div>
+{% endif %}
+
 <form action="/teacher/coverage/update" method="post">
+  <input type="hidden" name="class_id" value="{{ selected_class_id }}">
   <div style="margin-bottom:1rem;display:flex;gap:.5rem;flex-wrap:wrap">
     <button type="button" onclick="setAll(true)">Alle markieren</button>
     <button type="button" onclick="setAll(false)">Alle abwählen</button>

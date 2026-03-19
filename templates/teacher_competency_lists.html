@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}Kompetenzlisten verwalten{% endblock %}
+{% block content %}
+<h1>Kompetenzlisten verwalten</h1>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+  {# System-Listen #}
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
+    <h2 style="margin-top:0">System-Listen</h2>
+    <p class="muted" style="font-size:.85rem;margin-bottom:1rem;">
+      Vom Administrator hinterlegte Listen. Können nicht bearbeitet werden, aber für eigene Klassen verwendet werden.
+    </p>
+    
+    {% if system_lists %}
+    <table class="kompetenz-table" style="font-size:.9rem;">
+      <thead>
+        <tr><th>Name</th><th>Stufe</th><th>Kompetenzen</th><th>System-Fragen</th></tr>
+      </thead>
+      <tbody>
+        {% for lst in system_lists %}
+        <tr>
+          <td>{{ lst.name }}</td>
+          <td>Klasse {{ lst.grade_level }}</td>
+          <td>{{ lst.competency_count }}</td>
+          <td>
+            {% if lst.has_system_questions %}
+              <span style="color:var(--green);">✓ Verfügbar</span>
+            {% else %}
+              <span class="muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="muted">Keine System-Listen vorhanden.</p>
+    {% endif %}
+  </div>
+
+  {# Eigene Listen #}
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
+    <h2 style="margin-top:0">Eigene Listen</h2>
+    <p class="muted" style="font-size:.85rem;margin-bottom:1rem;">
+      Selbst hochgeladene Listen. Diese können für eigene Klassen verwendet werden.
+    </p>
+    
+    {% if teacher_lists %}
+    <table class="kompetenz-table" style="font-size:.9rem;">
+      <thead>
+        <tr><th>Name</th><th>Stufe</th><th>Kompetenzen</th><th>Fragen</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for lst in teacher_lists %}
+        <tr>
+          <td>{{ lst.name }}</td>
+          <td>Klasse {{ lst.grade_level }}</td>
+          <td>{{ lst.competency_count }}</td>
+          <td>
+            {% if lst.question_count > 0 %}
+              {{ lst.question_count }} Fragen
+            {% else %}
+              <span class="muted">Keine</span>
+            {% endif %}
+            <details style="display:inline;margin-left:.5rem;">
+              <summary style="font-size:.75rem;cursor:pointer;color:var(--blue);">Fragen verwalten</summary>
+              <div style="position:absolute;background:#fff;border:1px solid var(--border);border-radius:4px;padding:.75rem;box-shadow:0 2px 8px rgba(0,0,0,.1);z-index:10;min-width:250px;">
+                <form method="post" action="/teacher/competency-lists/{{ lst.id }}/upload-questions" enctype="multipart/form-data" style="margin-bottom:.75rem;">
+                  <label style="font-size:.8rem;display:block;margin-bottom:.25rem;">Fragen hochladen (CSV):</label>
+                  <input type="file" name="questions_file" accept=".csv" required style="font-size:.8rem;width:100%;margin-bottom:.5rem;">
+                  <button type="submit" class="btn-sm" style="width:100%;">Hochladen</button>
+                </form>
+                <form method="post" action="/teacher/competency-lists/{{ lst.id }}/use-system-questions">
+                  <button type="submit" class="btn-sm" style="width:100%;background:#f0f0f0;">System-Fragen verwenden</button>
+                </form>
+              </div>
+            </details>
+          </td>
+          <td>
+            <form method="post" action="/teacher/competency-lists/delete" style="display:inline">
+              <input type="hidden" name="list_id" value="{{ lst.id }}">
+              <button type="submit" class="btn-del" onclick="return confirm('Liste löschen?')">✕</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="muted">Noch keine eigenen Listen hochgeladen.</p>
+    {% endif %}
+    
+    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+      <h3 style="font-size:1rem;margin-bottom:.75rem;">Neue Liste hochladen</h3>
+      <form method="post" action="/teacher/competency-lists/upload" enctype="multipart/form-data">
+        <label style="display:block;margin-bottom:.5rem;font-size:.875rem;">
+          Name der Liste
+          <input type="text" name="name" placeholder="z.B. Meine Chemie-Liste Klasse 10" required style="width:100%;margin-top:.25rem;padding:.35rem .5rem;">
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem;">
+          <label style="font-size:.875rem;">
+            Typ
+            <select name="typ" required style="width:100%;margin-top:.25rem;padding:.35rem .5rem;">
+              <option value="">-- wählen --</option>
+              <option value="einfach">Einfach</option>
+              <option value="niveau">Niveau</option>
+            </select>
+          </label>
+          <label style="font-size:.875rem;">
+            Klassenstufe
+            <select name="grade_level" required style="width:100%;margin-top:.25rem;padding:.35rem .5rem;">
+              <option value="">-- wählen --</option>
+              <option value="5">Klasse 5</option>
+              <option value="6">Klasse 6</option>
+              <option value="7">Klasse 7</option>
+              <option value="8">Klasse 8</option>
+              <option value="9">Klasse 9</option>
+              <option value="10">Klasse 10</option>
+              <option value="11">Klasse 11</option>
+              <option value="12">Klasse 12</option>
+            </select>
+          </label>
+        </div>
+        <label style="display:block;margin-bottom:.5rem;font-size:.875rem;">
+          CSV-Datei (Kompetenzen)
+          <input type="file" name="file" accept=".csv" required style="margin-top:.25rem;font-size:.85rem;">
+        </label>
+        <label style="display:block;margin-bottom:.75rem;font-size:.875rem;">
+          CSV-Datei (Testfragen) — optional
+          <input type="file" name="questions_file" accept=".csv" style="margin-top:.25rem;font-size:.85rem;">
+        </label>
+        <button type="submit" class="btn-primary" style="margin-top:0;">Hochladen</button>
+      </form>
+      <p class="muted" style="font-size:.8rem;margin-top:.75rem;">
+        <strong>Formate:</strong><br>
+        Einfach: <code>ID;Kompetenz;Thema;Anmerkungen</code><br>
+        Niveau: <code>ID;Nummer;pbk;Möglichkeit1;Möglichkeit2;Möglichkeit3;Hinweise</code><br>
+        Fragen: <code>competency_id;frage</code> (eine Frage pro Zeile)
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<hr style="margin:2rem 0;border:none;border-top:1px solid var(--border);">
+
+{# Listen Klassen zuweisen #}
+<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
+  <h2>Listen Klassen zuweisen</h2>
+  <p class="muted" style="font-size:.85rem;margin-bottom:1rem;">
+    Wähle für jede Klasse die zu verwendende Kompetenzliste aus.
+  </p>
+  
+  {% if classes %}
+  {# Build a lookup dict for list names #}
+  {% set list_names = {} %}
+  {% for lst in system_lists %}
+    {% set _ = list_names.update({lst.id: lst.name}) %}
+  {% endfor %}
+  {% for lst in teacher_lists %}
+    {% set _ = list_names.update({lst.id: lst.name}) %}
+  {% endfor %}
+  
+  <table class="kompetenz-table">
+    <thead>
+      <tr><th>Klasse</th><th>Aktuelle Liste</th><th>Neue Liste zuweisen</th></tr>
+    </thead>
+    <tbody>
+      {% for cls in classes %}
+      <tr>
+        <td><strong>{{ cls.displayName }}</strong><br><span class="muted" style="font-size:.8rem;">Klasse {{ cls.grade_level or '?' }}</span></td>
+        <td>
+          {% if cls.competency_list_id %}
+            <strong>{{ list_names.get(cls.competency_list_id, cls.competency_list_id) }}</strong>
+            <span class="muted" style="font-size:.75rem;">({{ cls.list_source }})</span>
+          {% else %}
+            <span class="muted">Keine Liste zugewiesen</span>
+          {% endif %}
+        </td>
+        <td>
+          <form method="post" action="/teacher/class/{{ cls.id }}/set-list" style="display:flex;gap:.5rem;">
+            <select name="list_id" required style="flex:1;padding:.35rem .5rem;">
+              <option value="">-- Liste wählen --</option>
+              <optgroup label="System-Listen">
+                {% for lst in system_lists %}
+                  {% if lst.grade_level == cls.grade_level %}
+                  <option value="{{ lst.id }}">{{ lst.name }}</option>
+                  {% endif %}
+                {% endfor %}
+              </optgroup>
+              <optgroup label="Eigene Listen">
+                {% for lst in teacher_lists %}
+                  {% if lst.grade_level == cls.grade_level %}
+                  <option value="{{ lst.id }}">{{ lst.name }}</option>
+                  {% endif %}
+                {% endfor %}
+              </optgroup>
+            </select>
+            <button type="submit" class="btn-primary" style="margin-top:0;">Zuweisen</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">Noch keine Klassen angelegt.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

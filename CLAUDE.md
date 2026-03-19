@@ -19,6 +19,8 @@ Kompetenz-Dashboard — a Microsoft 365-connected student dashboard for chemistr
 
 **Agents must only commit to `agent-dev`.** Merges to `main` are done by the user.
 
+**Important: DEV_MODE changes must NOT be committed to git.** The Dev-Mode (fake login, test classes, sample data) is for local testing only. Never commit changes that are specific to `DEV_MODE=true` (like the dev login buttons, test students, or dev classes) to any branch.
+
 Commit format: `agent: <short description>`
 
 ## Service Topology
@@ -189,31 +191,46 @@ Kompetenz-Dashboard/
 
 ## Navigation (role-dependent)
 
-**Teacher:** Klassen | Unterrichtsstand | Notenrechner | Testanfragen | Kompetenzanträge | Testgenerator | Listen verwalten | Notenschlüssel | Klassen verwalten
+**Teacher:** Klassen | Unterrichtsstand | Notenrechner | Testanfragen | Kompetenzanträge | Testgenerator | Notenschlüssel | Klassen verwalten
 
 **Student:** Meine Kompetenzen | Nachweis anfordern
 
-## Competency Data Model (`kompetenzen.json`)
+**Note:** "Listen verwalten" was removed. Competency lists are now managed as JSON files in `kompetenzlisten/` directory (system lists) or uploaded by teachers per class.
+
+## Competency Data Model (Grade-Level Based)
+
+**Old (deprecated):** `kompetenzen.json` — single global list
+
+**New:** `kompetenzlisten/klasse-{GRADE}-{NAME}.json` — grade-specific lists
+
+```
+kompetenzlisten/
+├── klasse-9-chemie.json              # Klasse 9: IDs 901-999
+├── klasse-9-chemie-questions.json    # Questions for Klasse 9
+├── klasse-10-chemie.json             # Klasse 10: IDs 1001-1099
+└── klasse-10-chemie-questions.json   # Questions for Klasse 10
+```
 
 Each entry:
 ```json
 {
-  "id": 1,
+  "id": 901,              // Grade-specific ID range
   "typ": "einfach",       // or "niveau"
   "name": "...",
-  "thema": 1,             // Integer 1–10 or null; einfach only (meaningful)
-  "anmerkungen": "",
-  "bp_nummer": "32125"    // Internal only, never shown in UI
+  "thema": 1,             // Integer 1–10 or null
+  "anmerkungen": ""
 }
 ```
-Niveau entries additionally have:
-```json
-  "moeglichkeiten": ["Protokoll X", "Video Y"]   // Nachweis examples from pbK CSV
-```
 
-**Sorting:** `_EINFACH` is sorted by `(thema or 999, id)` — thema grouping in all templates comes from this order, not from any explicit grouping logic. `_NIVEAU` sorted by `id`.
+**ID Ranges:**
+- Klasse 9: 901–999
+- Klasse 10: 1001–1099
+- Klasse 11: 1101–1199
+- etc.
 
-**Reloading:** `_reload_kompetenzen()` rebuilds `_KOMPETENZEN`, `_KOMPETENZ_MAP`, `_EINFACH`, `_NIVEAU`, and updates all Jinja2 template globals. Must be called after every write to `kompetenzen.json`. Same pattern for `_reload_questions()` / `questions.json` and `_reload_grading_scale()` / `grading_scale.json`.
+**Loading:** `_load_competency_list(list_id)` loads a specific list. `_get_student_competencies(student_id)` returns the appropriate list based on the student's class assignment.
+
+**Sorting:** Same as before — `_EINFACH` by `(thema or 999, id)`, `_NIVEAU` by `id`.
 
 ## Test Questions (`questions.json`)
 
@@ -317,7 +334,10 @@ Each row is one niveau proof attempt: `id` (UUID), `student_id`, `competency_id`
 
 ### `active_ids`
 
-Single-column table (`competency_id`) — the current Unterrichtsstand set.
+`competency_id`, `class_id` (nullable) — the current Unterrichtsstand set.
+
+- If `class_id` is set: class-specific active IDs
+- If `class_id` is NULL: global active IDs (backward compatibility)
 
 ### `test_requests`
 
@@ -329,21 +349,34 @@ Single-column table (`competency_id`) — the current Unterrichtsstand set.
 
 ### `classes` + `class_members`
 
-`classes`: `id`, `name`, `description`.
+`classes`: `id`, `name`, `description`, `grade_level` (9, 10, etc.), `competency_list_id`, `list_source` ("system" or "teacher").
 `class_members`: `class_id`, `student_id`, `student_name`, `upn`. Primary key is `(class_id, student_id)`.
 
 **CSV import** (`db.import_class_members_csv()`): columns `Name` (or `Vorname`+`Nachname`), `UPN` (or `E-Mail` or `UserPrincipalName`).
 
-## DEV_MODE
+**Grade-level based competency lists:** Each class is assigned a competency list (e.g., `klasse-9-chemie`, `klasse-10-chemie`). Students only see competencies from their class's list. The lists are stored as JSON files in `kompetenzlisten/` directory.
+
+## DEV_MODE (Local Testing Only — Do Not Commit)
 
 `DEV_MODE=true` enables fake login (`/dev-login`) — no Azure AD needed. All data goes into the same SQLite `dashboard.db`.
 
-Dev student: `oid="dev-student-001"`, name="Anna Beispiel". Dev teacher: `oid="dev-teacher-001"`.
+**⚠️ NEVER commit DEV_MODE changes to git.** This includes:
+- Changes to `_init_dev_db()`
+- Dev login page modifications
+- Test classes or test students
+- Sample data population
 
-**Pre-populated on first startup** via `_init_dev_db()` (skipped if dev student data already exists in SQLite):
-- Dev class `"9a (Dev)"` with Anna Beispiel as member
-- `active_ids`: all einfach in Themen 1–3 + first 10 niveau competencies
-- Dev student: 80% of active einfach achieved; niveau: 5×Advanced, 3×Beginner, 2×Expert on first 10 niveau comps
+### Dev Mode Users
+- **Teacher:** `lehrer@schule.de`
+- **Student Klasse 9:** `anna@schule.de` (Anna Beispiel)
+- **Student Klasse 10:** `max@schule.de` (Max Mustermann)
+
+### Pre-populated on first startup
+Via `_init_dev_db()` (skipped if data exists):
+- **Klasse 9:** `9a (Dev)` with Anna Beispiel, using `klasse-9-chemie.json`
+- **Klasse 10:** `10a (Dev)` with Max Mustermann, using `klasse-10-chemie.json`
+- `active_ids`: class-specific Unterrichtsstand per class
+- Sample achievements for both students
 
 **`_TEST_PREVIEWS`** (dict in `main.py`): in-memory only, lost on restart. Acceptable — previews are short-lived.
 
@@ -430,10 +463,43 @@ BOOKINGS_PAGE_URL=https://outlook.office.com/book/Birklehof3@birklehof.de/
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # fill in secrets, set DEV_MODE=true for local dev
+cp .env.example .env   # set DEV_MODE=true for local dev (see warning below)
 uvicorn main:app --reload
 # → http://localhost:8000/login
 ```
+
+**⚠️ DEV_MODE Warning:** When `DEV_MODE=true`, the app shows a fake login page with test users (Anna, Max, Lehrer). This is convenient for local development but **must never be committed to git**. Always set `DEV_MODE=false` before committing.
+
+## Grade-Level Based Competency Lists
+
+Each class is assigned:
+- `grade_level`: 9, 10, 11, etc.
+- `competency_list_id`: e.g., "klasse-9-chemie" or "klasse-10-chemie"
+- `list_source`: "system" (from `kompetenzlisten/` directory) or "teacher" (uploaded)
+
+### Student Dashboard Filter
+
+`_get_student_competencies(student_id)` returns only competencies from the student's class list. This ensures:
+- Klasse 9 students see only Klasse 9 competencies (IDs 901-999)
+- Klasse 10 students see only Klasse 10 competencies (IDs 1001-1099)
+- Records are filtered to match the class competency IDs
+
+### Teacher Coverage Page
+
+The coverage page (`/teacher/coverage`) now has a class selector dropdown. The "Unterrichtsstand" (active_ids) is stored per class, not globally.
+
+### Creating New Lists
+
+Use the conversion script:
+```bash
+python convert_csv_to_json.py \
+    --input-kompetenzen meine-klasse-10.csv \
+    --input-fragen meine-fragen.csv \
+    --name "Chemie Klasse 10" \
+    --grade 10
+```
+
+See `KOMPETENZLISTEN_WORKFLOW.md` for detailed workflow.
 
 ## Implementation Phases
 

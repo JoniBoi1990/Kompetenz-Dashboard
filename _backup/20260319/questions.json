@@ -1,0 +1,558 @@
+{
+  "1": [
+    "Nenne die Grundbausteine eines Atoms",
+    "Beschreibe den Aufbau eines Atoms",
+    "Stelle den Aufbau eines Atoms zeichnerisch dar",
+    "Vergleiche die Ladungen der Atombausteine Neutron, Proton und Elektron",
+    "Vergleiche die Masse der Autombausteine Neutron, Proton und Elektron"
+  ],
+  "2": [
+    "Stelle das Atom Lithium im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Natrium im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Helium im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Wasserstoff im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Helium im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Neon im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Fluor im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Chlor im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Bor im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Beryllium im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Kohlentoff im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Aluminium im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Magnesium im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Stickstoff im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Sauerstoff im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Schwefel im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Phosphor im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Silicium im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen.",
+    "Stelle das Atom Argon im Schalenmodell dar. Achte vor allem auf die korrekte Darstellung von Protonen und Elektronen."
+  ],
+  "3": [
+    "Nenne eine Definition des Begriffs Periode aus dem Periodensystem",
+    "Beschreibe, welche Eigenschaften Elemente einer Periode gemeinsam haben"
+  ],
+  "4": [
+    "Nenne eine Definition des Begriffs Hauptgruppe aus dem Periodensystem",
+    "Beschreibe, welche Eigenschaften Elemente einer Hauptgruppe gemeinsam haben"
+  ],
+  "5": [
+    "Benenne eine Information, die man aus der Ordnungszahl über ein Element ablesen kann",
+    "Benenne das Element mit der Ordungszahl 1",
+    "Benenne das Element mit der Ordungszahl 2",
+    "Benenne das Element mit der Ordungszahl 3",
+    "Benenne das Element mit der Ordungszahl 4",
+    "Benenne das Element mit der Ordungszahl 5",
+    "Benenne das Element mit der Ordungszahl 6",
+    "Benenne das Element mit der Ordungszahl 7",
+    "Benenne das Element mit der Ordungszahl 8",
+    "Benenne das Element mit der Ordungszahl 9",
+    "Benenne das Element mit der Ordungszahl 10",
+    "Benenne das Element mit der Ordungszahl 11",
+    "Benenne das Element mit der Ordungszahl 12",
+    "Benenne das Element mit der Ordungszahl 13",
+    "Benenne das Element mit der Ordungszahl 14",
+    "Benenne das Element mit der Ordungszahl 15",
+    "Benenne das Element mit der Ordungszahl 16",
+    "Benenne das Element mit der Ordungszahl 17",
+    "Benenne das Element mit der Ordungszahl 18"
+  ],
+  "6": [
+    "Nenne eine Definition des Begriffs Ionisierungsenergie",
+    "Beschreibe, was passiert, wenn ein Atom der Energie ausgesetzt wird, die seiner ersten Ionisierungsenergie entspricht"
+  ],
+  "7": [
+    "Nenne eine Definition des Begriffs Außenelektron/Valenzelektron",
+    "Nenne die Anzahl an Außenelektronen von einem Atom aus der ersten Hauptgruppe",
+    "Nenne die Anzahl an Außenelektronen von einem Atom aus der zweiten Hauptgruppe",
+    "Nenne die Anzahl an Außenelektronen von einem Atom aus der dritten Hauptgruppe",
+    "Nenne die Anzahl an Außenelektronen von einem Atom aus der vierten Hauptgruppe",
+    "Nenne die Anzahl an Außenelektronen von einem Atom aus der fünften Hauptgruppe",
+    "Nenne die Anzahl an Außenelektronen von einem Atom aus der sechsten Hauptgruppe",
+    "Nenne die Anzahl an Außenelektronen von einem Atom aus der siebten Hauptgruppe",
+    "Nenne die Anzahl an Außenelektronen von einem Atom aus der achten Hauptgruppe",
+    "Benenne ein Atom mit 1 Außenelektron",
+    "Benenne eiin Atom mit 2 Außenelektronen",
+    "Benenne ein Atom mit 3 Außenelektronen",
+    "Benenne ein Atom mit 4 Außenelektronen",
+    "Benenne ein Atom mit 5 Außenelektronen",
+    "Benenne ein Atom mit 6 Außenelektronen",
+    "Benenne ein Atom mit 7 Außenelektronen",
+    "Benenne ein Atom mit 8 Außenelektronen"
+  ],
+  "8": [
+    "Beschreibe die Größenverhältnisse von Atomkern und Atomhülle."
+  ],
+  "9": [
+    "Beschreibe den Streuversuch von Rutherford.",
+    "Erstelle eine Skizze zum Streuversuch von Rutherford. Sie sollte folgende Elemente enthalten: Strahlenquelle, Bahn der radioaktiven Strahlung, Art der radioaktiven Strahlung, Darstellung der Gold-Atome, Fotoschirm zur Detektion der Strahlung)"
+  ],
+  "10": [
+    "Erläutere den Aufbau des Atoms nach den Erkenntnissen von Rutherford. Zeichne dazu eine Skizze des Atoms. Geh dabei auf elektrische Ladungen, Größenverhältnisse und Massenverteilung ein.",
+    "Erkläre den Aufbau des Atoms nach den Erkenntnissen von Rutherford. Geh dabei auf elektrische Ladungen, Größenverhältnisse und Massenverteilung ein."
+  ],
+  "11": [
+    "Erkläre, wie der Streuversuch von Rutherford zur Entwicklung eines \"Kern-Hülle-Atommodells\" beigetragen hat. Du kannst vereinfacht annehmen, dass man sich Atome vorher als harte Kugeln vorstellte."
+  ],
+  "12": [
+    "Die besten Lichtmikroskope können Objekte sichtbar machen, die weniger als einen Mikrometer (ein Millionstel Meter) groß sind. Begründe, warum man damit keine Atome sehen kann.",
+    "Bechreibe die Größenverhältnisse von Atomkern und Atomhülle (1:10.000) mit einem Bild aus der für uns sichtbaren Welt (Wo finden wir ein ähnliches Größenverhältnis)"
+  ],
+  "13": [
+    "Skizziere den Aufbau der Atomhülle im Schalenmodell an einem Beispiel deiner Wahl.",
+    "Beschreibe den Aufbau der Atomhülle im Schalenmodell an einem Beispiel deiner Wahl."
+  ],
+  "14": [
+    "Beschreibe, wie man aus der Stellung eines Elements im Periodensystem, Informationen über den Atombau dieses Elements gewinnen kann.",
+    "Erläutere an einem Beispiel, wie man mithilfe des Periodensystems, Protonen- und Neutronenanzahl, sowie Masse eines Atoms herausfinden kann.",
+    "Erläutere an einem Beispiel, wie man mithilfe des Periodensystems, die Anzahl an Elektronenschalen eines Atoms herausfinden kann.",
+    "Erläutere an einem Beispiel, wie man mithilfe des Periodensystems, Protonen-, Elektronen und Neutronenanzahl eines Atoms herausfinden kann.",
+    "Erläutere an einem Beispiel, wie man mithilfe des Periodensystems, die Anzahl an Außernelektronen eines Atoms aus den Hauptgruppen herausfinden kann.",
+    "Erläutere an einem Beispiel, wie man mithilfe des Periodensystems, die Verteilung der Elektronen auf den Schalen eines Atoms aus den Hauptgruppen herausfinden kann. Beachte dabei die Edelgasregel: Jede Schale kann maximal so viele Elektronen tragen, wie das Edelgas (Hauptgruppe VIII) in der jeweiligen Periode in dieser Schale trägt."
+  ],
+  "15": [
+    "Nenne eine Stoffeigenschaft von Salzen (salzartigen Stoffen)",
+    "Nenne eine Stoffeigenschaft von Kochsalz (Natriumchlorid)",
+    "Nenne eine Stoffeigenschaft des Salzes Natriumhydroxid"
+  ],
+  "16": [
+    "Nenne eine Stoffeigenschaft von Halogenen",
+    "Nenne eine Stoffeigenschaft des Halogens Chlor",
+    "Nenne eine Stoffeigenschaft des Halogens Brom",
+    "Nenne eine Stoffeigenschaft des Halogens Iod"
+  ],
+  "17": [
+    "Benenne die Teilreaktion bei der Elektronen abgegeben werden"
+  ],
+  "18": [
+    "Benenne die Teilreaktion bei der Elektronen aufgenommen werden"
+  ],
+  "19": [
+    "Benenne den Reaktionstyp bei der Elektronen übertragen werden"
+  ],
+  "20": [
+    "Beschreibe was Reduktionsmittel sind",
+    "Nenne den anderen Fachbegriff für einen Elektronendonator"
+  ],
+  "21": [
+    "Beschreibe was Oxidationsmittel sind",
+    "Nenne den anderen Fachbegriff für einen Elektronenekzeptor"
+  ],
+  "22": [
+    "Beschreibe einen Versuch mit dem man zeigen kann, dass Salze in wässriger Lösung elektrischen Strom leiten",
+    "Beschreibe einen Versuch mit dem zeigen kann, dass wasserlösliche Salze aus Ionen bestehen",
+    "Beschreibe die Beobachtung, wenn man die elektrische Leitfähigkeit von destilliertem Wasser mit der einer Salzlösung vergleicht"
+  ],
+  "23": [
+    "Beschreibe die Edelgasregel (Oktettregel)"
+  ],
+  "24": [
+    "Stelle das Schalenmodell des Lithium-Kations auf.",
+    "Stelle das Schalenmodell des Natrium-Kations auf.",
+    "Stelle das Schalenmodell des Beryllium-Kations auf.",
+    "Stelle das Schalenmodell des Magnesium-Kations auf.",
+    "Stelle das Schalenmodell des Bor-Kations auf.",
+    "Stelle das Schalenmodell des Aluminium-Kations auf.",
+    "Stelle das Schalenmodell des Nitrid-Anions (entsteht aus dem Stickstoff-Atom) auf.",
+    "Stelle das Schalenmodell des Phosphid-Anions auf (entsteht aus dem Phopsphor-Atom)",
+    "Stelle das Schalenmodell des Oxid-Anions (entsteht aus dem Sauerstoff-Atom) auf.",
+    "Stelle das Schalenmodell des Sulfid-Anions (entsteht aus dem Schwefel-Atom) auf.",
+    "Stelle das Schalenmodell des Fluorid-Anions (entsteht aus dem Fluor-Atom) auf.",
+    "Stelle das Schalenmodell des Chlorid-Anions (entsteht aus dem Chlor-Atom) auf."
+  ],
+  "25": [
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Lithium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Beryllium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Natirum-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Kalium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Rubidium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Caesium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Magnesium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Calcium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Barium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Strontium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Gallium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung das Germanium-Ion trägt",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung Anionen aus der fünften Hauptgruppe tragen",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung Anionen aus der sechsten Hauptgruppe tragen",
+    "Erkläre mithilfe der Edelgasregel, welche Ladung Anionen aus der siebten Hauptgruppe tragen"
+  ],
+  "26": [
+    "Nenne die Definition eines Kations",
+    "Nenne die Definition eines Anions",
+    "Beschreibe die Bedeutung des Begriffs Kation an einem Beispiel deiner Wahl",
+    "Beschreibe die Bedeutung des Begriffs Anion an einem Beispiel deiner Wahl"
+  ],
+  "27": [
+    "Erläutere die Benennung von Kationen an einem Beispiel deiner Wahl",
+    "Benenne das Ion, dass das Element Magnesium (Mg) bildet",
+    "Benenne das Ion, dass das Element Calcium (Ca) bildet",
+    "Benenne das Ion, dass das Element Lithium (Li) bildet",
+    "Benenne das Ion, dass das Element Natrium (Na) bildet",
+    "Benenne das Ion, dass das Element Beryllium (Be) bildet",
+    "Benenne das Ion, dass das Element Bor (B) bildet",
+    "Benenne das Ion, dass das Element Silicium (Si) bildet",
+    "Benenne das Fe(3+)-Ion",
+    "Benenne das Sn(4+)-Ion",
+    "Benenne das Ion, dass das Element Gallium (Ga) bildet",
+    "Benenne das Ion, dass das Element Germanium (Ge) bildet",
+    "Benenne das Ti(4+)-Ion",
+    "Benenne das Cu(2+)-Ion",
+    "Benenne das Sr(2+)-Ion"
+  ],
+  "28": [
+    "Erläutere die Benennung von Anionen an einem Beispiel",
+    "Erläutere die spezielle Benennung mancher Anionen am Beispiel des Oxid-Anions.",
+    "Benenne das Ion, dass das Element Chlor (Cl) bildet",
+    "Benenne das Ion, dass das Element Brom (Br) bildet",
+    "Benenne das Ion, dass das Element Iod (I) bildet",
+    "Benenne das Ion, dass das Element Sauerstoff (O) bildet",
+    "Benenne das Ion, dass das Element Phosphor (P) bildet",
+    "Benenne das F(-)-Ion",
+    "Benenne das Ion, dass das Element Schwefel (S) bildet"
+  ],
+  "29": [
+    "Stelle das Atom von Chlor mithilfe der Lewis-Formel dar",
+    "Stelle das Ion von Chlor mithilfe der Lewis-Formel dar",
+    "Stelle das Atom von Brom mithilfe der Lewis-Formel dar",
+    "Stelle das Ion von Brom mithilfe der Lewis-Formel dar",
+    "Stelle das Ion von Iod mithilfe der Lewis-Formel dar",
+    "Stelle das Ion von Sauerstoff mithilfe der Lewis-Formel dar",
+    "Stelle das Atom von Sauerstoff mithilfe der Lewis-Formel dar",
+    "Stelle das Atom von Iod mithilfe der Lewis-Formel dar",
+    "Stelle das Atom von Kalium mithilfe der Lewis-Formel dar",
+    "Stelle das Atom von Lithium mithilfe der Lewis-Formel dar",
+    "Stelle das Atom von Calcium mithilfe der Lewis-Formel dar",
+    "Stelle das Atom von Aluminium mithilfe der Lewis-Formel dar",
+    "Stelle das Atom von Schwefel mithilfe der Lewis-Formel dar",
+    "Stelle das Atom von Stickstoff mithilfe der Lewis-Formel dar",
+    "Stelle das Atom von Kohlenstoff mithilfe der Lewis-Formel dar",
+    "Stelle das Ion von Lithium mithilfe der Lewis-Formel dar",
+    "Stelle das Ion von Natrium mithilfe der Lewis-Formel dar"
+  ],
+  "30": [
+    "Erläutere mithilfe eines geeigneten Modells die Bildung eines Salzes aus einem Hauptgruppenmetall und einem Nichtmetall deiner Wahl",
+    "Erläutere mithilfe eines geeigneten Modells die Bildung eines Salzes aus einem Alkalimetall und einem Halogen deiner Wahl"
+  ],
+  "31": [
+    "Beschreibe die Bildung eines Salzes in einem Energiediagramm.  Kennzeichne dabei ungefähr den \"Zeitpunkt\" folgenden Teilschritts: Verdampfen des Metalls",
+    "Beschreibe die Bildung eines Salzes in einem Energiediagramm.  Kennzeichne dabei ungefähr den \"Zeitpunkt\" folgenden Teilschritts: Elektronenabgabe der Metall-Atome",
+    "Beschreibe die Bildung eines Salzes in einem Energiediagramm.  Kennzeichne dabei ungefähr den \"Zeitpunkt\" folgenden Teilschritts: Elektronenaufnahme der Nichtmetall-Atome",
+    "Beschreibe die Bildung eines Salzes in einem Energiediagramm.  Kennzeichne dabei ungefähr den \"Zeitpunkt\" folgenden Teilschritts: Trennung der Nichtmetall-Moleküle in einzelne Atome.",
+    "Beschreibe die Bildung eines Salzes in einem Energiediagramm.  Kennzeichne dabei ungefähr den \"Zeitpunkt\" folgenden Teilschritts: Anziehung gegensätzlich geladener Ionen und Bildung des Gitters."
+  ],
+  "32": [
+    "Ermittle die Ladung der Ionen aus der Verhältnisformel {NaCl}",
+    "Ermittle die Ladung der Ionen aus der Verhältnisformel {MgO}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {MgCl2}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {Na2O}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {Li2O}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {Cs2O}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {Rb2O}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {BaCl2}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {SrCl2}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {K2O}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {MgF2}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {MgBr2}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {CaI2}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {Al2O3}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {B2O3}",
+    "Ermittle die Ladung der Ionen aus der Verhätnisformel {Ga2O3}"
+  ],
+  "33": [
+    "Beschreibe einen Nachweis für ein Halogenid-Ion",
+    "Beschreibe einen Versuch, mit dem man zeigen kann, dass ein Halogenid-Ion in wässriger Lösung vorhanden ist.",
+    "Beschreibe die Beobachtung, wenn man eine die Natriumchlorid-Lösung mit Silbernitrat-Lösung versetzt",
+    "Beschreibe die Beobachtung, wenn man eine die Lithiumbromid-Lösung mit Silbernitrat-Lösung versetzt",
+    "Beschreibe die Beobachtung, wenn man eine die Kaliumiodid-Lösung mit Silbernitrat-Lösung versetzt"
+  ],
+  "34": [
+    "Erkläre mit einer geeigneten Zeichnung, wie die Kationen und Anionen in einem Salzkristall angeordnet sind",
+    "Begründe, warum Kationen und Anionen in einem Salzkristalle abwechselnd angeordnet sind"
+  ],
+  "35": [
+    "Stelle die Verhältnisformel eines Salzes aus einem Alkalimetall-Kation (erste Hauptgruppe)  und einem Halogenid-Anion (siebte Hauptgruppe) auf",
+    "Stelle die Verhältnisformel eines Salzes aus einem Erdalkalimetall-Kation (zweite Hauptgruppe)  und einem Halogenid-Anion (siebte Hauptgruppe) auf",
+    "Stelle die Verhältnisformel eines Salzes aus einem Alkalimetall-Kation (erste Hauptgruppe)  und einem Chalkogenid-Anion (sechste Hauptgruppe) auf",
+    "Stelle die Verhältnisformel eines Salzes aus einem Erdalkalimetall-Kation (zweite Hauptgruppe)  und einem Chalkogenid-Anion (sechste Hauptgruppe) auf",
+    "Stelle die Verhältnisformel eines Salzes aus einem Triel-Kation (dritte Hauptgruppe)  und einem Chalkogenid-Anion (sechste Hauptgruppe) auf",
+    "Stelle die Verhältnisformel eines Salzes aus einem Triel-Kation (dritte Hauptgruppe)  und einem Halogenid-Anion (siebte Hauptgruppe) auf"
+  ],
+  "36": [
+    "Stelle die Verhältnisformel von Lithiumchlorid auf",
+    "Stelle die Verhältnisformel von Natriumfluorid auf",
+    "Stelle die Verhältnisformel von Bariumoxid auf",
+    "Stelle die Verhältnisformel von Magnesiumfluorid auf",
+    "Stelle die Verhältnisformel von Strontiumiodid auf",
+    "Stelle die Verhältnisformel von Lithiumbromid auf",
+    "Stelle die Verhältnisformel von Kaliumbromid auf",
+    "Stelle die Verhältnisformel von Kaliumoxid auf",
+    "Stelle die Verhältnisformel von Aluminiumoxid auf",
+    "Stelle die Verhältnisformel von Borchlorid auf",
+    "Stelle die Verhältnisformel von Berylliumfluorid auf",
+    "Stelle die Verhältnisformel von Boroxid auf"
+  ],
+  "37": [
+    "Ermittle die Ladungen der Ionen in Natriumchlorid",
+    "Ermittle die Ladungen der Ionen in Natriumoxid",
+    "Ermittle die Ladungen der Ionen in Lithiumsulfid",
+    "Ermittle die Ladungen der Ionen in Kaliumfluorid",
+    "Ermittle die Ladungen der Ionen in Magnesiumoxid",
+    "Ermittle die Ladungen der Ionen in Magnesiumfluorid",
+    "Ermittle die Ladungen der Ionen in Calciumiodid",
+    "Ermittle die Ladungen der Ionen in Aluminiumchlorid",
+    "Ermittle die Ladungen der Ionen in Borchlorid",
+    "Ermittle die Ladungen der Ionen in Galliumoxid",
+    "Ermittle die Ladungen der Ionen in Germaniumoxid"
+  ],
+  "38": [
+    "Benenne das Salz mit der Verhältnisformel {NaCl}",
+    "Benenne das Salz mit der Verhältnisformel {MgO}",
+    "Benenne das Salz mit der Verhätnisformel {MgCl2}",
+    "Benenne das Salz mit der Verhätnisformel {Na2O}",
+    "Benenne das Salz mit der Verhätnisformel {Li2O}",
+    "Benenne das Salz mit der Verhätnisformel {Cs2O}",
+    "Benenne das Salz mit der Verhätnisformel {Rb2O}",
+    "Benenne das Salz mit der Verhätnisformel {BaCl2}",
+    "Benenne das Salz mit der Verhätnisformel {SrCl2}",
+    "Benenne das Salz mit der Verhätnisformel {K2O}",
+    "Benenne das Salz mit der Verhätnisformel {MgF2}",
+    "Benenne das Salz mit der Verhätnisformel {MgBr2}",
+    "Benenne das Salz mit der Verhätnisformel {CaI2}",
+    "Benenne das Salz mit der Verhätnisformel {Al2O3}",
+    "Benenne das Salz mit der Verhätnisformel {B2O3}",
+    "Benenne das Salz mit der Verhätnisformel {Ga2O3}"
+  ],
+  "39": [
+    "Benenne das Salz, das aus Na(+)- und Cl(-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Mg(2+)- und O(2-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Mg(2+)- und Cl(-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Na(+)- und O(2-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Li(+)- und O(2-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Cs(+)- und O(2-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Rb(+)- und O(2-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Ba(2+)- und Cl(-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Sr(2+)- und Cl(-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus K(+)- und O(2-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Mg(2+)- und Cl(-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Mg(2+)- und Br(-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Ca(2+)- und I(-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Al(3+)- und O(2-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus B(3+)- und O(2-)-Ionen aufgebaut ist",
+    "Benenne das Salz, das aus Ga(3+)- und O(2-)-Ionen aufgebaut ist"
+  ],
+  "40": [
+    "Erkläre, warum Salze spröde sind. Du musst dich auf die Ionenbindung (Anziehungskraft im Ionengitter) beziehen.",
+    "Erläutere, warum Salze spröde sind. Du musst das mithilfe einer Skizze von einem Ionengitter tun."
+  ],
+  "41": [
+    "Erkläre, warum Salze so hohe Schmelztemperaturen haben. Du musst dich dabei auf die Ionenbindung (Anziehungskraft im Ionengitter) beziehen.",
+    "Das Metall Natrium besteht aus Na-Atomen, die in einem Gitter angeordnet sind. Natrium schmilzt bereits unter 100 °C. Erkläre, warum das Salz Natriumchlorid eine deutlich höhere Schmelztemperatur (800 °C) hat.",
+    "Das Metall Lithium besteht aus Li-Atomen, die in einem Gitter angeordnet sind. Natrium schmilzt bereits unter 100 °C. Erkläre, warum das Salz Lithiumfluorid eine deutlich höhere Schmelztemperatur (>500 °C) hat.",
+    "Begründe, ob Kalium (K) oder Kaliumiodid (KI) eine höhere Schmelztemperatur hat."
+  ],
+  "42": [
+    "Begründe, warum manche Salze schlechter wasserlöslich sind als andere. Du sollst dabei auf energetische Aspekte eingehen. Tipp: Die Energie, die das Ionengitter zusammenhält, heißt Gitterenergie, die Energie, die beim Auflösen eines Salzes in Wasser frei wird heißt Hydratationsenthalpie."
+  ],
+  "43": [
+    "Entscheide, ob es sich bei den folgenden Teilchen um Teilchen von Salzen handelt oder nicht. Begründe kurz für ein Stoffteilchen. Na2O, H2O, NH3, CaS",
+    "Entscheide, ob es sich bei den folgenden Teilchen um Teilchen von Salzen handelt oder nicht. Begründe kurz für ein Stoffteilchen. Na2O, K, CH4, CaS"
+  ],
+  "44": [
+    "Begründe warum Salze als Feststoff den elektrischen Strom nicht leiten, als Schmelze (geschmolzenes Salz) dagegen schon",
+    "Begründe warum Salze als Feststoff den elektrischen Strom nicht leiten, in Lösung (Salz in Wasser aufgelöst) dagegen schon"
+  ],
+  "46": [
+    "Begründe welches der drei Salze die niedrigste Schmelztemperatur hat: Natriumfluorid, Kaliumfluorid, Caesiumfluorid",
+    "Begründe welches der drei Salze die höchste Schmelztemperatur hat: Natriumfluorid, Natriumchlorid, Natriumbromid",
+    "Begründe welches der drei Salze die höchste Schmelztemperatur hat: Magnesiumfluorid, Magnesiumoxid, Calciumoxid"
+  ],
+  "47": [
+    "Begründe, warum man an einer Redoxreaktion das Donator-Akzeptor-Prinzip deutlich machen kann. Du kannst das auch an einem Beispiel erläutern. Du musst zunächst erklären, was das Donator-Akzeptor-Prinzip aussagt."
+  ],
+  "48": [
+    "Nenne eine Eigenschaft des Metalls Natrium"
+  ],
+  "49": [
+    "Entscheide, ob es sich bei den folgenden Teilchen um Teilchen von flüchtigen Stoffen handelt oder nicht. Begründe kurz für ein Stoffteilchen. Na2O, H2O, NH3, CaS",
+    "Entscheide, ob es sich bei den folgenden Teilchen um Teilchen von flüchtigen Stoffen handelt oder nicht. Begründe kurz für ein Stoffteilchen. Li, H2O, NH3, Fe"
+  ],
+  "50": [
+    "Stelle das Atom von Helium (He) und das Molekül von Wasser (H2O) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Lithium (Li) und das Molekül von Wasser (H2O) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Neon (Ne) und das Molekül von Wasser (H2O) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Barium (Ba) und das Molekül von Wasser (H2O) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Barium (Ba) und das Molekül von Ammoniak (NH3) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Magnesium (Mg) und das Molekül von Ammoniak (NH3) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Aluminium (Al) und das Molekül von Ammoniak (NH3) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Kohlenstoff (C) und das Molekül von Kohlenstoffdioxid (CO2) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Stickstoff (N) und das Molekül von Kohlenstoffdioxid (CO2) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Argon (Ar) und das Molekül von Kohlenstoffdioxid (CO2) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Bor (B) und das Molekül von Methan (CH4) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Beryllium (Be) und das Molekül von Methan (CH4) in Lewis-Strukturformel dar",
+    "Stelle das Atom von Rubidium (Rb) und das Molekül von Methan (CH4) in Lewis-Strukturformel dar"
+  ],
+  "51": [
+    "Beschreibe  den Begriff bindendes Elektronenpaar",
+    "Erkläre was der Strich zwischen zwei Atomen in Lewis-Strukturformel bedeutet (z.B. H-H)",
+    "Beschreibe den Unterschied zwischen einem bindenden und einem nicht bindenden Elektronenpaar",
+    "Ermittle die Anzahl an bindenden und nicht bindenden Elektronenpaaren im Sauerstoff-Molekül (O2)"
+  ],
+  "52": [
+    "Beschreibe den Unterschied zwischen einem bindenden und einem nicht bindenden Elektronenpaar",
+    "Erkläre, warum es im Molekül von Wasserstoff (H2) keine nicht bindenden Elektronenpaare gibt.",
+    "Ermittle die Anzahl an bindenden und nicht bindenden Elektronenpaaren im Stickstoff-Molekül (N2)",
+    "Ermittle die Anzahl an bindenden und nicht bindenden Elektronenpaaren im Fluor-Molekül (F2)",
+    "Ermittle die Anzahl an bindenden und nicht bindenden Elektronenpaaren im Iod-Molekül (I2)",
+    "Ermittle die Anzahl an bindenden und nicht bindenden Elektronenpaaren im Chlor-Molekül (Cl2)",
+    "Ermittle die Anzahl an bindenden und nicht bindenden Elektronenpaaren im Brom-Molekül (Br2)",
+    "Ermittle die Anzahl an bindenden und nicht bindenden Elektronenpaaren im Wasserstoff-Molekül (H2)"
+  ],
+  "53": [
+    "Nenne ein Molekül, das über Mehrfachbindungen verfügt und stelle es mit Lewis-Strukturformel dar."
+  ],
+  "54": [
+    "Beschreibe die Elektronegativität in eigenen Worten",
+    "Erkläre den Effekt der Elektronegativität in einem Sauerstoff-Molekül (O2)",
+    "Erkläre den Effekt der Elektronegativität in einem Fluorwasserstoff-Molekül (HF)"
+  ],
+  "55": [
+    "Erläutere mithilfe der Edelgasregel, warum Wasser die Molekülformel H2O hat. Du solltest bei der Beschreibung der Elektronenkonfiguration der beteiligten Atome beginnen.",
+    "Erläutere mithilfe der Edelgasregel, warum Ammoniak die Molekülformel NH3 hat. Du solltest bei der Beschreibung der Elektronenkonfiguration der beteiligten Atome beginnen.",
+    "Erläutere mithilfe der Edelgasregel, warum Methan die Molekülformel CH4 hat. Du solltest bei der Beschreibung der Elektronenkonfiguration der beteiligten Atome beginnen.",
+    "Erläutere mithilfe der Edelgasregel, warum Fluor die Molekülformel F2 hat. Du solltest bei der Beschreibung der Elektronenkonfiguration der beteiligten Atome beginnen.",
+    "Erläutere mithilfe der Edelgasregel, warum Stickstoff die Molekülformel N2 hat. Du solltest bei der Beschreibung der Elektronenkonfiguration der beteiligten Atome beginnen.",
+    "Erläutere mithilfe der Edelgasregel, warum Blausäure die Molekülformel HCN hat. Du solltest bei der Beschreibung der Elektronenkonfiguration der beteiligten Atome beginnen.",
+    "Erläutere mithilfe der Edelgasregel, warum Kohlenstoffdioxid die Molekülformel CO2 hat. Du solltest bei der Beschreibung der Elektronenkonfiguration der beteiligten Atome beginnen."
+  ],
+  "56": [
+    "Der Winkel zwischen den Atomen H-O-H im Wassermolekül beträgt etwa 105°. Erläutere mit dem Elektronenpaarabstoßungs-Modell (EPA, engl. VSEPR) wie dieser Winkel zustande kommt.",
+    "Der Winkel zwischen den Atomen H-N-H im Ammoniak-Molekül beträgt etwa 107°. Erläutere mit dem Elektronenpaarabstoßungs-Modell (EPA, engl. VSEPR) wie dieser Winkel zustande kommt.",
+    "Der Winkel zwischen den Atomen H-C-H im Methan-Molekül beträgt etwa 110°. Erläutere mit dem Elektronenpaarabstoßungs-Modell (EPA, engl. VSEPR) wie dieser Winkel zustande kommt.",
+    "Der Winkel zwischen den Atomen O-C-O im Kohlenstoffdioxid-Molekül beträgt 180°. Erläutere mit dem Elektronenpaarabstoßungs-Modell (EPA, engl. VSEPR) wie dieser Winkel zustande kommt.",
+    "Der Winkel zwischen den Atomen Br-C-Br im Tetrabrommethan-Molekül (CBr4) beträgt etwa 110°. Erläutere mit dem Elektronenpaarabstoßungs-Modell (EPA, engl. VSEPR) wie dieser Winkel zustande kommt."
+  ],
+  "57": [
+    "Erläutere unter Verwendung eines Beispiels, was man unter einer polaren Elektronenpaarbindung versteht. Dazu musst du ein Molekül in Lewisstrukturformel zeichnen, die Teilladungen (Partialladungen) der Atome eintragen und mit ein paar Sätzen den Zusammenhang zur polaren Elektronenpaarbindung herstellen."
+  ],
+  "58": [
+    "Im Wasser-Molekül (H2O) sind Sauerstoff-Atome partial negativ geladen, Wasserstoff-Atome partial negativ. Erkläre wie es dazu kommt.",
+    "Im Ammoniak-Molekül (NH3) sind Stickstoff-Atome partial negativ geladen, Wasserstoff-Atome partial negativ. Erkläre wie es dazu kommt.",
+    "Im Kohlenstoffdioxid-Molekül (CO2) sind Kohlentoff-Atome partial negativ geladen, Wasserstoff-Atome partial negativ. Erkläre wie es dazu kommt."
+  ],
+  "59": [
+    "Beschreibe den Begriff Teilladung (Partialladung) in Abgrenzung zu dem Begriff Ladung."
+  ],
+  "60": [
+    "Erläutere, ob es sich beim Wasser-Molekül um ein Dipol-Molekül handelt. Dazu musst du das Molekül in Lewis-Strukturformel zeichnen, begründen, ob es Teilladungen an den einzelnen Atomen gibt und diese eintragen und auf dieser Grundlage argumentieren.",
+    "Erläutere, ob es sich beim Ammoniak-Molekül (NH3) um ein Dipol-Molekül handelt. Dazu musst du das Molekül in Lewis-Strukturformel zeichnen, begründen, ob es Teilladungen an den einzelnen Atomen gibt und diese eintragen und auf dieser Grundlage argumentieren.",
+    "Erläutere, ob es sich beim Methan-Molekül (CH4) um ein Dipol-Molekül handelt. Dazu musst du das Molekül in Lewis-Strukturformel zeichnen, begründen, ob es Teilladungen an den einzelnen Atomen gibt und diese eintragen und auf dieser Grundlage argumentieren.",
+    "Erläutere, ob es sich beim Kohlenstoffdioxid-Molekül (CO2) um ein Dipol-Molekül handelt. Dazu musst du das Molekül in Lewis-Strukturformel zeichnen, begründen, ob es Teilladungen an den einzelnen Atomen gibt und diese eintragen und auf dieser Grundlage argumentieren.",
+    "Erläutere, ob es sich beim Tetrafluormethan-Molekül (CH4) um ein Dipol-Molekül handelt. Dazu musst du das Molekül in Lewis-Strukturformel zeichnen, begründen, ob es Teilladungen an den einzelnen Atomen gibt und diese eintragen und auf dieser Grundlage argumentieren.",
+    "Erläutere, ob es sich beim Molekül der salpetrigen Säure (HNO2) um ein Dipol-Molekül handelt. Dazu musst du das Molekül in Lewis-Strukturformel zeichnen, begründen, ob es Teilladungen an den einzelnen Atomen gibt und diese eintragen und auf dieser Grundlage argumentieren."
+  ],
+  "61": [
+    "Begründe, mithilfe von zwischenmolekularen Wechselwirkungen, warum Wasser eine so hohe Siedetemperatur (100 °C)hat. (Tipp: Beim Sieden wird der Stoff gasförmig, was bedeutet, dass die einzelnen Moleküle voneinander getrennt werden müssen). Benenne auch die vorliegende zwischenmolekulare Wechselwirkung.",
+    "Begründe, mithilfe von zwischenmolekularen Wechselwirkungen, warum Fluorwasserstoff eine hohe Siedetemperatur (20 °C) hat. (Tipp: Beim Sieden wird der Stoff gasförmig, was bedeutet, dass die einzelnen Moleküle voneinander getrennt werden müssen). Benenne auch die vorliegende zwischenmolekulare Wechselwirkung.",
+    "Begründe, mithilfe von zwischenmolekularen Wechselwirkungen, warum Methan eine niedrige Siedetemperatur (-160 °C) hat. (Tipp: Beim Sieden wird der Stoff gasförmig, was bedeutet, dass die einzelnen Moleküle voneinander getrennt werden müssen). Benenne auch die vorliegende zwischenmolekulare Wechselwirkung.",
+    "Ordne die Stoffe Wasser (H2O), Kohlenstoffdioxid (CO2) und Methan (CH4) begründet nach Siedetemperaturen. Du musst bei der Begründung auf die vorliegenden zwischenmolekularen Wechselwirkungen eingehen."
+  ],
+  "62": [
+    "Beschreibe Dipol-Dipol-Wechselwirkungen",
+    "Beschreibe H-Brücken",
+    "Beschreibe den Unterschied zwischen H-Brücken und Dipol-Dipol-Wechselwirkungen"
+  ],
+  "63": [
+    "Erläutere den Zusammenhang von zwischenmolekularen Wechselwirkungen und Siedetemperaturen anhand von Beispielen deiner Wahl",
+    "Wasser (H2O) siedet bei 100 °C, Ammoniak bereits bei -33 °C. Wie lässt sich daran Zusammenhang von zwischenmolekularen Wechselwirkungen und Siedetemperaturen erläutern",
+    "Ammoniak siedet bei -33 °C, Methan (CH4) bei -162 °C. Wie lässt sich daran Zusammenhang von zwischenmolekularen Wechselwirkungen und Siedetemperaturen erläutern"
+  ],
+  "64": [
+    "Beschreibe, wie man sich das \"Verschwinden\" von Salzkristallen in Wasser auf Teilchenebene vorstellen kann. Du kannst alternativ oder ergänzend eine Zeichnung erstellen.",
+    "Erkläre, warum Wasser Kochsalz (NaCl) auflösen kann, aber Pentan (C5H12) nicht.",
+    "Erkläre, warum Wasser Kochsalz (NaCl) auflösen kann, aber Benzin (enthält Stoffe wie Heptan C7H16) nicht.",
+    "Erkläre, warum Wasser Kochsalz (NaCl) auflösen kann, aber Diesel (enthält Stoffe wie Decan C10H24) nicht."
+  ],
+  "65": [
+    "Begründe, warum ein Wasserstrahl von einem elektrische aufgeladenen Stab angezogen wird.",
+    "Erläutere mithilfe einer Zeichnung, warum ein Wasserstrahl von einem elektrisch aufgeladenen Stab angezogen wird."
+  ],
+  "66": [
+    "Beschreibe die Aussage des Satzes von Avogadro so genau wie möglich mit eigenen Worten. Du kannst auch Beispiele verwenden."
+  ],
+  "67": [
+    "Erkläre mithilfe des Satzes von Avogadro, warum man aus einem bekannten Volumen eines beliebigen Gases die darin enthaltene Teilchenanzahl berechnen kann. Du musst dazu keine Berechnung anstellen.",
+    "Begründe, warum sich der Satz von Avogadro nicht auf Flüssigkeiten oder Feststoffe anwenden lässt. Tipp: Was ist die entscheidende besondere beim Volumen von Gasen, die Avogadro beschreibt?"
+  ],
+  "69": [
+    "Erkläre wie die Metallbindung zustandekommt. Du kannst auch eine beschriftete Zeichnung erstellen."
+  ],
+  "70": [
+    "Begründe mithilfe einer Darstellung auf Teilchenebene, warum Metalle elektrisch leitfähig sind. Tipp: Für elektrische Leitfähigkeit braucht es bewegliche Ladungsträger."
+  ],
+  "71": [
+    "Begründe mithilfe einer Darstellung auf Teilchenebene, warum Metalle duktil (biegsam) sind."
+  ],
+  "72": [
+    "Erläutere mithilfe einer Darstellung auf Teilchenebene, wie Metallatome in der Metallbindung die Edelgasregel erfüllen"
+  ],
+  "73": [
+    "Beschreibe den Prozess der bei der Elektrolyse an der Kathode (Minuspol) abläuft",
+    "Beschreibe den Prozess der bei der Elektrolyse an der Anode (Pluspol) abläuft"
+  ],
+  "74": [
+    "Beschreibe, wie eine Batterie funktioniert. Es reicht hier aus, zu beschreiben, wie die Energie in einer Batterie gespeichert wird. Du musst keine Erklärung auf Teilchenebene oder Reaktionsgleichungen aufschreiben."
+  ],
+  "75": [
+    "Nenne das Teilchen, dass für alkalische Eigenschaften einer wässrigen Lösung verantwortlich ist"
+  ],
+  "76": [
+    "Nenne das Teilchen, dass für saure Eigenschaften einer wässrigen Lösung verantwortlich ist"
+  ],
+  "77": [
+    "Ordne den folgenden pH-Werten die Begriffe sauer, alkalisch oder neutral zu: 1, 4, 9",
+    "Ordne den folgenden pH-Werten die Begriffe sauer, alkalisch oder neutral zu: 13, 4, 8",
+    "Ordne den folgenden pH-Werten die Begriffe sauer, alkalisch oder neutral zu: 11, 7, 2"
+  ],
+  "78": [
+    "Stelle folgendes Molekül-Ion in Lewis-Strukturformel dar: Hydroxid-Ion",
+    "Stelle folgendes Molekül-Ion in Lewis-Strukturformel dar: Oxonium-Ion",
+    "Stelle folgendes Molekül-Ion in Lewis-Strukturformel dar: Ammonium-Ion"
+  ],
+  "79": [
+    "Beschreibe, was man unter einer Säure-Base-Reaktion (nach Brönstedt) versteht"
+  ],
+  "80": [
+    "Benenne den Reaktionstyp bei dem ein Proton (H+) übertragen wird"
+  ],
+  "81": [
+    "Beschreibe einen Versuch, mit dem man zeigen kann, dass Hydroxid-Ionen für die alkalischen Eigenschaften in wässriger Lösung verantwortlich sind."
+  ],
+  "82": [
+    "Erkläre, warum alkalische Lösungen elektrisch leitfähig sind. Anmerkung: Für elektrische Leitfähigkeit braucht es bewegliche Ladungsträger."
+  ],
+  "83": [
+    "Ermittle die Formalladung des Sauerstoffatoms im Hydroxid-Ion (OH-)",
+    "Ermittle die Formalladung des Sauerstoffatoms im Oxonium-Ion (H3O+)"
+  ],
+  "85": [
+    "Stelle die Reaktionsgleichung von Wasser mit Chlorwasserstoff mithilfe von Lewis-Strukturformeln dar. Kennzeichne den Protononenübergang.",
+    "Stelle die Reaktionsgleichung von Wasser mit Ammoniak mithilfe von Lewis-Strukturformeln dar. Kennzeichne den Protononenübergang."
+  ],
+  "86": [
+    "Stelle die Reaktion  einer Neutralisationsreaktion auf. Du kannst das allgemein (Reaktionsschema mit Worten) machen oder ein Beispiel (Reaktionsgleichung) nutzen.",
+    "Stellle die Reaktionsgleichung der Neutralisationsreaktion zwischen Natronlauge  (enthält Na+,  OH- und Wasser) und Salzsäure  (enthalt H3O+, Cl- und Wasser) auf."
+  ],
+  "87": [
+    "Zeichne das Stoffteilchen und ordne den Stoff begründet einer der Stoffklassen Metalle, flüchtige Stoffe (Molekülverbindungen), salzartige Stoffe zu: Chlorwasserstoff",
+    "Zeichne das Stoffteilchen und ordne den Stoff begründet einer der Stoffklassen Metalle, flüchtige Stoffe (Molekülverbindungen), salzartige Stoffe zu: Wasser",
+    "Zeichne das Stoffteilchen und ordne den Stoff begründet einer der Stoffklassen Metalle, flüchtige Stoffe (Molekülverbindungen), salzartige Stoffe zu: Natriumfluorid",
+    "Zeichne das Stoffteilchen und ordne den Stoff begründet einer der Stoffklassen Metalle, flüchtige Stoffe (Molekülverbindungen), salzartige Stoffe zu: Magnesiumoxid",
+    "Zeichne das Stoffteilchen und ordne den Stoff begründet einer der Stoffklassen Metalle, flüchtige Stoffe (Molekülverbindungen), salzartige Stoffe zu: Magnesium",
+    "Zeichne das Stoffteilchen und ordne den Stoff begründet einer der Stoffklassen Metalle, flüchtige Stoffe (Molekülverbindungen), salzartige Stoffe zu: Aluminium"
+  ],
+  "88": [
+    "Stelle das folgende Teilchen in Lewis-Strukturformel dar. Achte darauf, Formalladungen und die Gesamtladung (falls vorhanden) anzugeben: H2SO4",
+    "Stelle das folgende Teilchen in Lewis-Strukturformel dar. Achte darauf, Formalladungen und die Gesamtladung (falls vorhanden) anzugeben: HNO3",
+    "Stelle das folgende Teilchen in Lewis-Strukturformel dar. Achte darauf, Formalladungen und die Gesamtladung (falls vorhanden) anzugeben: H3PO4"
+  ]
+}
