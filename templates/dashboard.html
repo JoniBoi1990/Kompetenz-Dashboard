@@ -150,7 +150,7 @@
   <div>
     <h2>Niveau-Kompetenzen</h2>
     <table class="kompetenz-table">
-      <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Niveau</th><th>Nachweis</th><th></th></tr></thead>
+      <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Niveau</th><th>Nachweis beantragen</th></tr></thead>
       <tbody>
         {% for k in niveau_kompetenzen %}
         {% set best = best_nachweis_by_comp.get(k.id) %}
@@ -167,11 +167,11 @@
                 <tbody>
                   {% for n in entries %}
                   <tr>
-                    <td>{{ n.updated_at[:10] if n.updated_at else "–" }}</td>
+                    <td style="white-space:nowrap">{{ n.updated_at[:10] if n.updated_at else "–" }}</td>
                     <td><span class="niveau-badge niveau-{{ n.niveau_level }}">{{ NIVEAU_LABELS[n.niveau_level] }}</span></td>
                     <td>
                       {% if n.evidence_url %}
-                      <a href="{{ n.evidence_url }}" target="_blank" rel="noopener">
+                      <a href="{{ n.evidence_url }}" target="_blank" rel="noopener" class="link-truncate" title="{{ n.evidence_name or n.evidence_url }}">
                         {{ n.evidence_name or "Link" }}
                       </a>
                       {% else %}–{% endif %}
@@ -192,13 +192,6 @@
             {% else %}
             <span class="muted">–</span>
             {% endif %}
-          </td>
-          <td>
-            {% if best and best.evidence_url %}
-            <a href="{{ best.evidence_url }}" target="_blank" rel="noopener">
-              {{ best.evidence_name or "Link" }}
-            </a>
-            {% else %}–{% endif %}
           </td>
           <td>
             {% if best_niveau == 0 %}
