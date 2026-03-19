@@ -15,11 +15,19 @@ Kompetenz-Dashboard — a Microsoft 365-connected student dashboard for chemistr
 | Branch | Purpose |
 |--------|---------|
 | `main` | Stable production branch — deployed on Uberspace |
-| `agent-dev` | Development branch for AI agents |
+| `agent-dev` | Development branch for AI agents — **DEV_MODE features only** |
 
-**Agents must only commit to `agent-dev`.** Merges to `main` are done by the user.
+**⚠️ CRITICAL: `agent-dev` contains DEV_MODE-only code!**
 
-**Important: DEV_MODE changes must NOT be committed to git.** The Dev-Mode (fake login, test classes, sample data) is for local testing only. Never commit changes that are specific to `DEV_MODE=true` (like the dev login buttons, test students, or dev classes) to any branch.
+The `agent-dev` branch has features that only work with `DEV_MODE=true`:
+- Multiple test users (Anna, Max, Lehrer)
+- Test classes (9a, 10a) with sample data
+- Class-specific competency lists (Klasse 9, 10)
+- CSV upload workflow for competency lists
+
+**DO NOT merge `agent-dev` → `main` directly!** The production app uses Azure AD and a different data model.
+
+**Agents must only commit to `agent-dev`.** Merges to `main` are done by the user after careful review.
 
 Commit format: `agent: <short description>`
 
@@ -518,3 +526,39 @@ See `KOMPETENZLISTEN_WORKFLOW.md` for detailed workflow.
 | 10 | done | DEV_MODE pre-populated SQLite; Git repo + Uberspace deployment |
 | 11 | done | SQLite persistence for all data (test_requests, kompetenzantraege, classes, members) |
 | 12 | done | Class management admin UI (/admin/classes): add/delete classes, manage + CSV-import members |
+
+
+---
+
+## ⚠️ DEV-MODE Status (Current Branch: agent-dev)
+
+**This documentation reflects the `agent-dev` branch state which includes DEV_MODE-only features.**
+
+### DEV_MODE Features (NOT in production/main)
+
+| Feature | DEV_MODE | Production |
+|---------|----------|------------|
+| Login | Fake login form (`/dev-login`) | Azure AD OAuth |
+| Test Users | Anna, Max, Lehrer | Real school users |
+| Test Classes | 9a (Dev), 10a (Dev) | Real classes from Azure AD |
+| Competency Lists | Multiple (Klasse 9, 10, teacher uploads) | Single global list |
+| Data Storage | SQLite + JSON files | SQLite (production) |
+| CSV Upload | Full workflow for teachers | Admin only |
+
+### Switching to Production
+
+To use this code in production (`main` branch):
+
+1. Set `DEV_MODE=false` in `.env`
+2. Configure Azure AD credentials
+3. Remove or disable test users and classes
+4. Consider: Production uses single global competency list, not class-specific
+
+### DEV_MODE Test Credentials
+
+| User | Email | Password | Class |
+|------|-------|----------|-------|
+| Anna Beispiel | anna@schule.de | (any) | 9a |
+| Max Mustermann | max@schule.de | (any) | 10a |
+| Lehrer (Dev) | lehrer@schule.de | (any) | — |
+
