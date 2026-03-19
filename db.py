@@ -51,8 +51,10 @@ def init_db() -> None:
             updated_at    TEXT NOT NULL DEFAULT ''
         );
         CREATE TABLE IF NOT EXISTS active_ids (
-            competency_id INTEGER PRIMARY KEY
+            competency_id INTEGER PRIMARY KEY,
+            class_id TEXT  -- NULL = global (für Abwärtskompatibilität)
         );
+        CREATE INDEX IF NOT EXISTS idx_active_ids_class ON active_ids(class_id);
         CREATE TABLE IF NOT EXISTS test_requests (
             id             TEXT PRIMARY KEY,
             student_id     TEXT NOT NULL,
@@ -69,7 +71,10 @@ def init_db() -> None:
         CREATE TABLE IF NOT EXISTS classes (
             id          TEXT PRIMARY KEY,
             name        TEXT NOT NULL,
-            description TEXT NOT NULL DEFAULT ''
+            description TEXT NOT NULL DEFAULT '',
+            grade_level INTEGER,
+            competency_list_id TEXT,
+            list_source TEXT DEFAULT 'system'
         );
         CREATE TABLE IF NOT EXISTS class_members (
             class_id     TEXT NOT NULL,
@@ -78,26 +83,61 @@ def init_db() -> None:
             upn          TEXT NOT NULL DEFAULT '',
             PRIMARY KEY (class_id, student_id)
         );
+        CREATE TABLE IF NOT EXISTS teacher_lists (
+            id            TEXT PRIMARY KEY,
+            name          TEXT NOT NULL,
+            grade_level   INTEGER NOT NULL,
+            uploaded_by   TEXT NOT NULL,
+            uploaded_at   TEXT NOT NULL,
+            data          TEXT NOT NULL,  -- JSON mit competencies
+            questions     TEXT DEFAULT '{}'  -- JSON mit questions
+        );
         """)
+        
+        # Migration: Add questions column if table exists without it
+        try:
+            con.execute("SELECT questions FROM teacher_lists LIMIT 1")
+        except sqlite3.OperationalError:
+            con.execute("ALTER TABLE teacher_lists ADD COLUMN questions TEXT DEFAULT '{}' ")
 
 
 # ---------------------------------------------------------------------------
 # Active competency IDs (Unterrichtsstand)
 # ---------------------------------------------------------------------------
 
-def get_active_ids() -> set[int]:
+def get_active_ids(class_id: str | None = None) -> set[int]:
+    """Get active competency IDs. If class_id provided, returns class-specific IDs,
+    otherwise returns global active IDs (where class_id IS NULL)."""
     with _conn() as con:
-        rows = con.execute("SELECT competency_id FROM active_ids").fetchall()
+        if class_id:
+            rows = con.execute(
+                "SELECT competency_id FROM active_ids WHERE class_id = ?",
+                (class_id,)
+            ).fetchall()
+        else:
+            # For backward compatibility: return IDs with NULL class_id
+            rows = con.execute(
+                "SELECT competency_id FROM active_ids WHERE class_id IS NULL"
+            ).fetchall()
     return {row[0] for row in rows}
 
 
-def set_active_ids(ids: set[int]) -> None:
+def set_active_ids(ids: set[int], class_id: str | None = None) -> None:
+    """Set active competency IDs. If class_id provided, sets class-specific IDs."""
     with _conn() as con:
-        con.execute("DELETE FROM active_ids")
-        con.executemany(
-            "INSERT INTO active_ids(competency_id) VALUES(?)",
-            [(i,) for i in ids],
-        )
+        if class_id:
+            con.execute("DELETE FROM active_ids WHERE class_id = ?", (class_id,))
+            con.executemany(
+                "INSERT INTO active_ids(competency_id, class_id) VALUES(?, ?)",
+                [(i, class_id) for i in ids],
+            )
+        else:
+            # Global active IDs (backward compatibility)
+            con.execute("DELETE FROM active_ids WHERE class_id IS NULL")
+            con.executemany(
+                "INSERT INTO active_ids(competency_id, class_id) VALUES(?, NULL)",
+                [(i,) for i in ids],
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -251,7 +291,9 @@ def get_classes() -> list[dict]:
 def get_classes_with_counts() -> list[dict]:
     with _conn() as con:
         rows = con.execute(
-            """SELECT c.id, c.name, c.description, COUNT(m.student_id) AS member_count
+            """SELECT c.id, c.name, c.description, c.grade_level, 
+                      c.competency_list_id, c.list_source,
+                      COUNT(m.student_id) AS member_count
                FROM classes c
                LEFT JOIN class_members m ON c.id = m.class_id
                GROUP BY c.id
@@ -262,18 +304,81 @@ def get_classes_with_counts() -> list[dict]:
             "id": r["id"],
             "displayName": r["name"],
             "description": r["description"],
+            "grade_level": r["grade_level"],
+            "competency_list_id": r["competency_list_id"],
+            "list_source": r["list_source"],
             "member_count": r["member_count"],
         }
         for r in rows
     ]
 
 
-def add_class(name: str, description: str = "", class_id: str | None = None) -> str:
+def get_class(class_id: str) -> dict | None:
+    """Get a single class with all details."""
+    with _conn() as con:
+        row = con.execute(
+            "SELECT * FROM classes WHERE id = ?",
+            (class_id,)
+        ).fetchone()
+    if not row:
+        return None
+    return {
+        "id": row["id"],
+        "displayName": row["name"],
+        "name": row["name"],
+        "description": row["description"],
+        "grade_level": row["grade_level"],
+        "competency_list_id": row["competency_list_id"],
+        "list_source": row["list_source"],
+    }
+
+
+def get_student_class(student_id: str) -> dict | None:
+    """Get the class that a student belongs to."""
+    with _conn() as con:
+        row = con.execute(
+            """SELECT c.* FROM classes c
+               JOIN class_members m ON c.id = m.class_id
+               WHERE m.student_id = ?""",
+            (student_id,)
+        ).fetchone()
+    if not row:
+        return None
+    return {
+        "id": row["id"],
+        "displayName": row["name"],
+        "name": row["name"],
+        "description": row["description"],
+        "grade_level": row["grade_level"],
+        "competency_list_id": row["competency_list_id"],
+        "list_source": row["list_source"],
+    }
+
+
+def set_class_competency_list(class_id: str, list_id: str, list_source: str = "system") -> None:
+    """Set the competency list for a class."""
+    with _conn() as con:
+        con.execute(
+            "UPDATE classes SET competency_list_id = ?, list_source = ? WHERE id = ?",
+            (list_id, list_source, class_id)
+        )
+
+
+def add_class(
+    name: str, 
+    description: str = "", 
+    class_id: str | None = None,
+    grade_level: int | None = None,
+    competency_list_id: str | None = None,
+    list_source: str = "system"
+) -> str:
     cid = class_id or str(uuid.uuid4())
     with _conn() as con:
         con.execute(
-            "INSERT OR IGNORE INTO classes(id, name, description) VALUES(?, ?, ?)",
-            (cid, name.strip(), description.strip()),
+            """INSERT OR IGNORE INTO classes(id, name, description, grade_level, 
+                                             competency_list_id, list_source) 
+                VALUES(?, ?, ?, ?, ?, ?)""",
+            (cid, name.strip(), description.strip(), grade_level, competency_list_id, list_source),
         )
     return cid
 
@@ -358,3 +463,97 @@ def import_class_members_csv(class_id: str, rows: list[dict]) -> int:
             )
             count += 1
     return count
+
+
+# ---------------------------------------------------------------------------
+# Teacher-uploaded competency lists
+# ---------------------------------------------------------------------------
+
+def save_teacher_list(
+    list_id: str,
+    name: str,
+    grade_level: int,
+    uploaded_by: str,
+    data: dict,
+    questions: dict | None = None,
+) -> None:
+    """Save a teacher-uploaded competency list."""
+    import json
+    now = datetime.now(timezone.utc).isoformat()
+    with _conn() as con:
+        con.execute(
+            """INSERT OR REPLACE INTO teacher_lists
+               (id, name, grade_level, uploaded_by, uploaded_at, data, questions)
+               VALUES(?, ?, ?, ?, ?, ?, ?)""",
+            (list_id, name.strip(), grade_level, uploaded_by, now, 
+             json.dumps(data), json.dumps(questions or {})),
+        )
+
+
+def get_teacher_lists(uploaded_by: str | None = None) -> list[dict]:
+    """Get all teacher-uploaded lists, optionally filtered by uploader."""
+    import json
+    with _conn() as con:
+        if uploaded_by:
+            rows = con.execute(
+                "SELECT * FROM teacher_lists WHERE uploaded_by = ? ORDER BY name",
+                (uploaded_by,)
+            ).fetchall()
+        else:
+            rows = con.execute(
+                "SELECT * FROM teacher_lists ORDER BY name"
+            ).fetchall()
+    
+    result = []
+    for row in rows:
+        data = json.loads(row["data"])
+        questions = json.loads(row["questions"] if row["questions"] else '{}')
+        result.append({
+            "id": row["id"],
+            "name": row["name"],
+            "grade_level": row["grade_level"],
+            "uploaded_by": row["uploaded_by"],
+            "uploaded_at": row["uploaded_at"],
+            "competency_count": len(data.get("competencies", [])),
+            "question_count": sum(len(v) for v in questions.values()),
+            "data": data,
+            "questions": questions,
+        })
+    return result
+
+
+def get_teacher_list(list_id: str) -> dict | None:
+    """Get a specific teacher-uploaded list."""
+    import json
+    with _conn() as con:
+        row = con.execute(
+            "SELECT * FROM teacher_lists WHERE id = ?",
+            (list_id,)
+        ).fetchone()
+    
+    if not row:
+        return None
+    
+    data = json.loads(row["data"])
+    questions = json.loads(row["questions"] if row["questions"] else '{}')
+    return {
+        "id": row["id"],
+        "name": row["name"],
+        "grade_level": row["grade_level"],
+        "uploaded_by": row["uploaded_by"],
+        "uploaded_at": row["uploaded_at"],
+        "competency_count": len(data.get("competencies", [])),
+        "question_count": sum(len(v) for v in questions.values()),
+        "data": data,
+        "questions": questions,
+    }
+
+
+def delete_teacher_list(list_id: str, uploaded_by: str) -> bool:
+    """Delete a teacher-uploaded list. Only the uploader can delete."""
+    with _conn() as con:
+        cursor = con.execute(
+            "DELETE FROM teacher_lists WHERE id = ? AND uploaded_by = ?",
+            (list_id, uploaded_by)
+        )
+        return cursor.rowcount > 0

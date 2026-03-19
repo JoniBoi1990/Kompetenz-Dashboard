@@ -127,9 +127,49 @@ def _reload_grading_scale() -> None:
     _GRADING_SCALE = json.loads(p.read_text(encoding="utf-8")) if p.exists() else _default_grading_scale()
 
 
+def _load_competency_list(list_id: str, list_source: str = "system") -> tuple[list[dict], dict]:
+    """Load a specific competency list by ID.
+    
+    Args:
+        list_id: The list ID
+        list_source: "system" (from files) or "teacher" (from DB)
+    """
+    if list_source == "teacher":
+        # Load from teacher_lists table
+        teacher_list = db.get_teacher_list(list_id)
+        if not teacher_list:
+            raise FileNotFoundError(f"Lehrer-Liste nicht gefunden: {list_id}")
+        
+        data = teacher_list["data"]
+        competencies = data.get("competencies", [])
+        questions = teacher_list.get("questions", {})
+        return competencies, questions
+    
+    else:  # system
+        list_file = BASE_DIR / "kompetenzlisten" / f"{list_id}.json"
+        if not list_file.exists():
+            raise FileNotFoundError(f"Kompetenzliste nicht gefunden: {list_id}")
+        
+        data = json.loads(list_file.read_text(encoding="utf-8"))
+        competencies = data.get("competencies", [])
+        
+        # Load questions if available
+        questions_file = BASE_DIR / "kompetenzlisten" / f"{list_id}-questions.json"
+        if questions_file.exists():
+            questions = json.loads(questions_file.read_text(encoding="utf-8"))
+        else:
+            questions = {}
+        
+        return competencies, questions
+
+
 def _reload_kompetenzen() -> None:
-    global _KOMPETENZEN, _KOMPETENZ_MAP, _EINFACH, _NIVEAU
-    _KOMPETENZEN = json.loads((BASE_DIR / "kompetenzen.json").read_text(encoding="utf-8"))
+    """Load default list (class 9) for backward compatibility during transition."""
+    global _KOMPETENZEN, _KOMPETENZ_MAP, _EINFACH, _NIVEAU, _QUESTIONS
+    
+    # Load default list (class 9)
+    _KOMPETENZEN, _QUESTIONS = _load_competency_list("klasse-9-chemie")
+    
     _KOMPETENZ_MAP = {k["id"]: k for k in _KOMPETENZEN}
     _EINFACH = sorted(
         (k for k in _KOMPETENZEN if k["typ"] == "einfach"),
@@ -142,15 +182,15 @@ def _reload_kompetenzen() -> None:
     themen: dict[int, list] = {}
     for k in _EINFACH:
         themen.setdefault(k.get("thema") or 0, []).append(k)
+    # Set globals as defaults (will be overridden in Dashboard for class-specific)
     templates.env.globals["einfach_kompetenzen"] = _EINFACH
     templates.env.globals["niveau_kompetenzen"]  = _NIVEAU
     templates.env.globals["einfach_nach_thema"]  = themen
 
 
 def _reload_questions() -> None:
-    global _QUESTIONS
-    p = BASE_DIR / "questions.json"
-    _QUESTIONS = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    """Questions are now loaded together with competencies."""
+    pass  # Handled in _reload_kompetenzen
 
 
 # Make these available in every template without passing them explicitly
@@ -171,42 +211,90 @@ _reload_grading_scale()
 # Ephemeral store for in-progress test previews (per-process, intentionally lost on restart)
 _TEST_PREVIEWS: dict = {}
 
-DEV_STUDENT_OID  = "dev@schule.de"  # Muss mit Dev-Login UPN übereinstimmen
-DEV_STUDENT_NAME = "Anna Beispiel"
+# Dev-Mode Users
+DEV_STUDENT_OID_9   = "anna@schule.de"
+DEV_STUDENT_NAME_9  = "Anna Beispiel"
+DEV_STUDENT_OID_10  = "max@schule.de"
+DEV_STUDENT_NAME_10 = "Max Mustermann"
 
 
 def _init_dev_db() -> None:
     """Pre-populate SQLite with sample data when in DEV_MODE and DB is empty."""
     if not settings.DEV_MODE:
         return
-    # Only populate once — skip if dev student data already exists
-    if db.get_einfach_records(DEV_STUDENT_OID):
+    # Only populate once — skip if already initialized
+    if db.get_einfach_records(DEV_STUDENT_OID_9):
         return
 
-    # Dev class
-    db.add_class("9a (Dev)", "Beispielklasse", class_id="dev-class")
-    db.add_class_member("dev-class", DEV_STUDENT_OID, DEV_STUDENT_NAME, "anna@schule.de")
+    # Klasse 9
+    db.add_class(
+        "9a (Dev)", "Beispielklasse Klasse 9", 
+        class_id="dev-class-9",
+        grade_level=9,
+        competency_list_id="klasse-9-chemie",
+        list_source="system"
+    )
+    db.add_class_member("dev-class-9", DEV_STUDENT_OID_9, DEV_STUDENT_NAME_9, DEV_STUDENT_OID_9)
 
-    # Unterrichtsstand: einfach Themen 1–3 + first 10 niveau competencies
-    active_einfach = [k for k in _EINFACH if k.get("thema") in (1, 2, 3)]
-    active_niveau  = _NIVEAU[:10]
-    db.set_active_ids({k["id"] for k in active_einfach} | {k["id"] for k in active_niveau})
+    # Klasse 10
+    db.add_class(
+        "10a (Dev)", "Beispielklasse Klasse 10",
+        class_id="dev-class-10", 
+        grade_level=10,
+        competency_list_id="klasse-10-chemie",
+        list_source="system"
+    )
+    db.add_class_member("dev-class-10", DEV_STUDENT_OID_10, DEV_STUDENT_NAME_10, DEV_STUDENT_OID_10)
 
-    # Dev student: 80 % of active einfach achieved
-    n_achieved = round(len(active_einfach) * 0.8)
-    for k in active_einfach:
+    # Unterrichtsstand Klasse 9: einfach Themen 1–3 + first 10 niveau
+    # Load Klasse 9 competencies
+    comps_9, _ = _load_competency_list("klasse-9-chemie", "system")
+    einfach_9 = [c for c in comps_9 if c["typ"] == "einfach"]
+    niveau_9 = [c for c in comps_9 if c["typ"] == "niveau"]
+    active_einfach_9 = [k for k in einfach_9 if k.get("thema") in (1, 2, 3)]
+    active_niveau_9 = niveau_9[:10]
+    db.set_active_ids({k["id"] for k in active_einfach_9} | {k["id"] for k in active_niveau_9}, class_id="dev-class-9")
+    
+    # Unterrichtsstand Klasse 10: first 30 einfach + first 10 niveau
+    comps_10, _ = _load_competency_list("klasse-10-chemie", "system")
+    einfach_10 = [c for c in comps_10 if c["typ"] == "einfach"]
+    niveau_10 = [c for c in comps_10 if c["typ"] == "niveau"]
+    active_einfach_10 = einfach_10[:30]
+    active_niveau_10 = niveau_10[:10]
+    db.set_active_ids({k["id"] for k in active_einfach_10} | {k["id"] for k in active_niveau_10}, class_id="dev-class-10")
+
+    # Anna (Klasse 9): 80% der einfach erreicht
+    n_achieved = round(len(active_einfach_9) * 0.8)
+    for k in active_einfach_9:
         db.upsert_einfach(
-            DEV_STUDENT_OID, DEV_STUDENT_NAME, k["id"],
-            achieved=(k in active_einfach[:n_achieved]),
-            updated_by="lehrer@lehrer.schule.de",
+            DEV_STUDENT_OID_9, DEV_STUDENT_NAME_9, k["id"],
+            achieved=(k in active_einfach_9[:n_achieved]),
+            updated_by="lehrer@schule.de",
         )
 
-    # Dev student niveau: 5×Advanced, 3×Beginner, 2×Expert
-    for k, lvl in zip(active_niveau, [2, 2, 2, 2, 2, 1, 1, 1, 3, 3]):
+    # Anna niveau: 5×Advanced, 3×Beginner, 2×Expert
+    for k, lvl in zip(active_niveau_9, [2, 2, 2, 2, 2, 1, 1, 1, 3, 3]):
         db.add_nachweis(
-            DEV_STUDENT_OID, DEV_STUDENT_NAME, k["id"], lvl,
+            DEV_STUDENT_OID_9, DEV_STUDENT_NAME_9, k["id"], lvl,
             "https://example.com/nachweis", "Beispiel-Nachweis",
-            "lehrer@lehrer.schule.de",
+            "lehrer@schule.de",
+        )
+
+    # Max (Klasse 10): 60% erreicht
+    n_achieved_10 = round(len(active_einfach_10) * 0.6)
+    for k in active_einfach_10:
+        db.upsert_einfach(
+            DEV_STUDENT_OID_10, DEV_STUDENT_NAME_10, k["id"],
+            achieved=(k in active_einfach_10[:n_achieved_10]),
+            updated_by="lehrer@schule.de",
+        )
+
+    # Max niveau: 3×Advanced, 4×Beginner, 3×Expert
+    for k, lvl in zip(active_niveau_10, [2, 2, 2, 1, 1, 1, 1, 3, 3, 3]):
+        db.add_nachweis(
+            DEV_STUDENT_OID_10, DEV_STUDENT_NAME_10, k["id"], lvl,
+            "https://example.com/nachweis", "Nachweis Max",
+            "lehrer@schule.de",
         )
 
 
@@ -333,13 +421,28 @@ async def login(request: Request):
 async def dev_login(
     display_name: str = Form(...),
     role: str = Form(...),
+    email: str = Form(default=""),
 ):
     if not settings.DEV_MODE:
         raise HTTPException(status_code=403, detail="Nur im Dev-Modus verfügbar")
     is_teacher = role == "teacher"
-    upn = f"dev@lehrer.schule.de" if is_teacher else "dev@schule.de"
+    
+    # Bestimme UPN basierend auf Rolle und optionaler Email
+    if is_teacher:
+        upn = "lehrer@schule.de"
+    else:
+        # Student: use provided email or default
+        if email:
+            upn = email
+        elif "anna" in display_name.lower():
+            upn = "anna@schule.de"
+        elif "max" in display_name.lower():
+            upn = "max@schule.de"
+        else:
+            upn = "student@schule.de"
+    
     user_info = {
-        "oid": upn,  # UPN als eindeutige ID verwenden
+        "oid": upn,
         "upn": upn,
         "display_name": display_name,
         "roles": ["Lehrer"] if is_teacher else [],
@@ -382,6 +485,32 @@ async def auth_me(user: dict = Depends(auth.require_user)):
 # Student routes
 # ---------------------------------------------------------------------------
 
+def _get_student_competencies(student_id: str) -> tuple[list[dict], list[dict], set[int], str | None]:
+    """Get competencies for a student based on their class.
+    Returns: (einfach_list, niveau_list, active_ids, class_id)"""
+    student_class = db.get_student_class(student_id)
+    
+    if not student_class or not student_class.get("competency_list_id"):
+        # Fallback to default list (class 9)
+        return _EINFACH, _NIVEAU, db.get_active_ids(), None
+    
+    class_id = student_class["id"]
+    list_id = student_class["competency_list_id"]
+    list_source = student_class.get("list_source", "system")
+    
+    try:
+        # Load class-specific competency list (system or teacher)
+        comps, _ = _load_competency_list(list_id, list_source)
+        einfach = sorted([c for c in comps if c["typ"] == "einfach"], 
+                        key=lambda k: (k.get("thema") or 999, k["id"]))
+        niveau = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+        active_ids = db.get_active_ids(class_id)
+        return einfach, niveau, active_ids, class_id
+    except FileNotFoundError:
+        # Fallback if list file not found
+        return _EINFACH, _NIVEAU, db.get_active_ids(), None
+
+
 @app.get("/", response_class=HTMLResponse)
 async def student_dashboard(request: Request, user: dict = Depends(auth.require_user)):
     if user["is_teacher"]:
@@ -390,28 +519,42 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
     einfach_map, nachweise_by_comp, best_nachweis_by_comp, _ = _load_student_data(
         user["access_token"], user["oid"]
     )
-    active_ids = _load_active_ids(user["access_token"])
+    
+    # Get class-specific competencies
+    class_einfach, class_niveau, active_ids, class_id = _get_student_competencies(user["oid"])
+    
+    # Build competency lookup for this class
+    class_comp_ids = {c["id"] for c in class_einfach + class_niveau}
+    
+    # Filter records to only include class competencies
+    einfach_map_filtered = {k: v for k, v in einfach_map.items() if k in class_comp_ids}
+    nachweise_filtered = {k: v for k, v in nachweise_by_comp.items() if k in class_comp_ids}
+    best_nachweis_filtered = {k: v for k, v in best_nachweis_by_comp.items() if k in class_comp_ids}
 
-    # Recalculate grade filtered by active_ids + proven competencies (Unterrichtsstand basis)
+    # Recalculate grade filtered by active_ids + proven competencies
     if active_ids:
         proven_ids = (
-            {cid for cid, r in einfach_map.items() if r.get("achieved")}
-            | {cid for cid, entries in nachweise_by_comp.items()
+            {cid for cid, r in einfach_map_filtered.items() if r.get("achieved")}
+            | {cid for cid, entries in nachweise_filtered.items()
                if any(e.get("niveau_level", 0) > 0 for e in entries)}
         )
-        grade_comps = [k for k in _KOMPETENZEN if k["id"] in active_ids or k["id"] in proven_ids]
+        grade_comps = [k for k in class_einfach + class_niveau 
+                      if k["id"] in active_ids or k["id"] in proven_ids]
     else:
+        proven_ids = set()
         grade_comps = None
-    grade = calculate_grade(_build_grade_records(einfach_map, nachweise_by_comp), competencies=grade_comps)
+    
+    grade = calculate_grade(_build_grade_records(einfach_map_filtered, nachweise_filtered), 
+                           competencies=grade_comps)
 
-    # JSON payloads for client-side planning mode
-    kompetenzen_json = json.dumps([{"id": k["id"], "typ": k["typ"]} for k in _KOMPETENZEN])
+    # JSON payloads for client-side planning mode (filtered to class competencies)
+    kompetenzen_json = json.dumps([{"id": k["id"], "typ": k["typ"]} for k in class_einfach + class_niveau])
     current_state: dict = {}
-    for k in _EINFACH:
-        r = einfach_map.get(k["id"], {})
+    for k in class_einfach:
+        r = einfach_map_filtered.get(k["id"], {})
         current_state[k["id"]] = {"achieved": bool(r.get("achieved")), "niveau_level": 0}
-    for k in _NIVEAU:
-        entries = nachweise_by_comp.get(k["id"], [])
+    for k in class_niveau:
+        entries = nachweise_filtered.get(k["id"], [])
         best_niv = max((e.get("niveau_level", 0) for e in entries), default=0)
         current_state[k["id"]] = {"achieved": False, "niveau_level": best_niv}
     current_state_json = json.dumps(current_state)
@@ -421,13 +564,15 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
         [{"note": e["note"], "min_percent": e["min_percent"]} for e in _GRADING_SCALE]
     )
 
-    # Build antrag lookup dicts for this student
+    # Build antrag lookup dicts for this student (filtered to class competencies)
     pending_antraege_by_comp: dict[int, dict] = {}
     rejected_niveau_antraege_by_comp: dict[int, dict] = {}
     for a in db.get_all_kompetenzantraege().values():
         if a["student_id"] != user["oid"]:
             continue
         cid = a["competency_id"]
+        if cid not in class_comp_ids:
+            continue  # Skip antraege for competencies not in this class
         if a["status"] == "pending":
             pending_antraege_by_comp[cid] = a
         elif a["status"] == "rejected" and a["typ"] == "niveau":
@@ -440,9 +585,9 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "user": user,
-        "einfach_map": einfach_map,
-        "nachweise_by_comp": nachweise_by_comp,
-        "best_nachweis_by_comp": best_nachweis_by_comp,
+        "einfach_map": einfach_map_filtered,
+        "nachweise_by_comp": nachweise_filtered,
+        "best_nachweis_by_comp": best_nachweis_filtered,
         "grade": grade,
         "active_ids": active_ids,
         "kompetenzen_json": kompetenzen_json,
@@ -453,6 +598,9 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
         "pending_antraege_by_comp": pending_antraege_by_comp,
         "rejected_niveau_antraege_by_comp": rejected_niveau_antraege_by_comp,
         "antrag_ok": antrag_ok,
+        "class_id": class_id,
+        "einfach_kompetenzen": class_einfach,  # Override global
+        "niveau_kompetenzen": class_niveau,    # Override global
     })
 
 
@@ -489,10 +637,14 @@ async def teacher_student_detail(
     student_name: str = "",
     user: dict = Depends(auth.require_teacher_user),
 ):
+    # Load student data
     einfach_map, nachweise_by_comp, best_nachweis_by_comp, grade = _load_student_data(
         user["access_token"], student_id
     )
-    active_ids = _load_active_ids(user["access_token"])
+    
+    # Get student's class competencies (not global)
+    class_einfach, class_niveau, active_ids, _ = _get_student_competencies(student_id)
+    
     return templates.TemplateResponse("student_detail.html", {
         "request": request,
         "user": user,
@@ -504,6 +656,8 @@ async def teacher_student_detail(
         "best_nachweis_by_comp": best_nachweis_by_comp,
         "grade": grade,
         "active_ids": active_ids,
+        "einfach_kompetenzen": class_einfach,  # Use class-specific
+        "niveau_kompetenzen": class_niveau,    # Use class-specific
     })
 
 
@@ -543,6 +697,288 @@ async def add_nachweis(
         url=f"/teacher/student/{student_id}?class_id={class_id}&student_name={student_name}",
         status_code=302,
     )
+
+
+# ---------------------------------------------------------------------------
+# Teacher competency list management
+# ---------------------------------------------------------------------------
+
+@app.get("/teacher/competency-lists", response_class=HTMLResponse)
+async def teacher_competency_lists(
+    request: Request,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    # Get system lists from kompetenzlisten/ directory
+    system_lists = []
+    kompetenzlisten_dir = BASE_DIR / "kompetenzlisten"
+    if kompetenzlisten_dir.exists():
+        for f in sorted(kompetenzlisten_dir.glob("*.json")):
+            if f.name.endswith("-questions.json"):
+                continue
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+                # Check if system questions exist
+                questions_file = kompetenzlisten_dir / f"{f.stem}-questions.json"
+                has_questions = questions_file.exists()
+                system_lists.append({
+                    "id": f.stem,
+                    "name": data.get("name", f.stem),
+                    "grade_level": data.get("grade_level", 0),
+                    "competency_count": len(data.get("competencies", [])),
+                    "has_system_questions": has_questions,
+                })
+            except Exception:
+                pass
+    
+    # Get teacher's own uploaded lists
+    teacher_lists = db.get_teacher_lists(uploaded_by=user["upn"])
+    
+    # Get classes for assignment
+    classes = db.get_classes_with_counts()
+    
+    return templates.TemplateResponse("teacher_competency_lists.html", {
+        "request": request,
+        "user": user,
+        "system_lists": system_lists,
+        "teacher_lists": teacher_lists,
+        "classes": classes,
+    })
+
+
+def _parse_csv_competencies(content: bytes, typ: str, grade_level: int) -> list[dict]:
+    """Parse CSV content and return competencies list.
+    
+    Args:
+        content: CSV file content as bytes
+        typ: "einfach" or "niveau"
+        grade_level: grade level (9, 10, etc.)
+    """
+    import csv
+    import io
+    
+    # Parse CSV
+    text = content.decode('utf-8-sig')
+    reader = csv.DictReader(io.StringIO(text), delimiter=';')
+    
+    competencies = []
+    for row in reader:
+        if not row.get('ID'):
+            continue
+        
+        try:
+            comp_id = int(row['ID'])
+        except (ValueError, TypeError):
+            continue
+        
+        # Adjust ID based on grade (e.g., Klasse 10: IDs 1001+)
+        adjusted_id = grade_level * 100 + comp_id  # 10*100+1 = 1001
+        
+        if typ == "einfach":
+            competency = {
+                "id": adjusted_id,
+                "typ": "einfach",
+                "name": row.get('Kompetenz', '').strip(),
+                "thema": int(row['Thema']) if row.get('Thema') and row['Thema'].strip() else None,
+                "anmerkungen": row.get('Anmerkungen', '').strip(),
+            }
+        else:  # niveau
+            moeglichkeiten = []
+            for i in range(1, 4):
+                val = row.get(f'Möglichkeit{i}', '').strip()
+                if val:
+                    moeglichkeiten.append(val)
+            
+            competency = {
+                "id": adjusted_id,
+                "typ": "niveau",
+                "name": row.get('pbk', '').strip(),
+                "bp_nummer": row.get('Nummer', '').strip(),
+                "moeglichkeiten": moeglichkeiten,
+                "anmerkungen": row.get('Hinweise zu den Kriterien', '').strip(),
+            }
+        
+        competencies.append(competency)
+    
+    return competencies
+
+
+def _parse_csv_questions(content: bytes) -> dict:
+    """Parse questions CSV format: competency_id;frage"""
+    import csv
+    import io
+    
+    text = content.decode('utf-8-sig')
+    reader = csv.DictReader(io.StringIO(text), delimiter=';')
+    
+    questions = {}
+    for row in reader:
+        comp_id = row.get('competency_id', '').strip()
+        frage = row.get('frage', '').strip()
+        if comp_id and frage:
+            if comp_id not in questions:
+                questions[comp_id] = []
+            questions[comp_id].append(frage)
+    
+    return questions
+
+
+@app.post("/teacher/competency-lists/upload")
+async def teacher_competency_lists_upload(
+    request: Request,
+    name: str = Form(...),
+    typ: str = Form(...),
+    grade_level: int = Form(...),
+    file: UploadFile = File(...),
+    questions_file: UploadFile = File(None),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    # Validate typ
+    if typ not in ("einfach", "niveau"):
+        raise HTTPException(status_code=400, detail="Typ muss 'einfach' oder 'niveau' sein")
+    
+    # Parse competencies CSV
+    content = await file.read()
+    try:
+        competencies = _parse_csv_competencies(content, typ, grade_level)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Fehler beim Parsen der CSV: {e}")
+    
+    data = {
+        "name": name,
+        "grade_level": grade_level,
+        "typ": typ,
+        "competencies": competencies,
+    }
+    
+    # Load questions if provided
+    questions = {}
+    if questions_file and questions_file.filename:
+        questions_content = await questions_file.read()
+        try:
+            questions = _parse_csv_questions(questions_content)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Fehler beim Parsen der Fragen-CSV: {e}")
+    
+    # Generate ID
+    list_id = f"teacher-{user['upn'].replace('@', '-').replace('.', '-')}-{grade_level}-{int(datetime.now().timestamp())}"
+    
+    # Save to DB
+    db.save_teacher_list(
+        list_id=list_id,
+        name=name,
+        grade_level=grade_level,
+        uploaded_by=user["upn"],
+        data=data,
+        questions=questions,
+    )
+    
+    return RedirectResponse("/teacher/competency-lists", status_code=302)
+
+
+@app.post("/teacher/competency-lists/{list_id}/upload-questions")
+async def teacher_competency_lists_upload_questions(
+    list_id: str,
+    questions_file: UploadFile = File(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    # Get existing list
+    teacher_list = db.get_teacher_list(list_id)
+    if not teacher_list or teacher_list["uploaded_by"] != user["upn"]:
+        raise HTTPException(status_code=403, detail="Nicht berechtigt")
+    
+    # Parse questions CSV
+    questions_content = await questions_file.read()
+    try:
+        questions = _parse_csv_questions(questions_content)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Fehler beim Parsen der CSV: {e}")
+    
+    # Update list with questions
+    db.save_teacher_list(
+        list_id=list_id,
+        name=teacher_list["name"],
+        grade_level=teacher_list["grade_level"],
+        uploaded_by=user["upn"],
+        data=teacher_list["data"],
+        questions=questions,
+    )
+    
+    return RedirectResponse("/teacher/competency-lists", status_code=302)
+
+
+@app.post("/teacher/competency-lists/{list_id}/use-system-questions")
+async def teacher_competency_lists_use_system_questions(
+    list_id: str,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    # Get existing list
+    teacher_list = db.get_teacher_list(list_id)
+    if not teacher_list or teacher_list["uploaded_by"] != user["upn"]:
+        raise HTTPException(status_code=403, detail="Nicht berechtigt")
+    
+    # Try to find matching system questions (JSON format in kompetenzlisten/)
+    grade_level = teacher_list["grade_level"]
+    system_questions_file = BASE_DIR / "kompetenzlisten" / f"klasse-{grade_level}-chemie-questions.json"
+    
+    questions = {}
+    if system_questions_file.exists():
+        questions = json.loads(system_questions_file.read_text(encoding="utf-8"))
+    else:
+        # Try to parse from _samples CSV
+        samples_dir = BASE_DIR / "_samples"
+        questions_csv = samples_dir / f"Testfragen_{grade_level}_alle.csv"
+        if questions_csv.exists():
+            try:
+                content = questions_csv.read_bytes()
+                questions = _parse_csv_questions(content)
+            except Exception:
+                pass
+    
+    # Update list with system questions
+    db.save_teacher_list(
+        list_id=list_id,
+        name=teacher_list["name"],
+        grade_level=teacher_list["grade_level"],
+        uploaded_by=user["upn"],
+        data=teacher_list["data"],
+        questions=questions,
+    )
+    
+    return RedirectResponse("/teacher/competency-lists", status_code=302)
+
+
+@app.post("/teacher/competency-lists/delete")
+async def teacher_competency_lists_delete(
+    list_id: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    success = db.delete_teacher_list(list_id, uploaded_by=user["upn"])
+    if not success:
+        raise HTTPException(status_code=403, detail="Nicht berechtigt oder Liste nicht gefunden")
+    return RedirectResponse("/teacher/competency-lists", status_code=302)
+
+
+@app.post("/teacher/class/{class_id}/set-list")
+async def teacher_class_set_list(
+    class_id: str,
+    list_id: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    # Determine if this is a system or teacher list
+    kompetenzlisten_dir = BASE_DIR / "kompetenzlisten"
+    system_list_file = kompetenzlisten_dir / f"{list_id}.json"
+    
+    if system_list_file.exists():
+        list_source = "system"
+    else:
+        # Check if it's a teacher list
+        teacher_list = db.get_teacher_list(list_id)
+        if not teacher_list:
+            raise HTTPException(status_code=404, detail="Liste nicht gefunden")
+        list_source = "teacher"
+    
+    db.set_class_competency_list(class_id, list_id, list_source)
+    return RedirectResponse("/teacher/competency-lists", status_code=302)
 
 
 # ---------------------------------------------------------------------------
@@ -667,19 +1103,59 @@ async def antraege_reject(
 # ---------------------------------------------------------------------------
 
 @app.get("/teacher/coverage", response_class=HTMLResponse)
-async def teacher_coverage(request: Request, user: dict = Depends(auth.require_teacher_user)):
-    active_ids = _load_active_ids(user["access_token"])
+async def teacher_coverage(
+    request: Request, 
+    user: dict = Depends(auth.require_teacher_user),
+    class_id: str = "",
+):
+    # Get available classes
+    classes = db.get_classes_with_counts()
+    
+    # If no class specified, use first one
+    if not class_id and classes:
+        class_id = classes[0]["id"]
+    
+    # Get competencies for this class
+    selected_class = db.get_class(class_id) if class_id else None
+    if selected_class and selected_class.get("competency_list_id"):
+        try:
+            list_source = selected_class.get("list_source", "system")
+            comps, _ = _load_competency_list(selected_class["competency_list_id"], list_source)
+            einfach = [c for c in comps if c["typ"] == "einfach"]
+            niveau = [c for c in comps if c["typ"] == "niveau"]
+        except FileNotFoundError:
+            einfach, niveau = _EINFACH, _NIVEAU
+    else:
+        einfach, niveau = _EINFACH, _NIVEAU
+    
+    active_ids = db.get_active_ids(class_id) if class_id else db.get_active_ids()
+    
     return templates.TemplateResponse("coverage.html", {
-        "request": request, "user": user, "active_ids": active_ids,
+        "request": request, 
+        "user": user, 
+        "active_ids": active_ids,
+        "classes": classes,
+        "selected_class_id": class_id,
+        "einfach_kompetenzen": einfach,
+        "niveau_kompetenzen": niveau,
     })
 
 
 @app.post("/teacher/coverage/update")
-async def teacher_coverage_update(request: Request, user: dict = Depends(auth.require_teacher_user)):
+async def teacher_coverage_update(
+    request: Request, 
+    user: dict = Depends(auth.require_teacher_user),
+    class_id: str = Form(""),
+):
     form = await request.form()
     ids = {int(v) for k, v in form.multi_items() if k == "active_id"}
-    _save_active_ids(user["access_token"], ids)
-    return RedirectResponse(url="/teacher/coverage", status_code=302)
+    
+    if class_id:
+        db.set_active_ids(ids, class_id)
+    else:
+        db.set_active_ids(ids)
+    
+    return RedirectResponse(url=f"/teacher/coverage?class_id={class_id}", status_code=302)
 
 
 # ---------------------------------------------------------------------------
@@ -687,30 +1163,74 @@ async def teacher_coverage_update(request: Request, user: dict = Depends(auth.re
 # ---------------------------------------------------------------------------
 
 @app.get("/tests/builder", response_class=HTMLResponse)
-async def test_builder(request: Request, user: dict = Depends(auth.require_user)):
-    active_ids = _load_active_ids(user["access_token"])
-    active_ids_list = json.dumps(sorted(active_ids))
-
-    if not user["is_teacher"]:
+async def test_builder(
+    request: Request, 
+    user: dict = Depends(auth.require_user),
+    class_id: str = "",
+):
+    # Get class-specific competencies
+    einfach_list = _EINFACH
+    niveau_list = _NIVEAU
+    active_ids = db.get_active_ids()
+    
+    if user["is_teacher"]:
+        # Teacher: can select class
+        groups = db.get_classes_with_counts()
+        selected_class_id = class_id
+        if not selected_class_id and groups:
+            selected_class_id = groups[0]["id"]
+        
+        if selected_class_id:
+            selected_class = db.get_class(selected_class_id)
+            if selected_class and selected_class.get("competency_list_id"):
+                try:
+                    list_source = selected_class.get("list_source", "system")
+                    comps, _ = _load_competency_list(selected_class["competency_list_id"], list_source)
+                    einfach_list = sorted([c for c in comps if c["typ"] == "einfach"], 
+                                         key=lambda k: (k.get("thema") or 999, k["id"]))
+                    niveau_list = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+                    active_ids = db.get_active_ids(selected_class_id)
+                except FileNotFoundError:
+                    pass
+        
+        active_ids_list = json.dumps(sorted(active_ids))
+        return templates.TemplateResponse("test_builder.html", {
+            "request": request, "user": user,
+            "active_ids": active_ids,
+            "active_ids_list": active_ids_list,
+            "groups": groups,
+            "selected_class_id": selected_class_id,
+            "einfach_kompetenzen": einfach_list,
+            "niveau_kompetenzen": niveau_list,
+        })
+    
+    else:
+        # Student: use their class
+        student_class = db.get_student_class(user["oid"])
+        if student_class and student_class.get("competency_list_id"):
+            try:
+                list_source = student_class.get("list_source", "system")
+                comps, _ = _load_competency_list(student_class["competency_list_id"], list_source)
+                einfach_list = sorted([c for c in comps if c["typ"] == "einfach"], 
+                                     key=lambda k: (k.get("thema") or 999, k["id"]))
+                niveau_list = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+                active_ids = db.get_active_ids(student_class["id"])
+            except FileNotFoundError:
+                pass
+        
         einfach_map, _, _, _ = _load_student_data(user["access_token"], user["oid"])
         proven_ids = {cid for cid, r in einfach_map.items() if r.get("achieved")}
         reqs = _get_test_requests()
         next_number = sum(1 for r in reqs.values() if r["student_id"] == user["oid"]) + 1
+        
         return templates.TemplateResponse("test_builder.html", {
             "request": request, "user": user,
             "proven_ids": proven_ids,
             "active_ids": active_ids,
             "next_number": next_number,
+            "einfach_kompetenzen": einfach_list,
+            "niveau_kompetenzen": niveau_list,
         })
-
-    groups = db.get_classes()
-
-    return templates.TemplateResponse("test_builder.html", {
-        "request": request, "user": user,
-        "active_ids": active_ids,
-        "active_ids_list": active_ids_list,
-        "groups": groups,
-    })
 
 
 @app.post("/tests/generate")
@@ -869,24 +1389,65 @@ async def api_student_competencies(student_id: str = "", user: dict = Depends(au
 # ---------------------------------------------------------------------------
 
 @app.get("/grades/calculator", response_class=HTMLResponse)
-async def grade_calculator(request: Request, user: dict = Depends(auth.require_user)):
-    active_ids = _load_active_ids(user["access_token"])
+async def grade_calculator(
+    request: Request, 
+    user: dict = Depends(auth.require_user),
+    class_id: str = "",
+):
+    # For teachers: allow class selection
+    classes = []
+    selected_class_id = class_id
+    
+    if user["is_teacher"]:
+        classes = db.get_classes_with_counts()
+        if not selected_class_id and classes:
+            selected_class_id = classes[0]["id"]
+    else:
+        # Students: use their own class
+        student_class = db.get_student_class(user["oid"])
+        if student_class:
+            selected_class_id = student_class["id"]
+    
+    # Get competencies for selected class
+    einfach_list = _EINFACH
+    niveau_list = _NIVEAU
+    active_ids = db.get_active_ids()
+    
+    if selected_class_id:
+        selected_class = db.get_class(selected_class_id)
+        if selected_class and selected_class.get("competency_list_id"):
+            try:
+                list_source = selected_class.get("list_source", "system")
+                comps, _ = _load_competency_list(selected_class["competency_list_id"], list_source)
+                einfach_list = sorted([c for c in comps if c["typ"] == "einfach"], 
+                                     key=lambda k: (k.get("thema") or 999, k["id"]))
+                niveau_list = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+                active_ids = db.get_active_ids(selected_class_id)
+            except FileNotFoundError:
+                pass
+    
+    # Build record map (for students, load their records)
     record_map: dict = {}
     if not user["is_teacher"]:
         einfach_map, nachweise_by_comp, _, _ = _load_student_data(user["access_token"], user["oid"])
-        for k in _EINFACH:
+        for k in einfach_list:
             r = einfach_map.get(k["id"])
             if r:
                 record_map[k["id"]] = r
-        for k in _NIVEAU:
+        for k in niveau_list:
             entries = nachweise_by_comp.get(k["id"], [])
             if entries:
                 best = max(entries, key=lambda e: e.get("niveau_level", 0))
                 record_map[k["id"]] = {"competency_id": k["id"], "niveau_level": best.get("niveau_level", 0), "achieved": False}
+    
     return templates.TemplateResponse("grade_calculator.html", {
         "request": request, "user": user,
         "grade": None, "record_map": record_map,
         "active_ids": active_ids, "basis": "unterricht",
+        "classes": classes,
+        "selected_class_id": selected_class_id,
+        "einfach_kompetenzen": einfach_list,
+        "niveau_kompetenzen": niveau_list,
     })
 
 

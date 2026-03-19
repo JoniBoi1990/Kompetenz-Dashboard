@@ -1,0 +1,497 @@
+{
+  "name": "Chemie Klasse 10",
+  "grade_level": 10,
+  "description": "Standard-Kompetenzliste für Chemie Klasse 10",
+  "competencies": [
+    {
+      "id": 1001,
+      "typ": "einfach",
+      "name": "… beschreiben, was man unter Kohlenwasserstoffen versteht.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1002,
+      "typ": "einfach",
+      "name": "… erklären, wie Erdöl und Erdgas entstehen.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1003,
+      "typ": "einfach",
+      "name": "… einen Versuch erklären, mit dem man C- und H-Atome in Molekülen nachweisen kann.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1004,
+      "typ": "einfach",
+      "name": "den Satz von Avogadro beschreiben",
+      "thema": 1,
+      "anmerkungen": "Auch in 9"
+    },
+    {
+      "id": 1005,
+      "typ": "einfach",
+      "name": "Erklären, warum man bei Gasen direkt vom Volumen direkt Teilchenanzahl schließen kann (unabhängig vom Stoff)",
+      "thema": 1,
+      "anmerkungen": "Auch in 9"
+    },
+    {
+      "id": 1006,
+      "typ": "einfach",
+      "name": "Größen wie Stoffmenge, Volumen, molares Volumen, Masse, molare Masse rechnerisch und unter Angabe der richtigen Einheiten ermitteln",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1007,
+      "typ": "einfach",
+      "name": "… einen Versuch zur Bestimmung der molaren Masse von Gasen beschreiben und auswerten.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1008,
+      "typ": "einfach",
+      "name": "… eine Definition einer homologen Reihe nennen.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1009,
+      "typ": "einfach",
+      "name": "… erklären, was man unter Isomeren versteht.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1010,
+      "typ": "einfach",
+      "name": "… ausgehend von der Struktur- bzw. Halbstruktur-formel eines Alkan-Moleküls das Alkan benennen.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1011,
+      "typ": "einfach",
+      "name": "… ausgehend vom Namen eines Alkans die Struktur- bzw. Halbstrukturformel des Alkan-Moleküls darstellen.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1012,
+      "typ": "einfach",
+      "name": "Trends der Stoffeigenschaften Flammtemperatur, Dichte, Viskosität innerhalb der homolgen Reihe der Alkane benennen",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1013,
+      "typ": "einfach",
+      "name": "einen Versuch beschreiben, mit dem man die Viskosität oder die Dichte der flüssigen Alkane bestimmen kann.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1014,
+      "typ": "einfach",
+      "name": "sinnvoll begründen, warum die ermittelten Dichten und Viskositäten von Literaturwerten abweichen.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1015,
+      "typ": "einfach",
+      "name": "die Mischbarkeit mit Wasser und das Verhalten als Lösungsmittel von Alkanen beschreiben",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1016,
+      "typ": "einfach",
+      "name": "… anhand von Reaktionsgleichungen die Stoffmengen, Volumen und Massen von Ausgangsstoffen und Reaktionsprodukten rechnerisch ermitteln.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1017,
+      "typ": "einfach",
+      "name": "… die verschiedenen Arten der zwischenmolekularen Kräfte erklären.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1018,
+      "typ": "einfach",
+      "name": "… anhand der Strukturformeln von Alkan-Molekülen die Siedetemperaturen von Alkanen vergleichend begründen.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1019,
+      "typ": "einfach",
+      "name": "… die typischen Reaktion von Alkanen und Alkenen beschreiben.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1020,
+      "typ": "einfach",
+      "name": "… eine Nachweisreaktion für C-C-Mehrfachbindungen in Molekülen beschreiben.",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1021,
+      "typ": "einfach",
+      "name": "…Alkan-Moleküle in Skelettformel darstellen und Alkane ausgehend von einer Darstellung in Skelettformel in anderen Strukturformeln darstellen und die Moleküle benennen",
+      "thema": 1,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1022,
+      "typ": "einfach",
+      "name": "physikalische und chemische Eigenschaften von Ethanol nennen.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1023,
+      "typ": "einfach",
+      "name": "die Gefahren nennen, die von dem Stoff Methanol ausgehen.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1024,
+      "typ": "einfach",
+      "name": "Alltagsprodukte nennen, die Ethanol enthalten und erläutern, welche Eigenschaft von Ethanol man dabei nutzt.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1025,
+      "typ": "einfach",
+      "name": "erläutern, was man unter einem Massenprozent und einem Volumenprozent versteht und einfach Rechnung damit durchführen.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1026,
+      "typ": "einfach",
+      "name": "einen Versuch beschreiben, mit Hilfe dessen man herausfinden kann, ab wie viel Volumenprozent Ethanol mit Wasser brennbare Gemische bildet.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1027,
+      "typ": "einfach",
+      "name": "Wasser als Beispiel für ein typisches polares (hydrophiles/ lipophobes) Lösemittel nennen und Benzin/Heptan als Beispiel für ein typisches unpolares (lipophiles/hydrophobes) Lösemittel.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1028,
+      "typ": "einfach",
+      "name": "mithilfe der Elektronegativität eine Bindung den polaren bzw. unpolaren Bindungen zuordnen.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1029,
+      "typ": "einfach",
+      "name": "die homologe Reihe der ersten 10 Alkanole nennen und deren Strukturformeln zeichnen.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1030,
+      "typ": "einfach",
+      "name": "anhand der Strukturformel eines Moleküls mit Hilfe des PSE (EN!) ermitteln, welche Bindungen polar bzw. unpolar sind und damit eine begründete Vorhersage treffen, ob sich der zugehörige Stoff gut in Wasser oder Vorhersage treffen, ob sich der zugehörige Stoff gut in Wasser oder Benzin/Heptan löst.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1031,
+      "typ": "einfach",
+      "name": "erläutern, was man unter einer homologen Reihe versteht.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1032,
+      "typ": "einfach",
+      "name": "anhand der Strukturformel eines Moleküls mit Hilfe des PSE (EN!) ermitteln, welche Bindungen polar bzw. unpolar sind und damit eine begründete Vorhersage treffen, ob sich der zugehörige Stoff gut in Wasser oder Vorhersage treffen, ob sich der zugehörige Stoff gut in Wasser oder Benzin/Heptan löst.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1033,
+      "typ": "einfach",
+      "name": "erläutern, wie sich Stoffeigenschaften innerhalb der homologen Reihe der Alkanole verändern (Brennverhalten, Löslichkeit in Wasser, Löslichkeit in Öl).",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1034,
+      "typ": "einfach",
+      "name": "erläutern, was die Aussage „Ähnliches löst sich gut in Ähnlichem“ bedeutet.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1035,
+      "typ": "einfach",
+      "name": "Zwischenmolekulare Wechselwirkungen (London-WW, Dipol-Dipol-WW, H-Brücken) den richtigen Stoffen auf Grundlage der Strukturformel ihrer Moleküle zuordnen",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1036,
+      "typ": "einfach",
+      "name": "Mithilfe von zwischenolekularen WW und der räumlichen Struktur der Moleküle die Siedetemperatur verschiedener Stoffe begründen",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1037,
+      "typ": "einfach",
+      "name": "Die funktionelle Gruppe der Alkohole (Hydroxyl-Gruppe) erkennen und darstellen",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1038,
+      "typ": "einfach",
+      "name": "Stoffe aufgrund der Strukturformel ihrer Moleküle als hydrophil/lipophob, hydrophob/lipophil oder hydrophil/lipophil beschreiben.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1039,
+      "typ": "einfach",
+      "name": "Stoffmenge, molare Masse und Masse rechnerisch ermitteln.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1040,
+      "typ": "einfach",
+      "name": "… die Herstellung von Ethanol beschreiben.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1041,
+      "typ": "einfach",
+      "name": "… die einzelnen Schritte zur Ermittlung der Strukturformel von Ethanol erklären.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1042,
+      "typ": "einfach",
+      "name": "… die unterschiedliche Löslichkeit von verschiedenen Alkoholen in Benzin bzw. Wasser erklären.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1043,
+      "typ": "einfach",
+      "name": "… die Strukturformeln für jeweils einen primären, sekundären und tertiären Alkohol angeben.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1044,
+      "typ": "einfach",
+      "name": "… erklären, was man unter mehrwertigen Alkoholen versteht.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1045,
+      "typ": "einfach",
+      "name": "… anhand der Strukturformel eines Alkohols den systematischen Namen nach der IUPAC-Nomenklatur bestimmen.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1046,
+      "typ": "einfach",
+      "name": "… eine Reaktionsgleichung für die Redoxreaktion (inklusive Teilgleichungen) eines Alkohols durch Kupferoxid zu einem Aldehyd bzw. Keton aufstellen.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1047,
+      "typ": "einfach",
+      "name": "… Oxidationszahlen in Ionen, Atomen und Molekülen bestimmen",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1048,
+      "typ": "einfach",
+      "name": "… mithilfe von Oxidationszahlen erklären, dass die Reaktion von Alkoholen mit Kupferoxid eine Redoxreaktion ist.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1049,
+      "typ": "einfach",
+      "name": "… die Durchführung der Tollens-Probe (Silberspiegelprobe) beschreiben.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1050,
+      "typ": "einfach",
+      "name": "… eine Reaktionsgleichung der Redoxreaktion (inklusive Teilgleichungen) für den positiven Verlauf der Tollens-Probe (Silberspiegelprobe) mit einem Aldehyd aufstellen.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1051,
+      "typ": "einfach",
+      "name": "… die funktionelle Gruppe der Aldehyde bzw. Ketone zuordnen und benennen.",
+      "thema": 2,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1052,
+      "typ": "einfach",
+      "name": "… typische Eigenschaften der Essigsäure nennen.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1053,
+      "typ": "einfach",
+      "name": "… die Strukturformel des Essigsäure-Moleküls darstellen.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1054,
+      "typ": "einfach",
+      "name": "… die Brønsted-Definition auf die Reaktion von Essigsäure mit Wasser anwenden.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1055,
+      "typ": "einfach",
+      "name": "… den Unterschied zwischen Essigsäure und Essig beschreiben.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1056,
+      "typ": "einfach",
+      "name": "… die Verwendung von Essigsäure in Alltag und Technik erläutern.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1057,
+      "typ": "einfach",
+      "name": "… die Reaktion einer Carbonsäure mit Wasser aufstellen.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1058,
+      "typ": "einfach",
+      "name": "… die funktionelle Gruppe der Carbonsäuren zuordnen und benennen.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1059,
+      "typ": "einfach",
+      "name": "… Carbonsäure-Moleküle benennen.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1060,
+      "typ": "einfach",
+      "name": "… typische Eigenschaften von Ethansäureethylester nennen.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1061,
+      "typ": "einfach",
+      "name": "… die funktionelle Gruppe der Ester zuordnen und benennen.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1062,
+      "typ": "einfach",
+      "name": "… beschreiben, was man unter einer Veresterung versteht.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1063,
+      "typ": "einfach",
+      "name": "… die zwischenmolekularen Kräfte zwischen Carbonsäure-Molekülen benennen.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1064,
+      "typ": "einfach",
+      "name": "… die zwischenmolekularen Kräfte zwischen zwischen Ester-Molekülen benennen.",
+      "thema": null,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1065,
+      "typ": "einfach",
+      "name": "… die Stoffklassen der Alkansäuren bezüglich der Siedetemperaturen und der Wasserlöslichkeit vergleichen und die Unterschiede erklären.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1066,
+      "typ": "einfach",
+      "name": "… die Stoffklassen der Ester bezüglich der Siedetemperaturen und der Wasserlöslichkeit vergleichen und die Unterschiede erklären.",
+      "thema": null,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1067,
+      "typ": "einfach",
+      "name": "… das Aufbauprinzip von Polyester-Molekülen beschreiben.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1068,
+      "typ": "einfach",
+      "name": "Moleküle mit verschiedenen funktionellen Gruppen nach der IUPAC-Nomenklatur benennen.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1069,
+      "typ": "einfach",
+      "name": "mithilfe des systematischen Namen nach IUPAC-Nomenklatur Lewis-Struktur- oder Halbstrukturformeln von Molekülen darstellen, die über mehrere funktionelle Gruppen verfügen.",
+      "thema": 3,
+      "anmerkungen": ""
+    },
+    {
+      "id": 1070,
+      "typ": "einfach",
+      "name": "Die Priorität verschiedener funktioneller Gruppen in einem Molekül aufgrund der Oxidationsstufe der relevanten C-Atome ordnen.",
+      "thema": 3,
+      "anmerkungen": ""
+    }
+  ]
+}
