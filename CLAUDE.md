@@ -172,6 +172,8 @@ Kompetenz-Dashboard/
 | POST | /teacher/coverage/update | teacher | Save Unterrichtsstand |
 | POST | /records/update | teacher | Save einfach record → SQLite (also accepts AJAX) |
 | POST | /records/nachweis | teacher | Add niveau Nachweis → SQLite |
+| POST | /records/nachweis/delete | teacher | Delete niveau Nachweis |
+| POST | /tests/delete/{req_id} | teacher | Delete test request |
 | GET | /tests/builder | any | Role-split test form |
 | POST | /tests/generate | teacher | Create preview (→ redirect to /tests/preview/{pid}) |
 | POST | /tests/request | student | Submit test request (stored, no PDF yet) |

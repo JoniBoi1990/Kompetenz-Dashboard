@@ -94,7 +94,14 @@ def _extract_claims(id_token: str) -> dict:
 def is_teacher(claims: dict) -> bool:
     if "Lehrer" in claims.get("roles", []):
         return True
-    return "@lehrer." in claims.get("preferred_username", "")
+    upn = claims.get("preferred_username", "").lower()
+    # Birklehof: Schüler @s.birklehof.de, Lehrer @birklehof.de
+    if upn.endswith("@s.birklehof.de"):
+        return False
+    if upn.endswith("@birklehof.de"):
+        return True
+    # Fallback für andere Umgebungen (Entwicklung)
+    return "@lehrer." in upn
 
 
 def build_user_info(token_response: dict) -> dict:

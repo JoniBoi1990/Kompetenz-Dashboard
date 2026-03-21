@@ -398,6 +398,12 @@ def add_nachweis(
         )
 
 
+def delete_nachweis(nachweis_id: str) -> None:
+    """Delete a nachweis by ID."""
+    with _conn() as con:
+        con.execute("DELETE FROM nachweise WHERE id = ?", (nachweis_id,))
+
+
 # ---------------------------------------------------------------------------
 # Test requests
 # ---------------------------------------------------------------------------
@@ -431,6 +437,11 @@ def update_test_request_status(req_id: str, status: str) -> None:
         con.execute(
             "UPDATE test_requests SET status=? WHERE id=?", (status, req_id)
         )
+
+
+def delete_test_request(req_id: str) -> None:
+    with _conn() as con:
+        con.execute("DELETE FROM test_requests WHERE id=?", (req_id,))
 
 
 # ---------------------------------------------------------------------------

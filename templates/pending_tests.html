@@ -38,8 +38,12 @@
         </tbody>
       </table>
     </details>
-    <button type="submit" class="btn-primary" style="margin-top:0.75rem;">PDF herunterladen &amp; drucken</button>
+    <div class="request-actions" style="margin-top:0.75rem; display:flex; gap:0.5rem;">
+      <button type="submit" class="btn-primary">PDF herunterladen &amp; drucken</button>
+      <button type="button" class="btn-danger" onclick="if(confirm('Testanfrage löschen?')) document.getElementById('delete-form-{{ req.id }}').submit();">Löschen</button>
+    </div>
   </form>
+  <form id="delete-form-{{ req.id }}" action="/tests/delete/{{ req.id }}" method="post" style="display:none;"></form>
 </div>
 {% endfor %}
 {% endif %}

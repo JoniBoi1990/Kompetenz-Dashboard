@@ -592,7 +592,9 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
     for a in db.get_all_kompetenzantraege().values():
         if a["student_id"] != user["oid"]:
             continue
-        cid = a["competency_id"]
+        # Normalize competency_id to int for comparison (can be str in old DB records)
+        cid_raw = a["competency_id"]
+        cid = int(cid_raw) if cid_raw is not None else None
         if cid not in class_comp_ids:
             continue  # Skip antraege for competencies not in this class
         if a["status"] == "pending":
@@ -737,6 +739,21 @@ async def add_nachweis(
         student_id, student_name, competency_id, niveau_level,
         evidence_url.strip(), evidence_name.strip() or evidence_url.strip(), user["upn"],
     )
+    return RedirectResponse(
+        url=f"/teacher/student/{student_id}?class_id={class_id}&student_name={student_name}",
+        status_code=302,
+    )
+
+
+@app.post("/records/nachweis/delete")
+async def delete_nachweis(
+    nachweis_id: str = Form(...),
+    student_id: str = Form(...),
+    student_name: str = Form(...),
+    class_id: str = Form(default=""),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    db.delete_nachweis(nachweis_id)
     return RedirectResponse(
         url=f"/teacher/student/{student_id}?class_id={class_id}&student_name={student_name}",
         status_code=302,
@@ -1188,13 +1205,16 @@ async def antraege_submit(
 
     # Must not already be proven
     einfach_map, nachweise_by_comp, _, _ = _load_student_data(user["access_token"], user["oid"])
+    # Build the full competency_id string (e.901, n.989) for DB lookup
+    prefix = "e" if typ == "einfach" else "n"
+    comp_id_full = f"{prefix}.{competency_id}"
     if typ == "einfach":
-        if einfach_map.get(competency_id, {}).get("achieved"):
+        if einfach_map.get(comp_id_full, {}).get("achieved"):
             raise HTTPException(status_code=400, detail="Bereits nachgewiesen")
         if not beschreibung.strip():
             raise HTTPException(status_code=400, detail="Beschreibung erforderlich")
     else:
-        entries = nachweise_by_comp.get(competency_id, [])
+        entries = nachweise_by_comp.get(comp_id_full, [])
         if any(e.get("niveau_level", 0) > 0 for e in entries):
             raise HTTPException(status_code=400, detail="Bereits nachgewiesen")
         if not evidence_url.strip():
@@ -1202,15 +1222,19 @@ async def antraege_submit(
 
     # No existing pending antrag for this competency
     for a in db.get_all_kompetenzantraege().values():
-        if a["student_id"] == user["oid"] and a["competency_id"] == competency_id and a["status"] == "pending":
+        # Normalize competency_id to string for comparison (can be int in DB, str from form)
+        db_comp_id = str(a["competency_id"]) if a["competency_id"] is not None else None
+        if a["student_id"] == user["oid"] and db_comp_id == str(competency_id) and a["status"] == "pending":
             raise HTTPException(status_code=400, detail="Antrag bereits gestellt")
 
     antrag_id = str(uuid.uuid4())
+    # Store competency_id as int for consistency
+    comp_id_int = int(competency_id) if competency_id is not None else None
     antrag = {
         "id": antrag_id,
         "student_id": user["oid"],
         "student_name": user["display_name"],
-        "competency_id": competency_id,
+        "competency_id": comp_id_int,
         "typ": typ,
         "beschreibung": beschreibung.strip(),
         "evidence_url": evidence_url.strip(),
@@ -1250,7 +1274,11 @@ async def antraege_accept(
 
     student_id = a["student_id"]
     student_name = a["student_name"]
-    competency_id = a["competency_id"]
+    # Convert competency_id to string format expected by DB (e.901, n.989)
+    cid_raw = a["competency_id"]
+    cid_num = int(cid_raw) if cid_raw is not None else 0
+    prefix = "e" if a["typ"] == "einfach" else "n"
+    competency_id = f"{prefix}.{cid_num}"
 
     if a["typ"] == "einfach":
         db.upsert_einfach(student_id, student_name, competency_id, True, user["upn"])
@@ -1537,6 +1565,13 @@ async def confirm_test(req_id: str, request: Request, user: dict = Depends(auth.
     return RedirectResponse(f"/tests/preview/{pid}", status_code=303)
 
 
+@app.post("/tests/delete/{req_id}")
+async def delete_test(req_id: str, user: dict = Depends(auth.require_teacher_user)):
+    """Teacher deletes a test request (no notification to student)."""
+    db.delete_test_request(req_id)
+    return RedirectResponse("/tests/pending", status_code=303)
+
+
 @app.get("/tests/preview/{pid}", response_class=HTMLResponse)
 async def test_preview(pid: str, request: Request, user: dict = Depends(auth.require_teacher_user)):
     preview = _TEST_PREVIEWS.get(pid)
@@ -1644,7 +1679,7 @@ async def grade_calculator(
                 comps, _ = _load_competency_list(selected_class["competency_list_id"], list_source)
                 einfach_list = sorted([c for c in comps if c["typ"] == "einfach"], 
                                      key=lambda k: (k.get("thema") or 999, k["id"]))
-                niveau_list = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+                niveau_list = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: (k.get("thema") or 999, k["id"]))
             except FileNotFoundError:
                 pass
     
