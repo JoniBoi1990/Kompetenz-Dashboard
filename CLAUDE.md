@@ -167,7 +167,7 @@ Kompetenz-Dashboard/
 | GET | / | student | Dashboard: score (no grade), planning mode, Kompetenzanträge |
 | GET | /teacher | teacher | Class overview + pending test + antrag count badges |
 | GET | /teacher/class/{id} | teacher | Student list (SQLite) |
-| GET | /teacher/student/{id} | teacher | Competency grid + grade |
+| GET | /teacher/student/{id} | teacher | Competency grid + grade + **planning mode** |
 | GET | /teacher/coverage | teacher | Set which competencies are in Unterrichtsstand |
 | POST | /teacher/coverage/update | teacher | Save Unterrichtsstand |
 | POST | /records/update | teacher | Save einfach record → SQLite (also accepts AJAX) |
@@ -187,8 +187,8 @@ Kompetenz-Dashboard/
 | POST | /antraege/reject/{id} | teacher | Reject claim (with Begründung for niveau) |
 | GET | /api/class-students/{class_id} | teacher | AJAX: student list for a class |
 | GET | /api/student-competencies | teacher | AJAX: proven IDs for student name lookup |
-| GET | /grades/calculator | any | Grade calculator |
-| POST | /grades/calculate | any | Compute grade from form |
+| GET | /grades/calculator | any | ~~Grade calculator~~ (deprecated for teachers — use planning mode in student detail) |
+| POST | /grades/calculate | any | ~~Compute grade from form~~ |
 | GET | /bookings | any | Bookings link page |
 | GET | /admin/upload | teacher | CSV upload overview + status |
 | POST | /admin/upload/kompetenzen | teacher | Import ibK CSV → kompetenzen.json |
@@ -215,7 +215,7 @@ Kompetenz-Dashboard/
 
 ## Navigation (role-dependent)
 
-**Teacher:** Klassen | Unterrichtsstand | Notenrechner | Testanfragen | Kompetenzanträge | Testgenerator | Notenschlüssel | Klassen verwalten
+**Teacher:** Klassen | Unterrichtsstand | Testanfragen | Kompetenzanträge | Testgenerator | Notenschlüssel | Klassen verwalten
 
 **Student:** Meine Kompetenzen | Nachweis anfordern
 

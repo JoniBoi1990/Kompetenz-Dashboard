@@ -13,6 +13,94 @@
 </section>
 {% endif %}
 
+<button id="btn-planmode" class="btn-secondary" style="margin-bottom:1rem;">Planungsmodus aktivieren</button>
+
+{# --- Planungsmodus (anfangs verborgen, komplett client-seitig) --- #}
+<div id="plan-section" style="display:none">
+
+  <div class="score-display plan-score" style="background:#e8f4e8;border-color:#28a745;">
+    <span class="score-pts" id="plan-pts">– von – Punkten</span>
+    <span class="score-pct" id="plan-pct">– %</span>
+    <span class="score-note" id="plan-note">Note: –</span>
+  </div>
+
+  <div class="basis-toggle" style="margin:0.75rem 0;">
+    <label class="basis-label basis-active" id="lbl-unterricht">
+      <input type="radio" name="plan-basis" value="unterricht" checked onchange="onBasisChange(this)">
+      Unterrichtsstand
+    </label>
+    <label class="basis-label" id="lbl-schuljahr">
+      <input type="radio" name="plan-basis" value="schuljahr" onchange="onBasisChange(this)">
+      Ganzes Schuljahr
+    </label>
+    <button type="button" class="btn-sm" onclick="resetPlan()" style="margin-left:auto;">Zurücksetzen</button>
+  </div>
+
+  <div class="two-columns">
+
+    <div>
+      <h3>Einfache Kompetenzen (Planung)</h3>
+      <table class="kompetenz-table">
+        <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Erreicht</th></tr></thead>
+        <tbody>
+          {% set ns_plan = namespace(last_thema=None) %}
+          {% for k in einfach_kompetenzen %}
+          {% set r = einfach_map.get(k.id) %}
+          {% if k.thema != ns_plan.last_thema %}
+          {% set ns_plan.last_thema = k.thema %}
+          <tr class="thema-header">
+            <td colspan="3">
+              Thema {{ k.thema or "–" }}
+              <button type="button" class="btn-thema" onclick="setPlanThema({{ k.thema or 0 }}, true)">Alle</button>
+              <button type="button" class="btn-thema" onclick="setPlanThema({{ k.thema or 0 }}, false)">Keine</button>
+            </td>
+          </tr>
+          {% endif %}
+          <tr id="plan-row-{{ k.id }}" data-thema="{{ k.thema or 0 }}" class="{% if active_ids and k.id in active_ids %}comp-covered{% elif active_ids %}comp-not-covered{% endif %}">
+            <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
+            <td>{{ k.name }}</td>
+            <td class="center">
+              <input type="checkbox" id="plan-cb-{{ k.id }}" data-thema="{{ k.thema or 0 }}"
+                {% if r and r.achieved %}checked{% endif %}
+                onchange="planState['{{ k.id }}'].achieved=this.checked; updateDisplay()">
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <h3>Niveau-Kompetenzen (Planung)</h3>
+      <table class="kompetenz-table">
+        <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Niveau</th></tr></thead>
+        <tbody>
+          {% for k in niveau_kompetenzen %}
+          {% set best = best_nachweis_by_comp.get(k.id) %}
+          {% set best_niveau = best.niveau_level if best else 0 %}
+          <tr id="plan-row-{{ k.id }}" class="{% if active_ids and k.id in active_ids %}comp-covered{% elif active_ids %}comp-not-covered{% endif %}">
+            <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
+            <td>{{ k.name }}</td>
+            <td>
+              <select id="plan-sel-{{ k.id }}" onchange="planState['{{ k.id }}'].niveau_level=+this.value; updateDisplay()">
+                <option value="0" {% if best_niveau == 0 %}selected{% endif %}>noch nicht nachgewiesen</option>
+                <option value="1" {% if best_niveau == 1 %}selected{% endif %}>Beginner</option>
+                <option value="2" {% if best_niveau == 2 %}selected{% endif %}>Advanced</option>
+                <option value="3" {% if best_niveau == 3 %}selected{% endif %}>Expert</option>
+              </select>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <hr style="margin:2rem 0; border:none; border-top:1px solid var(--border);">
+
+</div>
+
 <div class="two-columns">
 
   {# --- Einfache Kompetenzen --- #}
@@ -191,5 +279,117 @@ function setThema(thema, state) {
       }
     });
 }
+
+// Bulk set all plan mode checkboxes in a thema group
+function setPlanThema(thema, state) {
+  document.querySelectorAll(`#plan-section input[type=checkbox][data-thema="${thema}"]`)
+    .forEach(cb => {
+      if (cb.checked !== state) {
+        cb.checked = state;
+        // Update planState
+        const compId = cb.id.replace('plan-cb-', '');
+        if (planState[compId]) {
+          planState[compId].achieved = state;
+        }
+      }
+    });
+  updateDisplay();
+}
+
+// --- Planungsmodus ---
+const KOMPETENZEN    = {{ kompetenzen_json | safe }};
+const ACTIVE_IDS     = new Set({{ active_ids_list | safe }});
+const INITIAL_STATE  = {{ current_state_json | safe }};
+const GRADING_SCALE  = {{ grading_scale_json | safe }};
+let   planState      = JSON.parse(JSON.stringify(INITIAL_STATE));
+
+function calcNote(pct) {
+    for (const e of GRADING_SCALE) {
+        if (pct >= e.min_percent) return e.note;
+    }
+    return '6';
+}
+
+function calcScore(basis) {
+    let comps;
+    if (basis === 'unterricht' && ACTIVE_IDS.size > 0) {
+        comps = KOMPETENZEN.filter(k => {
+            if (ACTIVE_IDS.has(k.id)) return true;
+            const r = planState[k.id] || {};
+            return k.typ === 'einfach' ? !!r.achieved : (r.niveau_level || 0) > 0;
+        });
+    } else {
+        comps = KOMPETENZEN;
+    }
+    const max = comps.reduce((s, k) => s + (k.typ === 'niveau' ? 3 : 1), 0);
+    const pts = comps.reduce((s, k) => {
+        const r = planState[k.id] || {};
+        return s + (k.typ === 'einfach' ? (r.achieved ? 1 : 0) : (r.niveau_level || 0));
+    }, 0);
+    const pct  = max > 0 ? Math.round(pts / max * 1000) / 10 : 0;
+    const note = calcNote(pct);
+    return { pts, max, pct, note };
+}
+
+function updateRowHighlight(basis) {
+    if (ACTIVE_IDS.size === 0) return;
+    KOMPETENZEN.forEach(k => {
+        const row = document.getElementById('plan-row-' + k.id);
+        if (!row) return;
+        if (basis === 'unterricht' && !ACTIVE_IDS.has(k.id)) {
+            row.classList.remove('comp-covered');
+            row.classList.add('comp-not-covered');
+        } else {
+            row.classList.remove('comp-not-covered');
+            row.classList.add('comp-covered');
+        }
+    });
+}
+
+function updateDisplay() {
+    const basis = document.querySelector('input[name="plan-basis"]:checked')?.value || 'unterricht';
+    const r = calcScore(basis);
+    document.getElementById('plan-pts').textContent  = `${r.pts} von ${r.max} Punkten`;
+    document.getElementById('plan-pct').textContent  = `${r.pct}\u2009%`;
+    document.getElementById('plan-note').textContent = `Note: ${r.note}`;
+    updateRowHighlight(basis);
+}
+
+function onBasisChange(radio) {
+    document.querySelectorAll('.basis-label').forEach(lbl => lbl.classList.remove('basis-active'));
+    radio.closest('.basis-label').classList.add('basis-active');
+    updateDisplay();
+}
+
+function resetPlan() {
+    planState = JSON.parse(JSON.stringify(INITIAL_STATE));
+    KOMPETENZEN.forEach(k => {
+        const s = planState[k.id] || {};
+        if (k.typ === 'einfach') {
+            const cb = document.getElementById('plan-cb-' + k.id);
+            if (cb) cb.checked = s.achieved;
+        } else {
+            const sel = document.getElementById('plan-sel-' + k.id);
+            if (sel) sel.value = s.niveau_level || 0;
+        }
+    });
+    updateDisplay();
+}
+
+// Toggle plan mode visibility
+document.getElementById('btn-planmode').addEventListener('click', function() {
+    const planSection = document.getElementById('plan-section');
+    if (planSection.style.display === 'none') {
+        planSection.style.display = 'block';
+        this.textContent = 'Planungsmodus ausblenden';
+        updateDisplay();
+    } else {
+        planSection.style.display = 'none';
+        this.textContent = 'Planungsmodus aktivieren';
+    }
+});
+
+// Initial display
+updateDisplay();
 </script>
 {% endblock %}
