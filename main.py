@@ -691,6 +691,22 @@ async def teacher_student_detail(
         competencies=grade_comps if grade_comps else class_comps
     )
     
+    # JSON payloads for client-side planning mode (class-specific)
+    kompetenzen_json = json.dumps([{"id": k["id"], "typ": k["typ"]} for k in class_einfach + class_niveau])
+    current_state: dict = {}
+    for k in class_einfach:
+        r = einfach_map_filtered.get(k["id"], {})
+        current_state[k["id"]] = {"achieved": bool(r.get("achieved")), "niveau_level": 0}
+    for k in class_niveau:
+        entries = nachweise_filtered.get(k["id"], [])
+        best_niv = max((e.get("niveau_level", 0) for e in entries), default=0)
+        current_state[k["id"]] = {"achieved": False, "niveau_level": best_niv}
+    current_state_json = json.dumps(current_state)
+    active_ids_list = json.dumps(sorted(active_ids))
+    grading_scale_json = json.dumps(
+        [{"note": e["note"], "min_percent": e["min_percent"]} for e in _GRADING_SCALE]
+    )
+    
     return templates.TemplateResponse("student_detail.html", {
         "request": request,
         "user": user,
@@ -704,6 +720,10 @@ async def teacher_student_detail(
         "active_ids": active_ids,
         "einfach_kompetenzen": class_einfach,  # Use class-specific
         "niveau_kompetenzen": class_niveau,    # Use class-specific
+        "kompetenzen_json": kompetenzen_json,
+        "active_ids_list": active_ids_list,
+        "current_state_json": current_state_json,
+        "grading_scale_json": grading_scale_json,
     })
 
 
