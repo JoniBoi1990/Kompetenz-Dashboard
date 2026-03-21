@@ -78,7 +78,7 @@
               <summary class="comp-name">{{ k.name }}</summary>
               {% if entries %}
               <table class="chronik-table">
-                <thead><tr><th>Datum</th><th>Niveau</th><th>Nachweis</th><th>von</th></tr></thead>
+                <thead><tr><th>Datum</th><th>Niveau</th><th>Nachweis</th><th>von</th><th>Aktion</th></tr></thead>
                 <tbody>
                   {% for n in entries %}
                   <tr>
@@ -92,6 +92,15 @@
                       {% else %}–{% endif %}
                     </td>
                     <td class="muted">{{ n.updated_by }}</td>
+                    <td>
+                      <form action="/records/nachweis/delete" method="post" class="inline-form" onsubmit="return confirm('Nachweis wirklich löschen?');">
+                        <input type="hidden" name="nachweis_id" value="{{ n.id }}">
+                        <input type="hidden" name="student_id" value="{{ student_id }}">
+                        <input type="hidden" name="student_name" value="{{ student_name }}">
+                        <input type="hidden" name="class_id" value="{{ class_id }}">
+                        <button type="submit" class="btn-danger" style="padding:0.2rem 0.5rem;font-size:0.8rem;">🗑️</button>
+                      </form>
+                    </td>
                   </tr>
                   {% endfor %}
                 </tbody>
