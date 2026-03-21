@@ -219,50 +219,232 @@ Kompetenz-Dashboard/
 
 **Note:** "Listen verwalten" was removed. Competency lists are now managed as JSON files in `kompetenzlisten/` directory (system lists) or uploaded by teachers per class.
 
-## Competency Data Model (Grade-Level Based)
+## Competency Data Model (Grade-Level Based with Type Prefix)
 
-**Old (deprecated):** `kompetenzen.json` — single global list
+**⚠️ CRITICAL: ID Format changed in 2026-03**
 
-**New:** `kompetenzlisten/klasse-{GRADE}-{NAME}.json` — grade-specific lists
+Old format (deprecated): Integer IDs like `901`, `1001`
+New format: **String IDs with type prefix** — `"e.901"` (einfach), `"n.989"` (niveau)
+
+### File Structure
 
 ```
 kompetenzlisten/
-├── klasse-9-chemie.json              # Klasse 9: IDs 901-999
+├── klasse-9-chemie.json              # Klasse 9: IDs e.901-e.988, n.989-n.1021
 ├── klasse-9-chemie-questions.json    # Questions for Klasse 9
-├── klasse-10-chemie.json             # Klasse 10: IDs 1001-1099
+├── klasse-10-chemie.json             # Klasse 10: IDs e.1001-e.1070, n.1071-n.1103
 └── klasse-10-chemie-questions.json   # Questions for Klasse 10
 ```
 
-Each entry:
+### ID Format Specification
+
+**Format:** `{type}.{grade}{sequence:02d}`
+
+| Type | Prefix | Example | Meaning |
+|------|--------|---------|---------|
+| Einfach | `e.` | `e.901` | Klasse 9, Einfach #01 |
+| Niveau | `n.` | `n.989` | Klasse 9, Niveau #01 |
+
+**Pattern:**
+- Klasse 9 Einfach: `e.901` - `e.988` (88 competencies)
+- Klasse 9 Niveau: `n.989` - `n.1021` (33 competencies)
+- Klasse 10 Einfach: `e.1001` - `e.1070` (70 competencies)
+- Klasse 10 Niveau: `n.1071` - `n.1103` (33 competencies)
+
+**Why this format:**
+1. **No collisions** between Einfach and Niveau (can both have #01)
+2. **Human readable** — see type and grade at a glance
+3. **Sortable** — alphabetical sort works correctly
+4. **Extensible** — add new types (e.g., `p.` for projects) easily
+
+### JSON Entry Structure
+
 ```json
 {
-  "id": 901,              // Grade-specific ID range
-  "typ": "einfach",       // or "niveau"
+  "id": "e.901",          // String! Format: "e.{grade}{seq}" or "n.{grade}{seq}"
+  "typ": "einfach",       // "einfach" or "niveau" (must match prefix)
   "name": "...",
   "thema": 1,             // Integer 1–10 or null
   "anmerkungen": ""
 }
 ```
 
-**ID Ranges:**
-- Klasse 9: 901–999
-- Klasse 10: 1001–1099
-- Klasse 11: 1101–1199
-- etc.
+### Database Schema (SQLite)
 
-**Loading:** `_load_competency_list(list_id)` loads a specific list. `_get_student_competencies(student_id)` returns the appropriate list based on the student's class assignment.
+**competency_id columns are TEXT (not INTEGER):**
 
-**Sorting:** Same as before — `_EINFACH` by `(thema or 999, id)`, `_NIVEAU` by `id`.
+```sql
+-- active_ids (Unterrichtsstand)
+CREATE TABLE active_ids (
+    competency_id TEXT NOT NULL,  -- e.g., "e.901", "n.989"
+    class_id TEXT,
+    PRIMARY KEY (competency_id, class_id)
+);
 
-## Test Questions (`questions.json`)
+-- einfach_records
+CREATE TABLE einfach_records (
+    student_id TEXT NOT NULL,
+    competency_id TEXT NOT NULL,  -- e.g., "e.901"
+    achieved INTEGER DEFAULT 0,
+    ...
+);
 
-```json
-{"1": ["Nenne die Grundbausteine...", "Beschreibe den Aufbau..."], "2": [...]}
+-- nachweise (niveau)
+CREATE TABLE nachweise (
+    student_id TEXT NOT NULL,
+    competency_id TEXT NOT NULL,  -- e.g., "n.989"
+    niveau_level INTEGER,
+    ...
+);
 ```
 
-- Keys are competency IDs as strings.
+### Adding a New Class (Checklist)
+
+**Prerequisites:** Decide on grade level (e.g., 11) and subject (e.g., chemie)
+
+**Step 1: Create JSON files**
+
+```bash
+# Create empty structure
+convert_csv_to_json.py --grade 11 --subject chemie \
+  --einfach-csv einfach_11.csv \
+  --niveau-csv niveau_11.csv \
+  --output-dir kompetenzlisten/
+```
+
+This creates:
+- `klasse-11-chemie.json` (IDs: e.1101, e.1102, ... n.1190, ...)
+- `klasse-11-chemie-questions.json`
+
+**Step 2: Verify ID format in JSON**
+
+```bash
+python3 -c "
+import json
+with open('kompetenzlisten/klasse-11-chemie.json') as f:
+    data = json.load(f)
+    for c in data['competencies'][:5]:
+        print(f\"  {c['id']} ({c['typ']})\")
+"
+# Should show: e.1101 (einfach), e.1102 (einfach), ...
+```
+
+**Step 3: Add class to database**
+
+Via web UI: `Admin → Klassen verwalten → Neue Klasse`
+
+Or SQL:
+```sql
+INSERT INTO classes (id, name, grade_level, 
+                     einfach_list_id, einfach_list_source,
+                     niveau_list_id, niveau_list_source)
+VALUES ('klasse-11-chemie-2026', '11a Chemie', 11,
+        'klasse-11-chemie', 'system',
+        'klasse-11-chemie', 'system');
+```
+
+**Step 4: Assign students to class**
+
+Via web UI or SQL:
+```sql
+INSERT INTO class_members (class_id, student_id, student_name, upn)
+VALUES ('klasse-11-chemie-2026', 'max@schule.de', 'Max Mustermann', 'max@schule.de');
+```
+
+**Step 5: Set Unterrichtsstand (optional)**
+
+Via web UI: `Unterrichtsstand → Klasse 11a auswählen → Kompetenzen markieren → Speichern`
+
+**⚠️ Common Pitfalls:**
+
+| Mistake | Symptom | Fix |
+|---------|---------|-----|
+| Integer IDs in JSON | Parse errors, "invalid literal" | Convert to strings: `"e.1101"` |
+| Missing type prefix | ID collisions between Einfach/Niveau | Add `e.` or `n.` prefix |
+| Wrong sequence padding | `e.1101` vs `e.111` | Always use 2-digit sequence: `e.{grade}{seq:02d}` |
+| Database still has INTEGER column | "datatype mismatch" | Run migration or recreate tables |
+
+### Loading Competency Lists
+
+```python
+# Load a specific list
+einfach_list, niveau_list, active_ids, class_id = _get_student_competencies(student_id)
+
+# Returns separate lists for einfach and niveau
+# active_ids: Set of strings like {"e.1101", "e.1102", "n.1190"}
+```
+
+### Code Changes Required When Adding Classes
+
+**If IDs follow the pattern: NONE** ✓
+
+The code automatically:
+- Parses `e.{grade}{seq}` format
+- Loads correct lists based on class assignment
+- Filters active_ids by type prefix
+- Renders templates with string IDs
+
+**Only modify if:**
+- Adding a new competency type (not "einfach" or "niveau")
+- Changing the ID format entirely
+- Adding metadata fields to competencies
+
+### Critical Code Paths (Handle with Care)
+
+These functions are sensitive to ID format changes:
+
+| Function | File | Line | Purpose |
+|----------|------|------|---------|
+| `_parse_csv_competencies` | `main.py` | ~815 | CSV → JSON conversion with ID generation |
+| `_get_student_competencies` | `main.py` | ~491 | Loads separate einfach/niveau lists |
+| `teacher_coverage` | `main.py` | ~1290 | Unterrichtsstand page |
+| `teacher_coverage_update` | `main.py` | ~1345 | Saves active_ids (no int() conversion!) |
+| `test_builder` | `main.py` | ~1364 | Test generator |
+| `api_student_competencies` | `main.py` | ~1600 | AJAX endpoint for proven IDs |
+| `get_active_ids` | `db.py` | ~213 | Returns Set[str] of IDs |
+| `set_active_ids` | `db.py` | ~231 | Saves Set[str] to database |
+| `upsert_einfach` | `db.py` | ~261 | Records einfach achievement |
+| `add_nachweis` | `db.py` | ~307 | Records niveau evidence |
+
+**Template files with ID handling:**
+- `templates/coverage.html` — Checkbox values, `k.id in active_ids`
+- `templates/test_builder.html` — Student lookup, `parseInt()` removed
+- `templates/dashboard.html` — Planning mode, JSON payloads
+- `templates/student_detail.html` — Teacher view, form submissions
+
+**⚠️ Common bug pattern:**
+```python
+# WRONG — breaks with string IDs:
+ids = {int(v) for k, v in form.multi_items() if k == "active_id"}
+
+# CORRECT:
+ids = {v for k, v in form.multi_items() if k == "active_id"}
+```
+
+## Test Questions (`{list}-questions.json`)
+
+```json
+{
+  "e.901": ["Nenne die Grundbausteine...", "Beschreibe den Aufbau..."],
+  "e.902": ["Frage 1...", "Frage 2..."],
+  "n.989": ["Niveau-Frage..."]
+}
+```
+
+- **Keys are competency IDs as strings** with type prefix: `"e.901"`, `"n.989"`
 - Fallback when a key is missing or file absent: competency name is used as the single question.
-- **CSV format:** Row 0 = competency IDs (column headers), rows 1–N = question variants. Semikolon-separated, UTF-8. Empty cells are skipped.
+- **CSV format:** 
+  - Row 0 = competency IDs (column headers) — must include type prefix: `e.901;e.902;n.989`
+  - Rows 1–N = question variants
+  - Semikolon-separated, UTF-8
+  - Empty cells are skipped
+
+**Example CSV for Klasse 11:**
+```csv
+e.1101;e.1102;e.1103;n.1190;n.1191
+"Was ist...?";"Erkläre...";"Nenne...";"Beweise...";"Analysiere..."
+"Definiere...";"Beschreibe...";"Liste...";"Vergleiche...";"Diskutiere..."
+```
 
 ## Student Dashboard (`/`)
 
@@ -502,8 +684,8 @@ Each class is assigned:
 ### Student Dashboard Filter
 
 `_get_student_competencies(student_id)` returns only competencies from the student's class list. This ensures:
-- Klasse 9 students see only Klasse 9 competencies (IDs 901-999)
-- Klasse 10 students see only Klasse 10 competencies (IDs 1001-1099)
+- Klasse 9 students see only Klasse 9 competencies (IDs `e.901`-`n.1021`)
+- Klasse 10 students see only Klasse 10 competencies (IDs `e.1001`-`n.1103`)
 - Records are filtered to match the class competency IDs
 
 ### Teacher Coverage Page
@@ -576,3 +758,66 @@ To use this code in production (`main` branch):
 | Max Mustermann | max@schule.de | (any) | 10a |
 | Lehrer (Dev) | lehrer@schule.de | (any) | — |
 
+
+
+---
+
+## Migration Guide: Old → New ID Format
+
+If migrating from the old integer ID format (2026-03 or earlier), run these steps:
+
+### 1. Backup Database
+```bash
+cp dashboard.db dashboard.db.backup.pre-migration
+```
+
+### 2. Update JSON Files
+All files in `kompetenzlisten/` must use new ID format:
+```python
+# Old: {"id": 901, "typ": "einfach"}
+# New: {"id": "e.901", "typ": "einfach"}
+
+# Migration script (run once):
+python3 << 'EOF'
+import json, os
+for f in os.listdir('kompetenzlisten'):
+    if f.endswith('.json') and not f.endswith('-questions.json'):
+        with open(f'kompetenzlisten/{f}') as file:
+            data = json.load(file)
+        for c in data.get('competencies', []):
+            old_id = c['id']
+            if isinstance(old_id, int):
+                prefix = 'n' if c['typ'] == 'niveau' else 'e'
+                c['id'] = f"{prefix}.{old_id}"
+        with open(f'kompetenzlisten/{f}', 'w') as file:
+            json.dump(data, file, indent=2)
+        print(f"Migrated {f}")
+EOF
+```
+
+### 3. Restart Server
+Database migration runs automatically on startup via `_migrate_competency_ids_to_text()` in `db.py`.
+
+### 4. Verify
+```bash
+sqlite3 dashboard.db "SELECT competency_id FROM active_ids LIMIT 5"
+# Should show: e.901, e.902, n.989, ... (not 901, 902, 989)
+```
+
+---
+
+## Quick Reference: ID Formats
+
+| Context | Old (pre-2026-03) | New (current) |
+|---------|-------------------|---------------|
+| JSON files | `"id": 901` | `"id": "e.901"` |
+| Database | `INTEGER` | `TEXT` |
+| Python | `int` | `str` |
+| Templates | `{{ k.id }}` → `901` | `{{ k.id }}` → `e.901` |
+| JavaScript | `parseInt(cb.value)` | `cb.value` (direct) |
+| CSV headers | `901;902;...` | `e.901;e.902;...` |
+
+---
+
+**Last updated:** 2026-03-21
+**Version:** 2.0 (String IDs with type prefix)

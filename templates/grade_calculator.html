@@ -4,6 +4,7 @@
 <h1>Notenrechner</h1>
 
 <form action="/grades/calculate" method="post" id="calc-form">
+  <input type="hidden" name="class_id" value="{{ selected_class_id }}">
 
   {# Toggle: Berechnungsgrundlage #}
   <div class="basis-toggle">

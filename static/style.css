@@ -384,3 +384,22 @@ tr.thema-header td {
   border-radius: 10px;
   white-space: nowrap;
 }
+
+/* Badge für Listentyp */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.badge-einfach {
+  background: #e6f4ea;
+  color: #1e7e34;
+}
+.badge-niveau {
+  background: #e8f0fe;
+  color: #1557b0;
+}

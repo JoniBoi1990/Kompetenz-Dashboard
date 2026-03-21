@@ -344,10 +344,13 @@ def _create_preview(student_name: str, title: str, competency_ids: list[int],
     return pid
 
 
-def _build_grade_records(einfach_map: dict, nachweise_by_comp: dict) -> list[dict]:
-    """Merge einfach records + best-niveau-per-comp into a unified list for calculate_grade()."""
+def _build_grade_records(einfach_map: dict, nachweise_by_comp: dict, 
+                         competencies: list[dict] | None = None) -> list[dict]:
+    """Merge einfach records + best-niveau-per-comp into a unified list for calculate_grade().
+    If competencies is None, uses _KOMPETENZEN (fallback for backward compatibility)."""
+    comps = competencies if competencies is not None else _KOMPETENZEN
     records = []
-    for k in _KOMPETENZEN:
+    for k in comps:
         cid = k["id"]
         if k["typ"] == "einfach":
             r = einfach_map.get(cid, {})
@@ -490,20 +493,37 @@ def _get_student_competencies(student_id: str) -> tuple[list[dict], list[dict], 
     Returns: (einfach_list, niveau_list, active_ids, class_id)"""
     student_class = db.get_student_class(student_id)
     
-    if not student_class or not student_class.get("competency_list_id"):
+    if not student_class:
         # Fallback to default list (class 9)
         return _EINFACH, _NIVEAU, db.get_active_ids(), None
     
     class_id = student_class["id"]
-    list_id = student_class["competency_list_id"]
-    list_source = student_class.get("list_source", "system")
+    
+    # Use new separate lists if available, otherwise fall back to legacy
+    einfach_list_id = student_class.get("einfach_list_id") or student_class.get("competency_list_id")
+    einfach_list_source = student_class.get("einfach_list_source") or student_class.get("list_source", "system")
+    niveau_list_id = student_class.get("niveau_list_id") or student_class.get("competency_list_id")
+    niveau_list_source = student_class.get("niveau_list_source") or student_class.get("list_source", "system")
+    
+    if not einfach_list_id and not niveau_list_id:
+        # Fallback to default list (class 9)
+        return _EINFACH, _NIVEAU, db.get_active_ids(), None
     
     try:
-        # Load class-specific competency list (system or teacher)
-        comps, _ = _load_competency_list(list_id, list_source)
-        einfach = sorted([c for c in comps if c["typ"] == "einfach"], 
-                        key=lambda k: (k.get("thema") or 999, k["id"]))
-        niveau = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+        einfach = []
+        niveau = []
+        
+        # Load einfach list
+        if einfach_list_id:
+            comps, _ = _load_competency_list(einfach_list_id, einfach_list_source)
+            einfach = sorted([c for c in comps if c["typ"] == "einfach"], 
+                            key=lambda k: (k.get("thema") or 999, k["id"]))
+        
+        # Load niveau list
+        if niveau_list_id:
+            comps, _ = _load_competency_list(niveau_list_id, niveau_list_source)
+            niveau = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+        
         active_ids = db.get_active_ids(class_id)
         return einfach, niveau, active_ids, class_id
     except FileNotFoundError:
@@ -544,8 +564,10 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
         proven_ids = set()
         grade_comps = None
     
-    grade = calculate_grade(_build_grade_records(einfach_map_filtered, nachweise_filtered), 
-                           competencies=grade_comps)
+    # Use class-specific competencies for grade calculation
+    class_comps = class_einfach + class_niveau
+    grade = calculate_grade(_build_grade_records(einfach_map_filtered, nachweise_filtered, class_comps), 
+                           competencies=grade_comps if grade_comps else class_comps)
 
     # JSON payloads for client-side planning mode (filtered to class competencies)
     kompetenzen_json = json.dumps([{"id": k["id"], "typ": k["typ"]} for k in class_einfach + class_niveau])
@@ -637,13 +659,35 @@ async def teacher_student_detail(
     student_name: str = "",
     user: dict = Depends(auth.require_teacher_user),
 ):
+    # Get student's class competencies
+    class_einfach, class_niveau, active_ids, _ = _get_student_competencies(student_id)
+    
     # Load student data
-    einfach_map, nachweise_by_comp, best_nachweis_by_comp, grade = _load_student_data(
+    einfach_map, nachweise_by_comp, best_nachweis_by_comp, _ = _load_student_data(
         user["access_token"], student_id
     )
     
-    # Get student's class competencies (not global)
-    class_einfach, class_niveau, active_ids, _ = _get_student_competencies(student_id)
+    # Filter to class-specific competencies
+    class_comp_ids = {c["id"] for c in class_einfach + class_niveau}
+    einfach_map_filtered = {k: v for k, v in einfach_map.items() if k in class_comp_ids}
+    nachweise_filtered = {k: v for k, v in nachweise_by_comp.items() if k in class_comp_ids}
+    
+    # Calculate grade with class-specific competencies
+    class_comps = class_einfach + class_niveau
+    if active_ids:
+        proven_ids = (
+            {cid for cid, r in einfach_map_filtered.items() if r.get("achieved")}
+            | {cid for cid, entries in nachweise_filtered.items()
+               if any(e.get("niveau_level", 0) > 0 for e in entries)}
+        )
+        grade_comps = [k for k in class_comps if k["id"] in active_ids or k["id"] in proven_ids]
+    else:
+        grade_comps = None
+    
+    grade = calculate_grade(
+        _build_grade_records(einfach_map_filtered, nachweise_filtered, class_comps),
+        competencies=grade_comps if grade_comps else class_comps
+    )
     
     return templates.TemplateResponse("student_detail.html", {
         "request": request,
@@ -651,9 +695,9 @@ async def teacher_student_detail(
         "student_id": student_id,
         "student_name": student_name,
         "class_id": class_id,
-        "einfach_map": einfach_map,
-        "nachweise_by_comp": nachweise_by_comp,
-        "best_nachweis_by_comp": best_nachweis_by_comp,
+        "einfach_map": einfach_map_filtered,  # Use filtered
+        "nachweise_by_comp": nachweise_filtered,  # Use filtered
+        "best_nachweis_by_comp": {k: v for k, v in best_nachweis_by_comp.items() if k in class_comp_ids},
         "grade": grade,
         "active_ids": active_ids,
         "einfach_kompetenzen": class_einfach,  # Use class-specific
@@ -665,7 +709,7 @@ async def teacher_student_detail(
 async def update_record(
     student_id: str = Form(...),
     student_name: str = Form(...),
-    competency_id: int = Form(...),
+    competency_id: str = Form(...),  # Format: e.901, n.989
     achieved: str = Form(default=""),
     class_id: str = Form(default=""),
     user: dict = Depends(auth.require_teacher_user),
@@ -682,7 +726,7 @@ async def update_record(
 async def add_nachweis(
     student_id: str = Form(...),
     student_name: str = Form(...),
-    competency_id: int = Form(...),
+    competency_id: str = Form(...),  # Format: e.901, n.989
     niveau_level: int = Form(...),
     evidence_url: str = Form(default=""),
     evidence_name: str = Form(default=""),
@@ -720,12 +764,19 @@ async def teacher_competency_lists(
                 # Check if system questions exist
                 questions_file = kompetenzlisten_dir / f"{f.stem}-questions.json"
                 has_questions = questions_file.exists()
+                # System lists contain both types - mark as None or 'both'
+                # We'll handle them specially in the template
+                einfach_count = len([c for c in data.get("competencies", []) if c.get("typ") == "einfach"])
+                niveau_count = len([c for c in data.get("competencies", []) if c.get("typ") == "niveau"])
                 system_lists.append({
                     "id": f.stem,
                     "name": data.get("name", f.stem),
                     "grade_level": data.get("grade_level", 0),
                     "competency_count": len(data.get("competencies", [])),
+                    "einfach_count": einfach_count,
+                    "niveau_count": niveau_count,
                     "has_system_questions": has_questions,
+                    "typ": "both",  # Special marker for system lists
                 })
             except Exception:
                 pass
@@ -770,8 +821,11 @@ def _parse_csv_competencies(content: bytes, typ: str, grade_level: int) -> list[
         except (ValueError, TypeError):
             continue
         
-        # Adjust ID based on grade (e.g., Klasse 10: IDs 1001+)
-        adjusted_id = grade_level * 100 + comp_id  # 10*100+1 = 1001
+        # New ID format: {typ}.{grade_level}{id:02d}
+        # e.g., Klasse 9, Einfach, ID 1 -> "e.901"
+        # e.g., Klasse 10, Niveau, ID 1 -> "n.1001"
+        prefix = "n" if typ == "niveau" else "e"
+        adjusted_id = f"{prefix}.{grade_level}{comp_id:02d}"
         
         if typ == "einfach":
             competency = {
@@ -870,6 +924,7 @@ async def teacher_competency_lists_upload(
         uploaded_by=user["upn"],
         data=data,
         questions=questions,
+        typ=typ,
     )
     
     return RedirectResponse("/teacher/competency-lists", status_code=302)
@@ -964,6 +1019,7 @@ async def teacher_class_set_list(
     list_id: str = Form(...),
     user: dict = Depends(auth.require_teacher_user),
 ):
+    # Legacy endpoint - sets both einfach and niveau to the same list
     # Determine if this is a system or teacher list
     kompetenzlisten_dir = BASE_DIR / "kompetenzlisten"
     system_list_file = kompetenzlisten_dir / f"{list_id}.json"
@@ -981,13 +1037,145 @@ async def teacher_class_set_list(
     return RedirectResponse("/teacher/competency-lists", status_code=302)
 
 
+@app.post("/teacher/class/{class_id}/set-lists")
+async def teacher_class_set_lists(
+    class_id: str,
+    einfach_list_id: str = Form(...),
+    niveau_list_id: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Set separate einfach and niveau competency lists for a class."""
+    
+    def get_list_source(list_id: str) -> str:
+        kompetenzlisten_dir = BASE_DIR / "kompetenzlisten"
+        system_list_file = kompetenzlisten_dir / f"{list_id}.json"
+        if system_list_file.exists():
+            return "system"
+        teacher_list = db.get_teacher_list(list_id)
+        if not teacher_list:
+            raise HTTPException(status_code=404, detail=f"Liste {list_id} nicht gefunden")
+        return "teacher"
+    
+    einfach_source = get_list_source(einfach_list_id)
+    niveau_source = get_list_source(niveau_list_id)
+    
+    db.set_class_competency_lists(
+        class_id,
+        einfach_list_id, einfach_source,
+        niveau_list_id, niveau_source
+    )
+    return RedirectResponse("/teacher/competency-lists", status_code=302)
+
+
+@app.get("/teacher/competency-lists/{list_id}/edit", response_class=HTMLResponse)
+async def teacher_competency_list_edit(
+    list_id: str,
+    request: Request,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Show edit page for a teacher-uploaded competency list."""
+    teacher_list = db.get_teacher_list(list_id)
+    if not teacher_list:
+        raise HTTPException(status_code=404, detail="Liste nicht gefunden")
+    
+    # Verify ownership
+    if teacher_list["uploaded_by"] != user["upn"]:
+        raise HTTPException(status_code=403, detail="Keine Berechtigung")
+    
+    return templates.TemplateResponse("teacher_list_edit.html", {
+        "request": request,
+        "user": user,
+        "list": teacher_list,
+    })
+
+
+@app.post("/teacher/competency-lists/{list_id}/update")
+async def teacher_competency_list_update(
+    list_id: str,
+    request: Request,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Update a teacher-uploaded competency list."""
+    teacher_list = db.get_teacher_list(list_id)
+    if not teacher_list:
+        raise HTTPException(status_code=404, detail="Liste nicht gefunden")
+    
+    # Verify ownership
+    if teacher_list["uploaded_by"] != user["upn"]:
+        raise HTTPException(status_code=403, detail="Keine Berechtigung")
+    
+    form = await request.form()
+    
+    # Build competencies from form data
+    name = form.get("name", teacher_list["name"])
+    grade_level = int(form.get("grade_level", teacher_list["grade_level"]))
+    typ = form.get("typ", teacher_list["typ"])
+    
+    competencies = []
+    comp_index = 0
+    while f"comp_{comp_index}_id" in form:
+        comp_id = int(form[f"comp_{comp_index}_id"])
+        comp_name = form.get(f"comp_{comp_index}_name", "")
+        
+        if not comp_name:  # Skip empty rows
+            comp_index += 1
+            continue
+            
+        if typ == "einfach":
+            thema = form.get(f"comp_{comp_index}_thema")
+            anmerkungen = form.get(f"comp_{comp_index}_anmerkungen", "")
+            competency = {
+                "id": comp_id,
+                "typ": "einfach",
+                "name": comp_name,
+                "thema": int(thema) if thema else None,
+                "anmerkungen": anmerkungen,
+            }
+        else:  # niveau
+            bp_nummer = form.get(f"comp_{comp_index}_bp_nummer", "")
+            moeglichkeiten_str = form.get(f"comp_{comp_index}_moeglichkeiten", "")
+            anmerkungen = form.get(f"comp_{comp_index}_anmerkungen", "")
+            moeglichkeiten = [m.strip() for m in moeglichkeiten_str.split(";") if m.strip()]
+            competency = {
+                "id": comp_id,
+                "typ": "niveau",
+                "name": comp_name,
+                "bp_nummer": bp_nummer,
+                "moeglichkeiten": moeglichkeiten,
+                "anmerkungen": anmerkungen,
+            }
+        
+        competencies.append(competency)
+        comp_index += 1
+    
+    data = {
+        "name": name,
+        "grade_level": grade_level,
+        "typ": typ,
+        "competencies": competencies,
+    }
+    
+    # Update in DB (keep existing questions)
+    db.save_teacher_list(
+        list_id=list_id,
+        name=name,
+        grade_level=grade_level,
+        uploaded_by=user["upn"],
+        data=data,
+        questions=teacher_list.get("questions", {}),
+        typ=typ,
+    )
+    
+    return RedirectResponse("/teacher/competency-lists", status_code=302)
+
+
 # ---------------------------------------------------------------------------
 # Kompetenzanträge — student-initiated competency claims
 # ---------------------------------------------------------------------------
 
 @app.post("/antraege/submit")
 async def antraege_submit(
-    competency_id: int = Form(...),
+    competency_id: str = Form(...),  # Format: e.901, n.989
     typ: str = Form(...),
     beschreibung: str = Form(default=""),
     evidence_url: str = Form(default=""),
@@ -1115,20 +1303,31 @@ async def teacher_coverage(
     if not class_id and classes:
         class_id = classes[0]["id"]
     
-    # Get competencies for this class
+    # Get competencies for this class (using separate einfach/niveau lists)
     selected_class = db.get_class(class_id) if class_id else None
-    if selected_class and selected_class.get("competency_list_id"):
-        try:
-            list_source = selected_class.get("list_source", "system")
-            comps, _ = _load_competency_list(selected_class["competency_list_id"], list_source)
-            einfach = [c for c in comps if c["typ"] == "einfach"]
-            niveau = [c for c in comps if c["typ"] == "niveau"]
-        except FileNotFoundError:
-            einfach, niveau = _EINFACH, _NIVEAU
-    else:
-        einfach, niveau = _EINFACH, _NIVEAU
+    einfach, niveau = _EINFACH, _NIVEAU
     
-    active_ids = db.get_active_ids(class_id) if class_id else db.get_active_ids()
+    if selected_class:
+        # Get separate list IDs (fallback to legacy if not set)
+        einfach_list_id = selected_class.get("einfach_list_id") or selected_class.get("competency_list_id")
+        einfach_list_source = selected_class.get("einfach_list_source") or selected_class.get("list_source", "system")
+        niveau_list_id = selected_class.get("niveau_list_id") or selected_class.get("competency_list_id")
+        niveau_list_source = selected_class.get("niveau_list_source") or selected_class.get("list_source", "system")
+        
+        try:
+            # Load einfach competencies
+            if einfach_list_id:
+                comps, _ = _load_competency_list(einfach_list_id, einfach_list_source)
+                einfach = [c for c in comps if c["typ"] == "einfach"]
+            
+            # Load niveau competencies  
+            if niveau_list_id:
+                comps, _ = _load_competency_list(niveau_list_id, niveau_list_source)
+                niveau = [c for c in comps if c["typ"] == "niveau"]
+        except FileNotFoundError:
+            pass  # Keep fallback values
+    
+    active_ids = db.get_active_ids(class_id) if class_id is not None else db.get_active_ids()
     
     return templates.TemplateResponse("coverage.html", {
         "request": request, 
@@ -1148,9 +1347,9 @@ async def teacher_coverage_update(
     class_id: str = Form(""),
 ):
     form = await request.form()
-    ids = {int(v) for k, v in form.multi_items() if k == "active_id"}
+    ids = {v for k, v in form.multi_items() if k == "active_id"}
     
-    if class_id:
+    if class_id is not None and class_id != "":
         db.set_active_ids(ids, class_id)
     else:
         db.set_active_ids(ids)
@@ -1168,7 +1367,7 @@ async def test_builder(
     user: dict = Depends(auth.require_user),
     class_id: str = "",
 ):
-    # Get class-specific competencies
+    # Get class-specific competencies (using separate einfach/niveau lists)
     einfach_list = _EINFACH
     niveau_list = _NIVEAU
     active_ids = db.get_active_ids()
@@ -1182,13 +1381,25 @@ async def test_builder(
         
         if selected_class_id:
             selected_class = db.get_class(selected_class_id)
-            if selected_class and selected_class.get("competency_list_id"):
+            if selected_class:
+                # Use new separate lists (fallback to legacy if not set)
+                einfach_list_id = selected_class.get("einfach_list_id") or selected_class.get("competency_list_id")
+                einfach_list_source = selected_class.get("einfach_list_source") or selected_class.get("list_source", "system")
+                niveau_list_id = selected_class.get("niveau_list_id") or selected_class.get("competency_list_id")
+                niveau_list_source = selected_class.get("niveau_list_source") or selected_class.get("list_source", "system")
+                
                 try:
-                    list_source = selected_class.get("list_source", "system")
-                    comps, _ = _load_competency_list(selected_class["competency_list_id"], list_source)
-                    einfach_list = sorted([c for c in comps if c["typ"] == "einfach"], 
-                                         key=lambda k: (k.get("thema") or 999, k["id"]))
-                    niveau_list = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+                    # Load einfach competencies
+                    if einfach_list_id:
+                        comps, _ = _load_competency_list(einfach_list_id, einfach_list_source)
+                        einfach_list = sorted([c for c in comps if c["typ"] == "einfach"], 
+                                             key=lambda k: (k.get("thema") or 999, k["id"]))
+                    
+                    # Load niveau competencies
+                    if niveau_list_id:
+                        comps, _ = _load_competency_list(niveau_list_id, niveau_list_source)
+                        niveau_list = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+                    
                     active_ids = db.get_active_ids(selected_class_id)
                 except FileNotFoundError:
                     pass
@@ -1207,13 +1418,25 @@ async def test_builder(
     else:
         # Student: use their class
         student_class = db.get_student_class(user["oid"])
-        if student_class and student_class.get("competency_list_id"):
+        if student_class:
+            # Use new separate lists (fallback to legacy if not set)
+            einfach_list_id = student_class.get("einfach_list_id") or student_class.get("competency_list_id")
+            einfach_list_source = student_class.get("einfach_list_source") or student_class.get("list_source", "system")
+            niveau_list_id = student_class.get("niveau_list_id") or student_class.get("competency_list_id")
+            niveau_list_source = student_class.get("niveau_list_source") or student_class.get("list_source", "system")
+            
             try:
-                list_source = student_class.get("list_source", "system")
-                comps, _ = _load_competency_list(student_class["competency_list_id"], list_source)
-                einfach_list = sorted([c for c in comps if c["typ"] == "einfach"], 
-                                     key=lambda k: (k.get("thema") or 999, k["id"]))
-                niveau_list = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+                # Load einfach competencies
+                if einfach_list_id:
+                    comps, _ = _load_competency_list(einfach_list_id, einfach_list_source)
+                    einfach_list = sorted([c for c in comps if c["typ"] == "einfach"], 
+                                         key=lambda k: (k.get("thema") or 999, k["id"]))
+                
+                # Load niveau competencies
+                if niveau_list_id:
+                    comps, _ = _load_competency_list(niveau_list_id, niveau_list_source)
+                    niveau_list = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
+                
                 active_ids = db.get_active_ids(student_class["id"])
             except FileNotFoundError:
                 pass
@@ -1236,7 +1459,7 @@ async def test_builder(
 @app.post("/tests/generate")
 async def generate_test(request: Request, user: dict = Depends(auth.require_teacher_user)):
     form = await request.form()
-    selected_ids = [int(v) for k, v in form.multi_items() if k == "competency_ids"]
+    selected_ids = [v for k, v in form.multi_items() if k == "competency_ids"]
 
     if not selected_ids:
         raise HTTPException(status_code=400, detail="Keine Kompetenzen ausgewählt")
@@ -1257,7 +1480,7 @@ async def student_test_request(request: Request, user: dict = Depends(auth.requi
         raise HTTPException(status_code=403, detail="Nur für Schüler")
 
     form = await request.form()
-    selected_ids = [int(v) for k, v in form.multi_items() if k == "competency_ids"]
+    selected_ids = [v for k, v in form.multi_items() if k == "competency_ids"]
     if not selected_ids:
         raise HTTPException(status_code=400, detail="Keine Kompetenzen ausgewählt")
 
@@ -1301,7 +1524,7 @@ async def pending_tests(request: Request, user: dict = Depends(auth.require_teac
 async def confirm_test(req_id: str, request: Request, user: dict = Depends(auth.require_teacher_user)):
     """Teacher confirms (possibly edited) competency selection → creates preview."""
     form = await request.form()
-    selected_ids = [int(v) for k, v in form.multi_items() if k == "competency_ids"]
+    selected_ids = [v for k, v in form.multi_items() if k == "competency_ids"]
 
     reqs = _get_test_requests()
     req = reqs.get(req_id)
@@ -1411,7 +1634,7 @@ async def grade_calculator(
     # Get competencies for selected class
     einfach_list = _EINFACH
     niveau_list = _NIVEAU
-    active_ids = db.get_active_ids()
+    active_ids = db.get_active_ids(selected_class_id) if selected_class_id else db.get_active_ids()
     
     if selected_class_id:
         selected_class = db.get_class(selected_class_id)
@@ -1422,7 +1645,6 @@ async def grade_calculator(
                 einfach_list = sorted([c for c in comps if c["typ"] == "einfach"], 
                                      key=lambda k: (k.get("thema") or 999, k["id"]))
                 niveau_list = sorted([c for c in comps if c["typ"] == "niveau"], key=lambda k: k["id"])
-                active_ids = db.get_active_ids(selected_class_id)
             except FileNotFoundError:
                 pass
     
@@ -1455,10 +1677,34 @@ async def grade_calculator(
 async def calculate_grade_form(request: Request, user: dict = Depends(auth.require_user)):
     form = await request.form()
     basis = form.get("basis", "unterricht")
-    active_ids = _load_active_ids(user["access_token"])
+    class_id = form.get("class_id", "")
+    
+    # Determine class_id for students
+    if not user["is_teacher"]:
+        student_class = db.get_student_class(user["oid"])
+        if student_class:
+            class_id = student_class["id"]
+    
+    # Load class-specific competencies and active_ids
+    einfach_list = _EINFACH
+    niveau_list = _NIVEAU
+    active_ids = db.get_active_ids(class_id) if class_id else db.get_active_ids()
+    
+    if class_id:
+        selected_class = db.get_class(class_id)
+        if selected_class and selected_class.get("competency_list_id"):
+            try:
+                list_source = selected_class.get("list_source", "system")
+                comps, _ = _load_competency_list(selected_class["competency_list_id"], list_source)
+                einfach_list = [c for c in comps if c["typ"] == "einfach"]
+                niveau_list = [c for c in comps if c["typ"] == "niveau"]
+            except FileNotFoundError:
+                pass
+    
+    kompetenzen = einfach_list + niveau_list
 
     records = []
-    for k in _KOMPETENZEN:
+    for k in kompetenzen:
         cid = k["id"]
         if k["typ"] == "einfach":
             achieved = form.get(f"achieved_{cid}") in ("on", "1", "true")
@@ -1470,17 +1716,25 @@ async def calculate_grade_form(request: Request, user: dict = Depends(auth.requi
     if basis == "unterricht" and active_ids:
         proven_ids = {r["competency_id"] for r in records
                       if r.get("achieved") or r.get("niveau_level", 0) > 0}
-        comps = [k for k in _KOMPETENZEN if k["id"] in active_ids or k["id"] in proven_ids]
+        comps = [k for k in kompetenzen if k["id"] in active_ids or k["id"] in proven_ids]
     else:
-        comps = _KOMPETENZEN
+        comps = kompetenzen
 
     grade = calculate_grade(records, competencies=comps) if comps else None
     record_map = {r["competency_id"]: r for r in records}
+    
+    # For teachers: get classes list
+    classes = db.get_classes_with_counts() if user["is_teacher"] else []
+    
     return templates.TemplateResponse("grade_calculator.html", {
         "request": request, "user": user,
         "grade": grade, "record_map": record_map,
         "active_ids": active_ids, "basis": basis,
         "no_active_warning": basis == "unterricht" and not active_ids,
+        "classes": classes,
+        "selected_class_id": class_id,
+        "einfach_kompetenzen": einfach_list,
+        "niveau_kompetenzen": niveau_list,
     })
 
 
