@@ -22,15 +22,19 @@ cp _samples/vorlage-fragen.csv meine-klasse-10-fragen.csv
 
 | id | name | typ | thema | anmerkungen |
 |----|------|-----|-------|-------------|
-| 1001 | Die Grundbausteine eines Atoms benennen | einfach | 1 | |
-| 1002 | Atome im Schalenmodell darstellen | einfach | 1 | |
-| 1003 | Ionenformeln aufstellen | niveau | 2 | z.B. NaCl |
+| e.1001 | Die Grundbausteine eines Atoms benennen | einfach | 1 | |
+| e.1002 | Atome im Schalenmodell darstellen | einfach | 1 | |
+| n.1071 | Ionenformeln aufstellen | niveau | 2 | z.B. NaCl |
 
 **Wichtige Regeln:**
-- **ID-Bereich beachten:**
-  - Klasse 9: 901-999
-  - Klasse 10: 1001-1099
-  - Klasse 11: 1101-1199
+- **ID-Format mit Typ-Prefix:**
+  - Einfache Kompetenzen: `e.{nummer}` (z.B. `e.901`, `e.1001`)
+  - Niveau-Kompetenzen: `n.{nummer}` (z.B. `n.989`, `n.1071`)
+- **ID-Bereiche:**
+  - Klasse 9 einfach: e.901-e.988
+  - Klasse 9 niveau: n.989-n.1021
+  - Klasse 10 einfach: e.1001-e.1070
+  - Klasse 10 niveau: n.1071-n.1103
 - **Typ:** nur `einfach` oder `niveau`
 - **Speichern als:** CSV (Semikolon-getrennt, UTF-8)
 
@@ -40,13 +44,13 @@ cp _samples/vorlage-fragen.csv meine-klasse-10-fragen.csv
 
 | competency_id | frage |
 |---------------|-------|
-| 1001 | Nenne die drei Grundbausteine des Atoms |
-| 1001 | Wie ist die Ladung eines Protons? |
-| 1002 | Zeichne das Schalenmodell von Sauerstoff |
-| 1003 | Stelle die Formel von Natriumchlorid auf |
+| e.1001 | Nenne die drei Grundbausteine des Atoms |
+| e.1001 | Wie ist die Ladung eines Protons? |
+| e.1002 | Zeichne das Schalenmodell von Sauerstoff |
+| n.1071 | Stelle die Formel von Natriumchlorid auf |
 
 **Wichtig:**
-- `competency_id` muss zur `id` in der Kompetenzen-CSV passen
+- `competency_id` muss zur `id` in der Kompetenzen-CSV passen (inkl. Prefix!)
 - Mehrere Fragen pro Kompetenz möglich (einfach neue Zeile)
 
 ### 4. Konvertieren (JSON erstellen)
@@ -64,11 +68,11 @@ python convert_csv_to_json.py \
 ```
 📁 Lade Kompetenzen aus: meine-klasse-10.csv
    50 Kompetenzen gefunden
-✅ Kompetenzen gespeichert: kompetenzlisten/klasse-10-chemie-klasse-10.json
+✅ Kompetenzen gespeichert: kompetenzlisten/klasse-10-chemie.json
 
 📁 Lade Fragen aus: meine-klasse-10-fragen.csv
    120 Fragen gefunden
-✅ Fragen gespeichert: kompetenzlisten/klasse-10-chemie-klasse-10-questions.json
+✅ Fragen gespeichert: kompetenzlisten/klasse-10-chemie-questions.json
 ```
 
 ### 5. App neustarten
@@ -82,7 +86,7 @@ python convert_csv_to_json.py \
 
 1. Als Lehrer einloggen
 2. Klasse 10 auswählen
-3. Kompetenzliste "Chemie Klasse 10" zuweisen
+3. Kompetenzliste "Chemie Klasse 10" zuweisen (einfach + niveau separat)
 4. Test erstellen → Fragen sollten angezeigt werden
 
 ---
@@ -90,7 +94,7 @@ python convert_csv_to_json.py \
 ## Fehlerbehebung
 
 ### "ID außerhalb des Bereichs"
-→ IDs müssen im richtigen Bereich liegen (z.B. 1001-1099 für Klasse 10)
+→ IDs müssen im richtigen Bereich liegen (z.B. e.1001-e.1070 für Klasse 10 einfach)
 
 ### "Datei nicht gefunden"
 → Pfad prüfen, Datei muss im Projektordner oder mit vollem Pfad angegeben werden
@@ -100,32 +104,16 @@ python convert_csv_to_json.py \
 
 ---
 
-## Migration bestehender Daten
-
-Wenn du bereits eine `kompetenzen.json` hast:
-
-```bash
-# Alte IDs (1, 2, 3...) werden zu 901, 902, 903...
-python convert_csv_to_json.py \
-    --input-kompetenzen _samples/ibK_9_alle.csv \
-    --input-fragen _samples/2026-01-30_Testfragen.csv \
-    --name "Chemie Klasse 9" \
-    --grade 9 \
-    --id-offset 900
-```
-
----
-
 ## Dateistruktur
 
 ```
 kompetenzlisten/
-├── klasse-9-chemie-klasse-9.json              # Kompetenzen
-├── klasse-9-chemie-klasse-9-questions.json    # Fragen
-├── klasse-10-chemie-klasse-10.json
-└── klasse-10-chemie-klasse-10-questions.json
+├── klasse-9-chemie.json              # Kompetenzen
+├── klasse-9-chemie-questions.json    # Fragen
+├── klasse-10-chemie.json
+└── klasse-10-chemie-questions.json
 ```
 
 **Namenskonvention:**
-- `klasse-{STUFE}-{NAME}.json`
-- `klasse-{STUFE}-{NAME}-questions.json`
+- `{name}.json` (z.B. `klasse-10-chemie.json`)
+- `{name}-questions.json` (z.B. `klasse-10-chemie-questions.json`)
