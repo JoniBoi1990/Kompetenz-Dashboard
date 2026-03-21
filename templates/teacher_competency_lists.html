@@ -15,14 +15,15 @@
     {% if system_lists %}
     <table class="kompetenz-table" style="font-size:.9rem;">
       <thead>
-        <tr><th>Name</th><th>Stufe</th><th>Kompetenzen</th><th>System-Fragen</th></tr>
+        <tr><th>Name</th><th>Stufe</th><th>Einfach</th><th>Niveau</th><th>System-Fragen</th></tr>
       </thead>
       <tbody>
         {% for lst in system_lists %}
         <tr>
           <td>{{ lst.name }}</td>
           <td>Klasse {{ lst.grade_level }}</td>
-          <td>{{ lst.competency_count }}</td>
+          <td>{{ lst.einfach_count }}</td>
+          <td>{{ lst.niveau_count }}</td>
           <td>
             {% if lst.has_system_questions %}
               <span style="color:var(--green);">✓ Verfügbar</span>
@@ -49,12 +50,17 @@
     {% if teacher_lists %}
     <table class="kompetenz-table" style="font-size:.9rem;">
       <thead>
-        <tr><th>Name</th><th>Stufe</th><th>Kompetenzen</th><th>Fragen</th><th></th></tr>
+        <tr><th>Name</th><th>Typ</th><th>Stufe</th><th>Kompetenzen</th><th>Fragen</th><th></th></tr>
       </thead>
       <tbody>
         {% for lst in teacher_lists %}
         <tr>
-          <td>{{ lst.name }}</td>
+          <td>
+            <a href="/teacher/competency-lists/{{ lst.id }}/edit" style="font-weight:500;color:var(--blue);">
+              {{ lst.name }}
+            </a>
+          </td>
+          <td><span class="badge badge-{{ lst.typ }}">{{ lst.typ|capitalize }}</span></td>
           <td>Klasse {{ lst.grade_level }}</td>
           <td>{{ lst.competency_count }}</td>
           <td>
@@ -149,11 +155,11 @@
 <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
   <h2>Listen Klassen zuweisen</h2>
   <p class="muted" style="font-size:.85rem;margin-bottom:1rem;">
-    Wähle für jede Klasse die zu verwendende Kompetenzliste aus.
+    Wähle für jede Klasse separate Listen für einfache und Niveau-Kompetenzen aus.
   </p>
   
   {% if classes %}
-  {# Build a lookup dict for list names #}
+  {# Build lookup dict for all list names #}
   {% set list_names = {} %}
   {% for lst in system_lists %}
     {% set _ = list_names.update({lst.id: lst.name}) %}
@@ -162,42 +168,88 @@
     {% set _ = list_names.update({lst.id: lst.name}) %}
   {% endfor %}
   
+  {# Build lookup lists for list names by type #}
+  {% set einfach_lists = [] %}
+  {% set niveau_lists = [] %}
+  {% for lst in system_lists + teacher_lists %}
+    {% if lst.typ == 'einfach' or lst.typ == 'both' %}
+      {% set _ = einfach_lists.append(lst) %}
+    {% endif %}
+    {% if lst.typ == 'niveau' or lst.typ == 'both' %}
+      {% set _ = niveau_lists.append(lst) %}
+    {% endif %}
+  {% endfor %}
+  
   <table class="kompetenz-table">
     <thead>
-      <tr><th>Klasse</th><th>Aktuelle Liste</th><th>Neue Liste zuweisen</th></tr>
+      <tr>
+        <th>Klasse</th>
+        <th>Aktuelle Einfach-Liste</th>
+        <th>Aktuelle Niveau-Liste</th>
+        <th>Neue Listen zuweisen</th>
+      </tr>
     </thead>
     <tbody>
       {% for cls in classes %}
       <tr>
         <td><strong>{{ cls.displayName }}</strong><br><span class="muted" style="font-size:.8rem;">Klasse {{ cls.grade_level or '?' }}</span></td>
         <td>
-          {% if cls.competency_list_id %}
-            <strong>{{ list_names.get(cls.competency_list_id, cls.competency_list_id) }}</strong>
-            <span class="muted" style="font-size:.75rem;">({{ cls.list_source }})</span>
+          {% if cls.einfach_list_id %}
+            {% set einfach_name = list_names.get(cls.einfach_list_id, cls.einfach_list_id) %}
+            <strong>{{ einfach_name }}</strong><br>
+            <span class="muted" style="font-size:.75rem;">({{ cls.einfach_list_source }})</span>
           {% else %}
-            <span class="muted">Keine Liste zugewiesen</span>
+            <span class="muted">Keine</span>
           {% endif %}
         </td>
         <td>
-          <form method="post" action="/teacher/class/{{ cls.id }}/set-list" style="display:flex;gap:.5rem;">
-            <select name="list_id" required style="flex:1;padding:.35rem .5rem;">
-              <option value="">-- Liste wählen --</option>
-              <optgroup label="System-Listen">
-                {% for lst in system_lists %}
-                  {% if lst.grade_level == cls.grade_level %}
-                  <option value="{{ lst.id }}">{{ lst.name }}</option>
-                  {% endif %}
-                {% endfor %}
-              </optgroup>
-              <optgroup label="Eigene Listen">
-                {% for lst in teacher_lists %}
-                  {% if lst.grade_level == cls.grade_level %}
-                  <option value="{{ lst.id }}">{{ lst.name }}</option>
-                  {% endif %}
-                {% endfor %}
-              </optgroup>
-            </select>
-            <button type="submit" class="btn-primary" style="margin-top:0;">Zuweisen</button>
+          {% if cls.niveau_list_id %}
+            {% set niveau_name = list_names.get(cls.niveau_list_id, cls.niveau_list_id) %}
+            <strong>{{ niveau_name }}</strong><br>
+            <span class="muted" style="font-size:.75rem;">({{ cls.niveau_list_source }})</span>
+          {% else %}
+            <span class="muted">Keine</span>
+          {% endif %}
+        </td>
+        <td>
+          <form method="post" action="/teacher/class/{{ cls.id }}/set-lists">
+            <div style="display:flex;flex-direction:column;gap:.35rem;">
+              <select name="einfach_list_id" required style="padding:.35rem .5rem;font-size:.85rem;">
+                <option value="">-- Einfach-Liste --</option>
+                <optgroup label="System-Listen">
+                  {% for lst in system_lists %}
+                    {% if lst.grade_level == cls.grade_level %}
+                    <option value="{{ lst.id }}" {% if cls.einfach_list_id == lst.id %}selected{% endif %}>{{ lst.name }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </optgroup>
+                <optgroup label="Eigene Listen">
+                  {% for lst in teacher_lists %}
+                    {% if lst.typ == 'einfach' and lst.grade_level == cls.grade_level %}
+                    <option value="{{ lst.id }}" {% if cls.einfach_list_id == lst.id %}selected{% endif %}>{{ lst.name }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </optgroup>
+              </select>
+              <select name="niveau_list_id" required style="padding:.35rem .5rem;font-size:.85rem;">
+                <option value="">-- Niveau-Liste --</option>
+                <optgroup label="System-Listen">
+                  {% for lst in system_lists %}
+                    {% if lst.grade_level == cls.grade_level %}
+                    <option value="{{ lst.id }}" {% if cls.niveau_list_id == lst.id %}selected{% endif %}>{{ lst.name }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </optgroup>
+                <optgroup label="Eigene Listen">
+                  {% for lst in teacher_lists %}
+                    {% if lst.typ == 'niveau' and lst.grade_level == cls.grade_level %}
+                    <option value="{{ lst.id }}" {% if cls.niveau_list_id == lst.id %}selected{% endif %}>{{ lst.name }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </optgroup>
+              </select>
+              <button type="submit" class="btn-primary" style="margin-top:.25rem;">Zuweisen</button>
+            </div>
           </form>
         </td>
       </tr>

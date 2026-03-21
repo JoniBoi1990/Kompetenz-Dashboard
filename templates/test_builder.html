@@ -15,10 +15,10 @@
       <input type="text" name="title" id="title-input" value="Kompetenztest" required>
     </label>
     <label>Klasse
-      <select id="class-select" onchange="loadStudents()">
+      <select id="class-select" onchange="onClassChange(this.value)">
         <option value="">— Klasse wählen —</option>
         {% for g in groups %}
-        <option value="{{ g.id }}">{{ g.displayName }}</option>
+        <option value="{{ g.id }}" {% if g.id == selected_class_id %}selected{% endif %}>{{ g.displayName }}</option>
         {% endfor %}
       </select>
     </label>
@@ -85,6 +85,23 @@ function selectThema(thema, state) {
     .forEach(cb => { if (!cb.disabled) cb.checked = state; });
 }
 
+function onClassChange(classId) {
+  // Reload page with selected class to load correct competencies
+  if (classId) {
+    window.location.href = '/tests/builder?class_id=' + encodeURIComponent(classId);
+  } else {
+    window.location.href = '/tests/builder';
+  }
+}
+
+// Load students automatically when page loads (if class is pre-selected)
+document.addEventListener('DOMContentLoaded', function() {
+  const classId = document.getElementById('class-select').value;
+  if (classId) {
+    loadStudents();
+  }
+});
+
 async function loadStudents() {
   const classId = document.getElementById('class-select').value;
   const sel = document.getElementById('student-select');
@@ -100,15 +117,19 @@ async function loadStudents() {
     return;
   }
 
-  const students = await fetch('/api/class-students/' + classId).then(r => r.json());
-  sel.innerHTML = '<option value="">— Schüler/in wählen —</option>';
-  students.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = s.displayName;
-    sel.appendChild(opt);
-  });
-  sel.disabled = false;
+  try {
+    const students = await fetch('/api/class-students/' + classId).then(r => r.json());
+    sel.innerHTML = '<option value="">— Schüler/in wählen —</option>';
+    students.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.displayName;
+      sel.appendChild(opt);
+    });
+    sel.disabled = false;
+  } catch (e) {
+    sel.innerHTML = '<option value="">Fehler beim Laden</option>';
+  }
 }
 
 async function onStudentChange() {
@@ -130,15 +151,19 @@ async function onStudentChange() {
 
   hint.textContent = 'Lade Kompetenzen…';
   const data = await fetch('/api/student-competencies?student_id=' + studentId).then(r => r.json());
-  const proven = new Set(data.proven_einfach_ids);
+  const proven = new Set(data.proven_einfach_ids);  // String IDs: "e.901"
 
   document.querySelectorAll('input[name=competency_ids]').forEach(cb => {
-    const id = parseInt(cb.value);
+    const id = cb.value;  // String ID like "e.901"
     cb.checked = !proven.has(id) && (ACTIVE_IDS_T.size === 0 || ACTIVE_IDS_T.has(id));
   });
 
-  const selected = document.querySelectorAll('input[name=competency_ids]:checked').length;
-  hint.textContent = `${studentName}: ${proven.size} nachgewiesen, ${selected} fehlend und im Unterricht behandelt vorausgewählt.`;
+  // Zähle nur einfache Kompetenzen im Unterrichtsstand
+  const activeEinfach = Array.from(ACTIVE_IDS_T).filter(id => id.startsWith('e.'));
+  const provenInActive = activeEinfach.filter(id => proven.has(id)).length;
+  const fehlend = activeEinfach.length - provenInActive;
+  
+  hint.textContent = `${studentName}: ${provenInActive} von ${activeEinfach.length} einfachen Kompetenzen nachgewiesen, ${fehlend} fehlend im Unterrichtsstand.`;
 }
 
 function onManualName(value) {

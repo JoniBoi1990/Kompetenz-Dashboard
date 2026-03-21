@@ -33,7 +33,7 @@ def init_db() -> None:
         CREATE TABLE IF NOT EXISTS einfach_records (
             student_id    TEXT NOT NULL,
             student_name  TEXT NOT NULL DEFAULT '',
-            competency_id INTEGER NOT NULL,
+            competency_id TEXT NOT NULL,  -- Format: e.901, n.989 (Typ.Prefix+ID)
             achieved      INTEGER NOT NULL DEFAULT 0,
             updated_by    TEXT NOT NULL DEFAULT '',
             updated_at    TEXT NOT NULL DEFAULT '',
@@ -43,7 +43,7 @@ def init_db() -> None:
             id            TEXT PRIMARY KEY,
             student_id    TEXT NOT NULL,
             student_name  TEXT NOT NULL DEFAULT '',
-            competency_id INTEGER NOT NULL,
+            competency_id TEXT NOT NULL,  -- Format: e.901, n.989 (Typ.Prefix+ID)
             niveau_level  INTEGER NOT NULL DEFAULT 0,
             evidence_url  TEXT NOT NULL DEFAULT '',
             evidence_name TEXT NOT NULL DEFAULT '',
@@ -51,8 +51,9 @@ def init_db() -> None:
             updated_at    TEXT NOT NULL DEFAULT ''
         );
         CREATE TABLE IF NOT EXISTS active_ids (
-            competency_id INTEGER PRIMARY KEY,
-            class_id TEXT  -- NULL = global (für Abwärtskompatibilität)
+            competency_id TEXT NOT NULL,  -- Format: e.901, n.989 (Typ.Prefix+ID)
+            class_id TEXT,  -- NULL = global (für Abwärtskompatibilität)
+            PRIMARY KEY (competency_id, class_id)
         );
         CREATE INDEX IF NOT EXISTS idx_active_ids_class ON active_ids(class_id);
         CREATE TABLE IF NOT EXISTS test_requests (
@@ -73,8 +74,12 @@ def init_db() -> None:
             name        TEXT NOT NULL,
             description TEXT NOT NULL DEFAULT '',
             grade_level INTEGER,
-            competency_list_id TEXT,
-            list_source TEXT DEFAULT 'system'
+            competency_list_id TEXT,  -- Legacy: wird durch einfach/niveau ersetzt
+            list_source TEXT DEFAULT 'system',  -- Legacy
+            einfach_list_id TEXT,
+            einfach_list_source TEXT DEFAULT 'system',
+            niveau_list_id TEXT,
+            niveau_list_source TEXT DEFAULT 'system'
         );
         CREATE TABLE IF NOT EXISTS class_members (
             class_id     TEXT NOT NULL,
@@ -89,6 +94,7 @@ def init_db() -> None:
             grade_level   INTEGER NOT NULL,
             uploaded_by   TEXT NOT NULL,
             uploaded_at   TEXT NOT NULL,
+            typ           TEXT NOT NULL DEFAULT 'einfach',  -- 'einfach' oder 'niveau'
             data          TEXT NOT NULL,  -- JSON mit competencies
             questions     TEXT DEFAULT '{}'  -- JSON mit questions
         );
@@ -99,17 +105,184 @@ def init_db() -> None:
             con.execute("SELECT questions FROM teacher_lists LIMIT 1")
         except sqlite3.OperationalError:
             con.execute("ALTER TABLE teacher_lists ADD COLUMN questions TEXT DEFAULT '{}' ")
+        
+        # Migration: Fix active_ids primary key to support composite key (competency_id, class_id)
+        try:
+            # Check if table exists and has old schema (competency_id as sole PRIMARY KEY)
+            rows = con.execute("SELECT name, pk FROM pragma_table_info('active_ids')").fetchall()
+            col_map = {name: pk for name, pk in rows}
+            # Old schema: competency_id has pk=1, class_id has pk=0 or doesn't exist
+            # New schema: competency_id has pk=1, class_id has pk=2 (part of composite PK)
+            if col_map.get('competency_id') == 1 and col_map.get('class_id', 1) == 0:
+                # Old schema detected: recreate table with composite primary key
+                con.execute("ALTER TABLE active_ids RENAME TO active_ids_old")
+                con.execute("""
+                    CREATE TABLE active_ids (
+                        competency_id INTEGER NOT NULL,
+                        class_id TEXT,
+                        PRIMARY KEY (competency_id, class_id)
+                    )
+                """)
+                con.execute("INSERT OR IGNORE INTO active_ids SELECT * FROM active_ids_old")
+                con.execute("DROP TABLE active_ids_old")
+        except sqlite3.OperationalError:
+            pass  # Table might not exist yet
+        
+        # Migration: Add typ column to teacher_lists if missing
+        try:
+            con.execute("SELECT typ FROM teacher_lists LIMIT 1")
+        except sqlite3.OperationalError:
+            con.execute("ALTER TABLE teacher_lists ADD COLUMN typ TEXT NOT NULL DEFAULT 'einfach'")
+        
+        # Migration: Add einfach/niveau list columns to classes if missing
+        try:
+            con.execute("SELECT einfach_list_id FROM classes LIMIT 1")
+        except sqlite3.OperationalError:
+            con.execute("ALTER TABLE classes ADD COLUMN einfach_list_id TEXT")
+            con.execute("ALTER TABLE classes ADD COLUMN einfach_list_source TEXT DEFAULT 'system'")
+            con.execute("ALTER TABLE classes ADD COLUMN niveau_list_id TEXT")
+            con.execute("ALTER TABLE classes ADD COLUMN niveau_list_source TEXT DEFAULT 'system'")
+            
+            # Migrate existing data: copy competency_list_id to both einfach and niveau
+            con.execute("""
+                UPDATE classes SET 
+                    einfach_list_id = competency_list_id,
+                    einfach_list_source = list_source,
+                    niveau_list_id = competency_list_id,
+                    niveau_list_source = list_source
+                WHERE competency_list_id IS NOT NULL
+            """)
+        except sqlite3.OperationalError:
+            pass  # Table might not exist yet
+        
+        # Migration: Convert competency_id from INTEGER to TEXT with prefix
+        # This requires recreating tables due to SQLite limitations
+        _migrate_competency_ids_to_text(con)
+
+
+def _migrate_competency_ids_to_text(con) -> None:
+    """Migrate competency_id columns from INTEGER to TEXT with type prefix.
+    Format: e.{id} for einfach, n.{id} for niveau.
+    """
+    import json
+    
+    # Helper to convert old numeric ID to new format
+    def convert_id(old_id: int, is_niveau: bool = False) -> str:
+        prefix = 'n' if is_niveau else 'e'
+        return f"{prefix}.{old_id}"
+    
+    # Helper to determine if ID is niveau based on numeric value
+    def is_niveau_id(old_id: int) -> bool:
+        # Klasse 9 niveau: 989-1021
+        # Klasse 10 niveau: 1071-1103
+        if 989 <= old_id <= 1021:
+            return True
+        if 1071 <= old_id <= 1103:
+            return True
+        return False
+    
+    # 1. Migrate active_ids
+    try:
+        test_row = con.execute("SELECT competency_id FROM active_ids LIMIT 1").fetchone()
+        if test_row and isinstance(test_row[0], int):
+            con.execute("ALTER TABLE active_ids RENAME TO active_ids_old")
+            con.execute("""
+                CREATE TABLE active_ids (
+                    competency_id TEXT NOT NULL,
+                    class_id TEXT,
+                    PRIMARY KEY (competency_id, class_id)
+                )
+            """)
+            rows = con.execute("SELECT competency_id, class_id FROM active_ids_old").fetchall()
+            for row in rows:
+                old_id = row[0]
+                class_id = row[1]
+                new_id = convert_id(old_id, is_niveau_id(old_id))
+                con.execute(
+                    "INSERT INTO active_ids (competency_id, class_id) VALUES (?, ?)",
+                    (new_id, class_id)
+                )
+            con.execute("DROP TABLE active_ids_old")
+    except Exception:
+        pass
+    
+    # 2. Migrate einfach_records (always einfach type)
+    try:
+        test_row = con.execute("SELECT competency_id FROM einfach_records LIMIT 1").fetchone()
+        if test_row and isinstance(test_row[0], int):
+            con.execute("ALTER TABLE einfach_records RENAME TO einfach_records_old")
+            con.execute("""
+                CREATE TABLE einfach_records (
+                    student_id TEXT NOT NULL,
+                    student_name TEXT NOT NULL DEFAULT '',
+                    competency_id TEXT NOT NULL,
+                    achieved INTEGER NOT NULL DEFAULT 0,
+                    updated_by TEXT NOT NULL DEFAULT '',
+                    updated_at TEXT NOT NULL DEFAULT '',
+                    PRIMARY KEY (student_id, competency_id)
+                )
+            """)
+            rows = con.execute("SELECT * FROM einfach_records_old").fetchall()
+            for row in rows:
+                old_id = row["competency_id"]
+                new_id = convert_id(old_id, False)  # Always einfach
+                con.execute(
+                    """INSERT INTO einfach_records 
+                       (student_id, student_name, competency_id, achieved, updated_by, updated_at)
+                       VALUES (?, ?, ?, ?, ?, ?)""",
+                    (row["student_id"], row["student_name"], new_id, 
+                     row["achieved"], row["updated_by"], row["updated_at"])
+                )
+            con.execute("DROP TABLE einfach_records_old")
+    except Exception:
+        pass
+    
+    # 3. Migrate nachweise (always niveau type)
+    try:
+        test_row = con.execute("SELECT competency_id FROM nachweise LIMIT 1").fetchone()
+        if test_row and isinstance(test_row[0], int):
+            con.execute("ALTER TABLE nachweise RENAME TO nachweise_old")
+            con.execute("""
+                CREATE TABLE nachweise (
+                    id TEXT PRIMARY KEY,
+                    student_id TEXT NOT NULL,
+                    student_name TEXT NOT NULL DEFAULT '',
+                    competency_id TEXT NOT NULL,
+                    niveau_level INTEGER NOT NULL DEFAULT 0,
+                    evidence_url TEXT NOT NULL DEFAULT '',
+                    evidence_name TEXT NOT NULL DEFAULT '',
+                    updated_by TEXT NOT NULL DEFAULT '',
+                    updated_at TEXT NOT NULL DEFAULT ''
+                )
+            """)
+            rows = con.execute("SELECT * FROM nachweise_old").fetchall()
+            for row in rows:
+                old_id = row["competency_id"]
+                new_id = convert_id(old_id, True)  # Always niveau
+                con.execute(
+                    """INSERT INTO nachweise 
+                       (id, student_id, student_name, competency_id, niveau_level,
+                        evidence_url, evidence_name, updated_by, updated_at)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (row["id"], row["student_id"], row["student_name"], new_id,
+                     row["niveau_level"], row["evidence_url"], row["evidence_name"],
+                     row["updated_by"], row["updated_at"])
+                )
+            con.execute("DROP TABLE nachweise_old")
+    except Exception:
+        pass
 
 
 # ---------------------------------------------------------------------------
 # Active competency IDs (Unterrichtsstand)
 # ---------------------------------------------------------------------------
 
-def get_active_ids(class_id: str | None = None) -> set[int]:
+def get_active_ids(class_id: str | None = None) -> set[str]:
     """Get active competency IDs. If class_id provided, returns class-specific IDs,
-    otherwise returns global active IDs (where class_id IS NULL)."""
+    otherwise returns global active IDs (where class_id IS NULL).
+    IDs are now strings with format: e.{number} or n.{number}"""
     with _conn() as con:
-        if class_id:
+        if class_id is not None:
             rows = con.execute(
                 "SELECT competency_id FROM active_ids WHERE class_id = ?",
                 (class_id,)
@@ -122,10 +295,11 @@ def get_active_ids(class_id: str | None = None) -> set[int]:
     return {row[0] for row in rows}
 
 
-def set_active_ids(ids: set[int], class_id: str | None = None) -> None:
-    """Set active competency IDs. If class_id provided, sets class-specific IDs."""
+def set_active_ids(ids: set[str], class_id: str | None = None) -> None:
+    """Set active competency IDs. If class_id provided, sets class-specific IDs.
+    IDs are now strings with format: e.{number} or n.{number}"""
     with _conn() as con:
-        if class_id:
+        if class_id is not None:
             con.execute("DELETE FROM active_ids WHERE class_id = ?", (class_id,))
             con.executemany(
                 "INSERT INTO active_ids(competency_id, class_id) VALUES(?, ?)",
@@ -144,7 +318,9 @@ def set_active_ids(ids: set[int], class_id: str | None = None) -> None:
 # Einfach records
 # ---------------------------------------------------------------------------
 
-def get_einfach_records(student_id: str) -> dict[int, dict]:
+def get_einfach_records(student_id: str) -> dict[str, dict]:
+    """Get einfach records for a student. Returns dict with competency_id as key.
+    competency_id is now a string (e.901, n.989)."""
     with _conn() as con:
         rows = con.execute(
             "SELECT * FROM einfach_records WHERE student_id = ?", (student_id,)
@@ -155,7 +331,7 @@ def get_einfach_records(student_id: str) -> dict[int, dict]:
 def upsert_einfach(
     student_id: str,
     student_name: str,
-    competency_id: int,
+    competency_id: str,  # Format: e.901, n.989
     achieved: bool,
     updated_by: str,
 ) -> None:
@@ -178,7 +354,7 @@ def upsert_einfach(
 # Nachweise (niveau evidence)
 # ---------------------------------------------------------------------------
 
-def get_nachweise(student_id: str, competency_id: int | None = None) -> list[dict]:
+def get_nachweise(student_id: str, competency_id: str | None = None) -> list[dict]:
     with _conn() as con:
         if competency_id is not None:
             rows = con.execute(
@@ -193,15 +369,15 @@ def get_nachweise(student_id: str, competency_id: int | None = None) -> list[dic
             ).fetchall()
     result = [dict(row) for row in rows]
     for r in result:
-        r["competency_id"] = int(r["competency_id"])
-        r["niveau_level"]  = int(r["niveau_level"])
+        # competency_id is now a string (e.901, n.989)
+        r["niveau_level"] = int(r["niveau_level"])
     return result
 
 
 def add_nachweis(
     student_id: str,
     student_name: str,
-    competency_id: int,
+    competency_id: str,  # Format: e.901, n.989
     niveau_level: int,
     evidence_url: str,
     evidence_name: str,
@@ -293,6 +469,8 @@ def get_classes_with_counts() -> list[dict]:
         rows = con.execute(
             """SELECT c.id, c.name, c.description, c.grade_level, 
                       c.competency_list_id, c.list_source,
+                      c.einfach_list_id, c.einfach_list_source,
+                      c.niveau_list_id, c.niveau_list_source,
                       COUNT(m.student_id) AS member_count
                FROM classes c
                LEFT JOIN class_members m ON c.id = m.class_id
@@ -307,6 +485,10 @@ def get_classes_with_counts() -> list[dict]:
             "grade_level": r["grade_level"],
             "competency_list_id": r["competency_list_id"],
             "list_source": r["list_source"],
+            "einfach_list_id": r["einfach_list_id"],
+            "einfach_list_source": r["einfach_list_source"],
+            "niveau_list_id": r["niveau_list_id"],
+            "niveau_list_source": r["niveau_list_source"],
             "member_count": r["member_count"],
         }
         for r in rows
@@ -330,6 +512,10 @@ def get_class(class_id: str) -> dict | None:
         "grade_level": row["grade_level"],
         "competency_list_id": row["competency_list_id"],
         "list_source": row["list_source"],
+        "einfach_list_id": row["einfach_list_id"],
+        "einfach_list_source": row["einfach_list_source"],
+        "niveau_list_id": row["niveau_list_id"],
+        "niveau_list_source": row["niveau_list_source"],
     }
 
 
@@ -352,15 +538,41 @@ def get_student_class(student_id: str) -> dict | None:
         "grade_level": row["grade_level"],
         "competency_list_id": row["competency_list_id"],
         "list_source": row["list_source"],
+        "einfach_list_id": row["einfach_list_id"],
+        "einfach_list_source": row["einfach_list_source"],
+        "niveau_list_id": row["niveau_list_id"],
+        "niveau_list_source": row["niveau_list_source"],
     }
 
 
 def set_class_competency_list(class_id: str, list_id: str, list_source: str = "system") -> None:
-    """Set the competency list for a class."""
+    """Set the competency list for a class (legacy - sets both einfach and niveau)."""
     with _conn() as con:
         con.execute(
-            "UPDATE classes SET competency_list_id = ?, list_source = ? WHERE id = ?",
-            (list_id, list_source, class_id)
+            """UPDATE classes SET 
+                competency_list_id = ?, list_source = ?,
+                einfach_list_id = ?, einfach_list_source = ?,
+                niveau_list_id = ?, niveau_list_source = ?
+               WHERE id = ?""",
+            (list_id, list_source, list_id, list_source, list_id, list_source, class_id)
+        )
+
+
+def set_class_competency_lists(
+    class_id: str,
+    einfach_list_id: str | None = None,
+    einfach_list_source: str = "system",
+    niveau_list_id: str | None = None,
+    niveau_list_source: str = "system",
+) -> None:
+    """Set separate einfach and niveau competency lists for a class."""
+    with _conn() as con:
+        con.execute(
+            """UPDATE classes SET 
+                einfach_list_id = ?, einfach_list_source = ?,
+                niveau_list_id = ?, niveau_list_source = ?
+               WHERE id = ?""",
+            (einfach_list_id, einfach_list_source, niveau_list_id, niveau_list_source, class_id)
         )
 
 
@@ -370,15 +582,29 @@ def add_class(
     class_id: str | None = None,
     grade_level: int | None = None,
     competency_list_id: str | None = None,
-    list_source: str = "system"
+    list_source: str = "system",
+    einfach_list_id: str | None = None,
+    einfach_list_source: str = "system",
+    niveau_list_id: str | None = None,
+    niveau_list_source: str = "system",
 ) -> str:
     cid = class_id or str(uuid.uuid4())
+    # Use competency_list_id as fallback for new fields
+    el_id = einfach_list_id or competency_list_id
+    nl_id = niveau_list_id or competency_list_id
+    el_src = einfach_list_source or list_source
+    nl_src = niveau_list_source or list_source
+    
     with _conn() as con:
         con.execute(
             """INSERT OR IGNORE INTO classes(id, name, description, grade_level, 
-                                             competency_list_id, list_source) 
-                VALUES(?, ?, ?, ?, ?, ?)""",
-            (cid, name.strip(), description.strip(), grade_level, competency_list_id, list_source),
+                                             competency_list_id, list_source,
+                                             einfach_list_id, einfach_list_source,
+                                             niveau_list_id, niveau_list_source) 
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (cid, name.strip(), description.strip(), grade_level, 
+             competency_list_id, list_source,
+             el_id, el_src, nl_id, nl_src),
         )
     return cid
 
@@ -476,6 +702,7 @@ def save_teacher_list(
     uploaded_by: str,
     data: dict,
     questions: dict | None = None,
+    typ: str = "einfach",
 ) -> None:
     """Save a teacher-uploaded competency list."""
     import json
@@ -483,9 +710,9 @@ def save_teacher_list(
     with _conn() as con:
         con.execute(
             """INSERT OR REPLACE INTO teacher_lists
-               (id, name, grade_level, uploaded_by, uploaded_at, data, questions)
-               VALUES(?, ?, ?, ?, ?, ?, ?)""",
-            (list_id, name.strip(), grade_level, uploaded_by, now, 
+               (id, name, grade_level, uploaded_by, uploaded_at, typ, data, questions)
+               VALUES(?, ?, ?, ?, ?, ?, ?, ?)""",
+            (list_id, name.strip(), grade_level, uploaded_by, now, typ,
              json.dumps(data), json.dumps(questions or {})),
         )
 
@@ -514,6 +741,7 @@ def get_teacher_lists(uploaded_by: str | None = None) -> list[dict]:
             "grade_level": row["grade_level"],
             "uploaded_by": row["uploaded_by"],
             "uploaded_at": row["uploaded_at"],
+            "typ": row["typ"],
             "competency_count": len(data.get("competencies", [])),
             "question_count": sum(len(v) for v in questions.values()),
             "data": data,
@@ -542,6 +770,7 @@ def get_teacher_list(list_id: str) -> dict | None:
         "grade_level": row["grade_level"],
         "uploaded_by": row["uploaded_by"],
         "uploaded_at": row["uploaded_at"],
+        "typ": row["typ"],
         "competency_count": len(data.get("competencies", [])),
         "question_count": sum(len(v) for v in questions.values()),
         "data": data,
