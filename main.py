@@ -1008,6 +1008,7 @@ async def teacher_competency_lists_upload_questions(
         uploaded_by=user["upn"],
         data=teacher_list["data"],
         questions=questions,
+        typ=teacher_list.get("typ", "einfach"),
     )
     
     return RedirectResponse("/teacher/competency-lists", status_code=302)
@@ -1049,6 +1050,7 @@ async def teacher_competency_lists_use_system_questions(
         uploaded_by=user["upn"],
         data=teacher_list["data"],
         questions=questions,
+        typ=teacher_list.get("typ", "einfach"),
     )
     
     return RedirectResponse("/teacher/competency-lists", status_code=302)
