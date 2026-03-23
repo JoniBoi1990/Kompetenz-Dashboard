@@ -907,15 +907,33 @@ def _parse_csv_competencies(content: bytes, typ: str, grade_level: int) -> list[
     return competencies
 
 
-def _parse_csv_questions(content: bytes) -> dict:
-    """Parse questions CSV format: competency_id;frage"""
+def _parse_questions(content: bytes) -> dict:
+    """Parse questions from CSV or JSON format.
+    
+    CSV format: competency_id;frage
+    JSON format: {"e.901": ["Frage 1", "Frage 2"], ...}
+    """
     import csv
     import io
+    import json
     
-    text = content.decode('utf-8-sig')
+    text = content.decode('utf-8-sig').strip()
+    
+    # Try JSON first (starts with { or [)
+    if text.startswith('{') or text.startswith('['):
+        try:
+            data = json.loads(text)
+            # JSON format: dict with competency_id -> list of questions
+            if isinstance(data, dict):
+                return {k: v if isinstance(v, list) else [v] for k, v in data.items()}
+            return {}
+        except json.JSONDecodeError:
+            pass  # Fall back to CSV parsing
+    
+    # CSV format: competency_id;frage
+    questions = {}
     reader = csv.DictReader(io.StringIO(text), delimiter=';')
     
-    questions = {}
     for row in reader:
         comp_id = row.get('competency_id', '').strip()
         frage = row.get('frage', '').strip()
@@ -967,7 +985,7 @@ async def teacher_competency_lists_upload(
         print(f"DEBUG UPLOAD: questions_content length={len(questions_content)}", flush=True)
         if questions_content and len(questions_content) > 0:
             try:
-                questions = _parse_csv_questions(questions_content)
+                questions = _parse_questions(questions_content)
                 print(f"DEBUG UPLOAD: Parsed {len(questions)} question entries", flush=True)
             except Exception as e:
                 print(f"DEBUG UPLOAD: Parse error: {e}", flush=True)
@@ -1015,7 +1033,7 @@ async def teacher_competency_lists_upload_questions(
     questions_content = await questions_file.read()
     logger.error(f"DEBUG: questions_content length = {len(questions_content) if questions_content else 0}")
     try:
-        questions = _parse_csv_questions(questions_content)
+        questions = _parse_questions(questions_content)
         logger.error(f"DEBUG: Parsed {len(questions)} question entries")
     except Exception as e:
         logger.error(f"DEBUG: Parse error: {e}")
@@ -1059,7 +1077,7 @@ async def teacher_competency_lists_use_system_questions(
         if questions_csv.exists():
             try:
                 content = questions_csv.read_bytes()
-                questions = _parse_csv_questions(content)
+                questions = _parse_questions(content)
             except Exception:
                 pass
     
