@@ -137,6 +137,16 @@ def clear_session(response) -> None:
     response.delete_cookie(_COOKIE_NAME)
 
 
+def get_logout_url(redirect_uri: str) -> str:
+    """Build Microsoft logout URL to end Azure AD session."""
+    if settings.DEV_MODE or not settings.AZURE_TENANT_ID:
+        return "/login"
+    return (
+        f"{AUTHORITY}/oauth2/v2.0/logout"
+        f"?post_logout_redirect_uri={redirect_uri}"
+    )
+
+
 def get_session(request: Request) -> dict | None:
     cookie = request.cookies.get(_COOKIE_NAME)
     if not cookie:
