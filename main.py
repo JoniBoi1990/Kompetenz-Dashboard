@@ -957,12 +957,13 @@ async def teacher_competency_lists_upload(
     
     # Load questions if provided
     questions = {}
-    if questions_file and questions_file.filename:
+    if questions_file and questions_file.filename and len(questions_file.filename) > 0:
         questions_content = await questions_file.read()
-        try:
-            questions = _parse_csv_questions(questions_content)
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Fehler beim Parsen der Fragen-CSV: {e}")
+        if questions_content and len(questions_content) > 0:
+            try:
+                questions = _parse_csv_questions(questions_content)
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f"Fehler beim Parsen der Fragen-CSV: {e}")
     
     # Generate ID
     list_id = f"teacher-{user['upn'].replace('@', '-').replace('.', '-')}-{grade_level}-{int(datetime.now().timestamp())}"
