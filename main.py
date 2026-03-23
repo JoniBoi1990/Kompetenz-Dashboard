@@ -322,7 +322,7 @@ def _save_test_request(req: dict) -> None:
     db.save_test_request(req)
 
 
-def _create_preview(student_name: str, title: str, competency_ids: list[int],
+def _create_preview(student_name: str, title: str, competency_ids: list,
                     request_id: str | None = None, class_id: str | None = None) -> str:
     # Load questions from class-specific list if available
     questions_dict = _QUESTIONS.copy()
@@ -331,11 +331,20 @@ def _create_preview(student_name: str, title: str, competency_ids: list[int],
         if cls:
             einfach_list_id = cls.get("einfach_list_id") or cls.get("competency_list_id")
             einfach_list_source = cls.get("einfach_list_source") or cls.get("list_source", "system")
-            if einfach_list_id and einfach_list_source == "teacher":
-                # Load questions from teacher list
-                teacher_list = db.get_teacher_list(einfach_list_id)
-                if teacher_list and teacher_list.get("questions"):
-                    questions_dict = teacher_list["questions"]
+            if einfach_list_id:
+                if einfach_list_source == "teacher":
+                    # Load questions from teacher list
+                    teacher_list = db.get_teacher_list(einfach_list_id)
+                    if teacher_list and teacher_list.get("questions"):
+                        questions_dict = teacher_list["questions"]
+                else:
+                    # Load questions from system list (JSON file)
+                    try:
+                        _, system_questions = _load_competency_list(einfach_list_id, "system")
+                        if system_questions:
+                            questions_dict = system_questions
+                    except FileNotFoundError:
+                        pass
     
     questions = []
     for cid in competency_ids:
