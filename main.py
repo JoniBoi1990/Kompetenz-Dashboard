@@ -988,16 +988,27 @@ async def teacher_competency_lists_upload_questions(
     questions_file: UploadFile = File(...),
     user: dict = Depends(auth.require_teacher_user),
 ):
+    import logging
+    logger = logging.getLogger(__name__)
+    
     # Get existing list
     teacher_list = db.get_teacher_list(list_id)
     if not teacher_list or teacher_list["uploaded_by"] != user["upn"]:
         raise HTTPException(status_code=403, detail="Nicht berechtigt")
     
+    # Debug logging
+    logger.error(f"DEBUG: Upload questions for list {list_id}")
+    logger.error(f"DEBUG: questions_file = {questions_file}")
+    logger.error(f"DEBUG: questions_file.filename = {questions_file.filename if questions_file else 'None'}")
+    
     # Parse questions CSV
     questions_content = await questions_file.read()
+    logger.error(f"DEBUG: questions_content length = {len(questions_content) if questions_content else 0}")
     try:
         questions = _parse_csv_questions(questions_content)
+        logger.error(f"DEBUG: Parsed {len(questions)} question entries")
     except Exception as e:
+        logger.error(f"DEBUG: Parse error: {e}")
         raise HTTPException(status_code=400, detail=f"Fehler beim Parsen der CSV: {e}")
     
     # Update list with questions
