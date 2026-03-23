@@ -1673,6 +1673,7 @@ async def pending_tests(request: Request, user: dict = Depends(auth.require_teac
     pending.sort(key=lambda r: r["created_at"])
     return templates.TemplateResponse("pending_tests.html", {
         "request": request, "user": user, "pending": pending,
+        "einfach_kompetenzen": _EINFACH,
     })
 
 
@@ -1689,7 +1690,12 @@ async def confirm_test(req_id: str, request: Request, user: dict = Depends(auth.
     if not selected_ids:
         raise HTTPException(status_code=400, detail="Keine Kompetenzen ausgewählt")
 
-    pid = _create_preview(req["student_name"], req["title"], selected_ids, request_id=req_id)
+    # Find student's class to load correct competencies/questions
+    student_id = req.get("student_id", "")
+    student_class = db.get_student_class(student_id)
+    class_id = student_class.get("id") if student_class else None
+
+    pid = _create_preview(req["student_name"], req["title"], selected_ids, request_id=req_id, class_id=class_id)
     return RedirectResponse(f"/tests/preview/{pid}", status_code=303)
 
 
