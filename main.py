@@ -1671,9 +1671,42 @@ async def pending_tests(request: Request, user: dict = Depends(auth.require_teac
     """Teacher views and confirms pending student test requests."""
     pending = [r for r in _get_test_requests().values() if r["status"] == "pending"]
     pending.sort(key=lambda r: r["created_at"])
+    
+    # Build competency map from all pending requests
+    all_comp_ids = set()
+    for req in pending:
+        all_comp_ids.update(req.get("competency_ids", []))
+    
+    # Load competencies for each request's class
+    comp_map = {}
+    for req in pending:
+        student_id = req.get("student_id", "")
+        student_class = db.get_student_class(student_id)
+        if student_class:
+            einfach_list_id = student_class.get("einfach_list_id") or student_class.get("competency_list_id")
+            einfach_list_source = student_class.get("einfach_list_source") or student_class.get("list_source", "system")
+            try:
+                if einfach_list_source == "teacher":
+                    teacher_list = db.get_teacher_list(einfach_list_id)
+                    if teacher_list:
+                        data = teacher_list.get("data", {})
+                        for c in data.get("competencies", []):
+                            if c.get("typ") == "einfach":
+                                comp_map[c["id"]] = c
+                else:
+                    comps, _ = _load_competency_list(einfach_list_id, "system")
+                    for c in comps:
+                        if c.get("typ") == "einfach":
+                            comp_map[c["id"]] = c
+            except FileNotFoundError:
+                pass
+    
+    # Fallback to _KOMPETENZ_MAP for any missing competencies
+    comp_map.update(_KOMPETENZ_MAP)
+    
     return templates.TemplateResponse("pending_tests.html", {
         "request": request, "user": user, "pending": pending,
-        "einfach_kompetenzen": _EINFACH,
+        "comp_map": comp_map,
     })
 
 
