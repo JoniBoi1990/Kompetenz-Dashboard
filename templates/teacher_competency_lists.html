@@ -73,7 +73,7 @@
               <summary style="font-size:.75rem;cursor:pointer;color:var(--blue);">Fragen verwalten</summary>
               <div style="position:absolute;background:#fff;border:1px solid var(--border);border-radius:4px;padding:.75rem;box-shadow:0 2px 8px rgba(0,0,0,.1);z-index:10;min-width:250px;">
                 <form method="post" action="/teacher/competency-lists/{{ lst.id }}/upload-questions" enctype="multipart/form-data" style="margin-bottom:.75rem;">
-                  <label style="font-size:.8rem;display:block;margin-bottom:.25rem;">Fragen hochladen (CSV):</label>
+                  <label style="font-size:.8rem;display:block;margin-bottom:.25rem;">Fragen hochladen (CSV oder JSON):</label>
                   <input type="file" name="questions_file" accept=".csv" required style="font-size:.8rem;width:100%;margin-bottom:.5rem;">
                   <button type="submit" class="btn-sm" style="width:100%;">Hochladen</button>
                 </form>
@@ -142,7 +142,7 @@
         <strong>Formate:</strong><br>
         Einfach: <code>ID;Kompetenz;Thema;Anmerkungen</code><br>
         Niveau: <code>ID;Nummer;pbk;Möglichkeit1;Möglichkeit2;Möglichkeit3;Hinweise</code><br>
-        Fragen: <code>competency_id;frage</code> (eine Frage pro Zeile)
+        CSV-Fragen: <code>competency_id;frage</code> (eine Frage pro Zeile)<br>JSON-Fragen: <code>{"e.901": ["Frage 1", "Frage 2"]}</code>
       </p>
     </div>
   </div>
