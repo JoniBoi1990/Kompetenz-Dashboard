@@ -937,6 +937,10 @@ async def teacher_competency_lists_upload(
     questions_file: UploadFile = File(None),
     user: dict = Depends(auth.require_teacher_user),
 ):
+    print(f"DEBUG UPLOAD: name={name}, typ={typ}, grade_level={grade_level}", flush=True)
+    print(f"DEBUG UPLOAD: questions_file={questions_file}", flush=True)
+    print(f"DEBUG UPLOAD: questions_file.filename={questions_file.filename if questions_file else 'None'}", flush=True)
+    
     # Validate typ
     if typ not in ("einfach", "niveau"):
         raise HTTPException(status_code=400, detail="Typ muss 'einfach' oder 'niveau' sein")
@@ -958,12 +962,18 @@ async def teacher_competency_lists_upload(
     # Load questions if provided
     questions = {}
     if questions_file and questions_file.filename and len(questions_file.filename) > 0:
+        print(f"DEBUG UPLOAD: Reading questions_file...", flush=True)
         questions_content = await questions_file.read()
+        print(f"DEBUG UPLOAD: questions_content length={len(questions_content)}", flush=True)
         if questions_content and len(questions_content) > 0:
             try:
                 questions = _parse_csv_questions(questions_content)
+                print(f"DEBUG UPLOAD: Parsed {len(questions)} question entries", flush=True)
             except Exception as e:
+                print(f"DEBUG UPLOAD: Parse error: {e}", flush=True)
                 raise HTTPException(status_code=400, detail=f"Fehler beim Parsen der Fragen-CSV: {e}")
+    else:
+        print(f"DEBUG UPLOAD: No questions file provided", flush=True)
     
     # Generate ID
     list_id = f"teacher-{user['upn'].replace('@', '-').replace('.', '-')}-{grade_level}-{int(datetime.now().timestamp())}"
