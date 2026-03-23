@@ -908,10 +908,12 @@ def _parse_csv_competencies(content: bytes, typ: str, grade_level: int) -> list[
 
 
 def _parse_questions(content: bytes) -> dict:
-    """Parse questions from CSV or JSON format.
+    """Parse questions from various CSV formats or JSON.
     
-    CSV format: competency_id;frage
-    JSON format: {"e.901": ["Frage 1", "Frage 2"], ...}
+    Supported formats:
+    1. JSON: {"e.901": ["Frage 1", "Frage 2"]}
+    2. CSV (row-based): competency_id;frage\ne.901;Frage 1
+    3. CSV (column-based): 1;2;3...\nFrage1;Frage2;Frage3... (questions per competency in columns)
     """
     import csv
     import io
@@ -923,24 +925,53 @@ def _parse_questions(content: bytes) -> dict:
     if text.startswith('{') or text.startswith('['):
         try:
             data = json.loads(text)
-            # JSON format: dict with competency_id -> list of questions
             if isinstance(data, dict):
                 return {k: v if isinstance(v, list) else [v] for k, v in data.items()}
             return {}
         except json.JSONDecodeError:
-            pass  # Fall back to CSV parsing
+            pass
     
-    # CSV format: competency_id;frage
+    # Try CSV formats
+    lines = text.split('\n')
+    if not lines:
+        return {}
+    
+    first_line = lines[0].strip()
+    
+    # Check if first line is header with column numbers (column-based format)
+    if first_line and first_line[0].isdigit() and ';' in first_line:
+        # Column-based format: questions are in columns
+        # First line: "1;2;3;4..."
+        # Following lines: "Question1;Question2;Question3..."
+        questions = {}
+        reader = csv.reader(io.StringIO(text), delimiter=';')
+        rows = list(reader)
+        
+        if len(rows) >= 2:
+            # Build competency IDs from column positions (e.901, e.902, etc.)
+            for col_idx in range(len(rows[0])):
+                comp_id = f"e.{901 + col_idx}"  # Start with e.901
+                col_questions = []
+                for row in rows[1:]:  # Skip header row with numbers
+                    if col_idx < len(row) and row[col_idx].strip():
+                        col_questions.append(row[col_idx].strip())
+                if col_questions:
+                    questions[comp_id] = col_questions
+        return questions
+    
+    # Try row-based CSV format with headers
     questions = {}
-    reader = csv.DictReader(io.StringIO(text), delimiter=';')
-    
-    for row in reader:
-        comp_id = row.get('competency_id', '').strip()
-        frage = row.get('frage', '').strip()
-        if comp_id and frage:
-            if comp_id not in questions:
-                questions[comp_id] = []
-            questions[comp_id].append(frage)
+    try:
+        reader = csv.DictReader(io.StringIO(text), delimiter=';')
+        for row in reader:
+            comp_id = row.get('competency_id', '').strip()
+            frage = row.get('frage', '').strip()
+            if comp_id and frage:
+                if comp_id not in questions:
+                    questions[comp_id] = []
+                questions[comp_id].append(frage)
+    except Exception:
+        pass
     
     return questions
 
