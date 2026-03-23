@@ -602,14 +602,13 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
     )
 
     # Build antrag lookup dicts for this student (filtered to class competencies)
-    pending_antraege_by_comp: dict[int, dict] = {}
-    rejected_niveau_antraege_by_comp: dict[int, dict] = {}
+    pending_antraege_by_comp: dict[str, dict] = {}
+    rejected_niveau_antraege_by_comp: dict[str, dict] = {}
     for a in db.get_all_kompetenzantraege().values():
         if a["student_id"] != user["oid"]:
             continue
-        # Normalize competency_id to int for comparison (can be str in old DB records)
-        cid_raw = a["competency_id"]
-        cid = int(cid_raw) if cid_raw is not None else None
+        # competency_id is now always a string (e.901, n.989)
+        cid = a["competency_id"]
         if cid not in class_comp_ids:
             continue  # Skip antraege for competencies not in this class
         if a["status"] == "pending":
