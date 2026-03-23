@@ -1304,11 +1304,8 @@ async def antraege_accept(
 
     student_id = a["student_id"]
     student_name = a["student_name"]
-    # Convert competency_id to string format expected by DB (e.901, n.989)
-    cid_raw = a["competency_id"]
-    cid_num = int(cid_raw) if cid_raw is not None else 0
-    prefix = "e" if a["typ"] == "einfach" else "n"
-    competency_id = f"{prefix}.{cid_num}"
+    # competency_id is already in format "e.901" or "n.989"
+    competency_id = a["competency_id"]
 
     if a["typ"] == "einfach":
         db.upsert_einfach(student_id, student_name, competency_id, True, user["upn"])
