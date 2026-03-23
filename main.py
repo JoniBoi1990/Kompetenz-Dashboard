@@ -1238,11 +1238,11 @@ async def antraege_submit(
     if typ not in ("einfach", "niveau"):
         raise HTTPException(status_code=400, detail="Ungültiger Typ")
 
+    # competency_id is already in format "e.901" or "n.989"
+    comp_id_full = competency_id
+
     # Must not already be proven
     einfach_map, nachweise_by_comp, _, _ = _load_student_data(user["access_token"], user["oid"])
-    # Build the full competency_id string (e.901, n.989) for DB lookup
-    prefix = "e" if typ == "einfach" else "n"
-    comp_id_full = f"{prefix}.{competency_id}"
     if typ == "einfach":
         if einfach_map.get(comp_id_full, {}).get("achieved"):
             raise HTTPException(status_code=400, detail="Bereits nachgewiesen")
@@ -1257,19 +1257,15 @@ async def antraege_submit(
 
     # No existing pending antrag for this competency
     for a in db.get_all_kompetenzantraege().values():
-        # Normalize competency_id to string for comparison (can be int in DB, str from form)
-        db_comp_id = str(a["competency_id"]) if a["competency_id"] is not None else None
-        if a["student_id"] == user["oid"] and db_comp_id == str(competency_id) and a["status"] == "pending":
+        if a["student_id"] == user["oid"] and a["competency_id"] == comp_id_full and a["status"] == "pending":
             raise HTTPException(status_code=400, detail="Antrag bereits gestellt")
 
     antrag_id = str(uuid.uuid4())
-    # Store competency_id as int for consistency
-    comp_id_int = int(competency_id) if competency_id is not None else None
     antrag = {
         "id": antrag_id,
         "student_id": user["oid"],
         "student_name": user["display_name"],
-        "competency_id": comp_id_int,
+        "competency_id": comp_id_full,  # Store as string (e.901, n.989)
         "typ": typ,
         "beschreibung": beschreibung.strip(),
         "evidence_url": evidence_url.strip(),
