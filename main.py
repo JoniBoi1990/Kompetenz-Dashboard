@@ -413,8 +413,9 @@ def _load_student_data(token: str, student_id: str) -> tuple[dict, dict, dict, d
 
 @app.get("/login")
 async def login(request: Request):
+    logout_msg = request.query_params.get("logout") == "1"
     if settings.DEV_MODE:
-        return templates.TemplateResponse("dev_login.html", {"request": request})
+        return templates.TemplateResponse("dev_login.html", {"request": request, "logout_msg": logout_msg})
     state = secrets.token_hex(16)
     url = auth.get_auth_url(state, request)
     return RedirectResponse(url)
@@ -472,8 +473,22 @@ async def auth_callback(request: Request, code: str = "", error: str = ""):
 
 
 @app.post("/logout")
-async def logout():
-    response = RedirectResponse(url="/login", status_code=302)
+async def logout(request: Request):
+    # Build the post-logout redirect URL
+    netloc = request.url.netloc
+    forwarded_proto = request.headers.get("x-forwarded-proto")
+    if forwarded_proto:
+        scheme = forwarded_proto
+    elif netloc.startswith("localhost") or netloc.startswith("127."):
+        scheme = "http"
+    else:
+        scheme = "https"
+    post_logout_uri = f"{scheme}://{netloc}/login?logout=1"
+    
+    # Get Microsoft logout URL (or local /login in DEV_MODE)
+    logout_url = auth.get_logout_url(post_logout_uri)
+    
+    response = RedirectResponse(url=logout_url, status_code=302)
     auth.clear_session(response)
     return response
 
