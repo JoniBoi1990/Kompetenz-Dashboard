@@ -27,13 +27,15 @@
       <table class="kompetenz-table" style="margin-bottom:0.5rem;">
         <thead><tr><th></th><th>#</th><th>Name</th></tr></thead>
         <tbody>
-          {% for k in einfach_kompetenzen %}
+          {% for cid in req.competency_ids %}
+          {% set k = comp_map.get(cid) %}
+          {% if k %}
           <tr>
-            <td><input type="checkbox" name="competency_ids" value="{{ k.id }}"
-              {% if k.id in req.competency_ids %}checked{% endif %}></td>
+            <td><input type="checkbox" name="competency_ids" value="{{ k.id }}" checked></td>
             <td>{{ k.id }}</td>
             <td>{{ k.name }}</td>
           </tr>
+          {% endif %}
           {% endfor %}
         </tbody>
       </table>
