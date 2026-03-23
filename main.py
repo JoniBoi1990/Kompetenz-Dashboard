@@ -323,13 +323,26 @@ def _save_test_request(req: dict) -> None:
 
 
 def _create_preview(student_name: str, title: str, competency_ids: list[int],
-                    request_id: str | None = None) -> str:
+                    request_id: str | None = None, class_id: str | None = None) -> str:
+    # Load questions from class-specific list if available
+    questions_dict = _QUESTIONS.copy()
+    if class_id:
+        cls = db.get_class(class_id)
+        if cls:
+            einfach_list_id = cls.get("einfach_list_id") or cls.get("competency_list_id")
+            einfach_list_source = cls.get("einfach_list_source") or cls.get("list_source", "system")
+            if einfach_list_id and einfach_list_source == "teacher":
+                # Load questions from teacher list
+                teacher_list = db.get_teacher_list(einfach_list_id)
+                if teacher_list and teacher_list.get("questions"):
+                    questions_dict = teacher_list["questions"]
+    
     questions = []
     for cid in competency_ids:
         k = _KOMPETENZ_MAP.get(cid)
         if not k or k["typ"] != "einfach":
             continue
-        opts = _QUESTIONS.get(str(cid)) or [k["name"]]
+        opts = questions_dict.get(str(cid)) or [k["name"]]
         questions.append({
             "competency_id": cid,
             "competency_name": k["name"],
@@ -1597,7 +1610,8 @@ async def generate_test(request: Request, user: dict = Depends(auth.require_teac
         raise HTTPException(status_code=400, detail="Kein Schülername angegeben")
 
     title = form.get("title", "Kompetenztest")
-    pid = _create_preview(student_name, title, selected_ids)
+    class_id = form.get("class_id", "")
+    pid = _create_preview(student_name, title, selected_ids, class_id=class_id or None)
     return RedirectResponse(f"/tests/preview/{pid}", status_code=303)
 
 
