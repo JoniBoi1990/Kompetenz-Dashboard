@@ -324,32 +324,37 @@ def _save_test_request(req: dict) -> None:
 
 def _create_preview(student_name: str, title: str, competency_ids: list,
                     request_id: str | None = None, class_id: str | None = None) -> str:
-    # Load questions from class-specific list if available
+    # Load competencies and questions from class-specific list
+    competency_map = _KOMPETENZ_MAP.copy()
     questions_dict = _QUESTIONS.copy()
+    
     if class_id:
         cls = db.get_class(class_id)
         if cls:
             einfach_list_id = cls.get("einfach_list_id") or cls.get("competency_list_id")
             einfach_list_source = cls.get("einfach_list_source") or cls.get("list_source", "system")
             if einfach_list_id:
-                if einfach_list_source == "teacher":
-                    # Load questions from teacher list
-                    teacher_list = db.get_teacher_list(einfach_list_id)
-                    if teacher_list and teacher_list.get("questions"):
-                        questions_dict = teacher_list["questions"]
-                else:
-                    # Load questions from system list (JSON file)
-                    try:
-                        _, system_questions = _load_competency_list(einfach_list_id, "system")
-                        if system_questions:
-                            questions_dict = system_questions
-                    except FileNotFoundError:
-                        pass
+                try:
+                    if einfach_list_source == "teacher":
+                        # Load competencies and questions from teacher list
+                        teacher_list = db.get_teacher_list(einfach_list_id)
+                        if teacher_list:
+                            data = teacher_list.get("data", {})
+                            comps = data.get("competencies", [])
+                            competency_map = {c["id"]: c for c in comps if c.get("typ") == "einfach"}
+                            questions_dict = teacher_list.get("questions", {})
+                    else:
+                        # Load from system list
+                        comps, system_questions = _load_competency_list(einfach_list_id, "system")
+                        competency_map = {c["id"]: c for c in comps if c.get("typ") == "einfach"}
+                        questions_dict = system_questions
+                except FileNotFoundError:
+                    pass
     
     questions = []
     for cid in competency_ids:
-        k = _KOMPETENZ_MAP.get(cid)
-        if not k or k["typ"] != "einfach":
+        k = competency_map.get(cid)
+        if not k:
             continue
         opts = questions_dict.get(str(cid)) or [k["name"]]
         questions.append({
