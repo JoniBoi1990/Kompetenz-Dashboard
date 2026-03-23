@@ -11,6 +11,17 @@
 <h2>Neue Klasse anlegen</h2>
 <form method="post" action="/admin/classes/add" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
   <input type="text" name="name" placeholder="Klassenname, z.B. 9a" required style="width:10rem">
+  <select name="grade_level" required style="padding:.35rem .5rem;">
+    <option value="">-- Klassenstufe --</option>
+    <option value="5">Klasse 5</option>
+    <option value="6">Klasse 6</option>
+    <option value="7">Klasse 7</option>
+    <option value="8">Klasse 8</option>
+    <option value="9">Klasse 9</option>
+    <option value="10">Klasse 10</option>
+    <option value="11">Klasse 11</option>
+    <option value="12">Klasse 12</option>
+  </select>
   <input type="text" name="description" placeholder="Beschreibung (optional)" style="width:16rem">
   <button type="submit">Anlegen</button>
 </form>

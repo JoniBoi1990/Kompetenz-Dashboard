@@ -2178,11 +2178,12 @@ async def admin_classes(request: Request, user: dict = Depends(auth.require_teac
 @app.post("/admin/classes/add")
 async def admin_classes_add(
     name: str = Form(...),
+    grade_level: int = Form(...),
     description: str = Form(default=""),
     user: dict = Depends(auth.require_teacher_user),
 ):
     if name.strip():
-        db.add_class(name.strip(), description.strip())
+        db.add_class(name.strip(), description.strip(), grade_level=grade_level)
     return RedirectResponse("/admin/classes", status_code=303)
 
 
