@@ -823,3 +823,81 @@ sqlite3 dashboard.db "SELECT competency_id FROM active_ids LIMIT 5"
 
 **Last updated:** 2026-03-21
 **Version:** 2.0 (String IDs with type prefix)
+
+
+---
+
+## Recent Changes (2026-03-23) - agent-dev Branch
+
+### Database Schema Updates
+Required migrations for production deployment:
+
+```sql
+-- Add grade_level to classes
+ALTER TABLE classes ADD COLUMN grade_level INTEGER;
+
+-- Add legacy columns for backward compatibility
+ALTER TABLE classes ADD COLUMN competency_list_id TEXT;
+ALTER TABLE classes ADD COLUMN list_source TEXT DEFAULT 'system';
+
+-- Update active_ids for class-specific support
+ALTER TABLE active_ids RENAME TO active_ids_old;
+CREATE TABLE active_ids (
+    competency_id TEXT NOT NULL,
+    class_id TEXT,
+    PRIMARY KEY (competency_id, class_id)
+);
+INSERT INTO active_ids (competency_id, class_id) 
+SELECT competency_id, NULL FROM active_ids_old;
+DROP TABLE active_ids_old;
+CREATE INDEX idx_active_ids_class ON active_ids(class_id);
+```
+
+### Features Added/Fixed
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Class creation with grade_level | ✅ | Now required field in admin UI |
+| Teacher competency lists | ✅ | Upload CSV, assign to classes |
+| Question upload formats | ✅ | CSV (row/column) + JSON supported |
+| Test generator | ✅ | Loads questions from class-specific lists |
+| Test requests (pending) | ✅ | Shows competencies from student's class |
+| Logout | ✅ | Full Azure AD session termination |
+| Logo | ✅ | Must be copied to static/logo.png |
+
+### CSV Formats for Questions
+
+**Row-based** (standard):
+```csv
+competency_id;frage
+e.901;Frage 1
+e.901;Frage 2
+e.902;Frage 3
+```
+
+**Column-based** (exported from spreadsheets):
+```csv
+1;2;3;4;5
+e.901 Q1;e.902 Q1;e.903 Q1;e.904 Q1;e.905 Q1
+e.901 Q2;e.902 Q2;e.903 Q2;e.904 Q2;e.905 Q2
+```
+
+### Known Limitations
+
+- **Multi-subject support**: Tables exist but UI not fully implemented
+- **Student test requests**: No class_id stored, uses student's class lookup
+- **Question display in pending tests**: Only shows request's competencies (not all class competencies)
+
+### Deployment Checklist
+
+1. Backup database: `cp dashboard.db dashboard.db.backup.$(date +%Y%m%d)`
+2. Run schema migrations (see above)
+3. Copy logo: `scp static/logo.png user@server:~/app/static/`
+4. Deploy code: `git pull && systemctl --user restart kompetenz`
+5. Verify: Check `/tests/builder` loads questions correctly
+
+---
+
+**Last updated:** 2026-03-23
+**Branch:** agent-dev
+**Commit:** post-live-testing fixes
