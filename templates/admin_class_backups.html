@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}{{ cls.displayName }} — Backups{% endblock %}
+{% block content %}
+<h1>{{ cls.displayName }} <span class="muted" style="font-size:.8em">— Backups</span></h1>
+<a href="/admin/classes">&larr; Zurück zur Übersicht</a>
+<a href="/admin/classes/{{ cls.id }}">| Klassenmitglieder</a>
+
+{% if msg %}
+<div class="success-notice" style="margin-top:1rem">{{ msg }}</div>
+{% endif %}
+
+<h2 style="margin-top:1.5rem">Neues Backup erstellen</h2>
+<p class="muted" style="margin-top:0">
+  Erstellt sofort ein manuelles Backup des aktuellen Kompetenzstands aller Schüler.
+</p>
+<form method="post" action="/admin/classes/{{ cls.id }}/backups/create" style="display:inline">
+  <button type="submit">Backup jetzt erstellen</button>
+</form>
+<a href="/admin/classes/{{ cls.id }}/backups/export" class="button" style="margin-left:.5rem">Als Datei exportieren</a>
+
+<h2 style="margin-top:1.5rem">Vorhandene Backups ({{ backups | length }})</h2>
+
+{% if backups %}
+<table>
+  <thead>
+    <tr>
+      <th>Datum</th>
+      <th>Typ</th>
+      <th>Erstellt von</th>
+      <th>Schüler</th>
+      <th>Größe</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for b in backups %}
+    <tr>
+      <td>{{ b.created_at[:16] | replace('T', ' ') }}</td>
+      <td>
+        {% if b.is_manual %}
+          <span class="badge badge-info">Manuell</span>
+        {% else %}
+          <span class="badge badge-muted">Automatisch</span>
+        {% endif %}
+      </td>
+      <td class="muted">{{ b.created_by }}</td>
+      <td>{{ b.student_count }}</td>
+      <td class="muted">{{ "%.1f" | format(b.size_bytes / 1024) }} KB</td>
+      <td style="white-space:nowrap">
+        <a href="/admin/classes/{{ cls.id }}/backups/download/{{ b.filename }}" 
+           class="btn-sm" download>Download</a>
+        
+        <form method="post" action="/admin/classes/{{ cls.id }}/backups/restore" 
+              style="display:inline;margin-left:.25rem"
+              onsubmit="return confirm('Backup vom {{ b.created_at[:16] }} wiederherstellen?\\n\\nDies fügt fehlende Kompetenzen hinzu (Merge-Modus).')">
+          <input type="hidden" name="filepath" value="{{ b.filepath }}">
+          <input type="hidden" name="merge" value="true">
+          <button type="submit" class="btn-sm">Wiederherstellen</button>
+        </form>
+        
+        <form method="post" action="/admin/classes/{{ cls.id }}/backups/delete" 
+              style="display:inline;margin-left:.25rem"
+              onsubmit="return confirm('Backup vom {{ b.created_at[:16] }} löschen?')">
+          <input type="hidden" name="filepath" value="{{ b.filepath }}">
+          <button type="submit" class="btn-danger">Löschen</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="info-notice" style="margin-top:1rem">
+  <strong>Hinweis:</strong> Automatische Backups werden täglich um 03:00 Uhr erstellt und 
+  nach 30 Tagen automatisch gelöscht. Manuelle Backups bleiben dauerhaft gespeichert.
+</div>
+
+{% else %}
+<p class="muted">Noch keine Backups vorhanden.</p>
+{% endif %}
+
+<style>
+.badge {
+  display: inline-block;
+  padding: .15rem .4rem;
+  border-radius: .25rem;
+  font-size: .75rem;
+  font-weight: 500;
+}
+.badge-info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.badge-muted {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.btn-sm {
+  padding: .2rem .5rem;
+  font-size: .85rem;
+}
+.btn-danger.btn-sm {
+  padding: .2rem .5rem;
+  font-size: .85rem;
+}
+.info-notice {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: .375rem;
+  padding: .75rem 1rem;
+  color: #1e40af;
+}
+</style>
+{% endblock %}

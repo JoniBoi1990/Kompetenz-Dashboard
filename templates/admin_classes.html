@@ -34,6 +34,7 @@
       <th>Name</th>
       <th>Beschreibung</th>
       <th>Schüler:innen</th>
+      <th>Backups</th>
       <th></th>
     </tr>
   </thead>
@@ -43,6 +44,9 @@
       <td><a href="/admin/classes/{{ cls.id }}">{{ cls.displayName }}</a></td>
       <td class="muted">{{ cls.description or "–" }}</td>
       <td>{{ cls.member_count }}</td>
+      <td>
+        <a href="/admin/classes/{{ cls.id }}/backups" class="btn-sm">Verwalten</a>
+      </td>
       <td>
         <form method="post" action="/admin/classes/delete" style="display:inline"
               onsubmit="return confirm('Klasse »{{ cls.displayName }}« und alle Mitglieder löschen?')">

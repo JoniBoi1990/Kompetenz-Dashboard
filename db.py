@@ -797,3 +797,136 @@ def delete_teacher_list(list_id: str, uploaded_by: str) -> bool:
             (list_id, uploaded_by)
         )
         return cursor.rowcount > 0
+
+
+# ---------------------------------------------------------------------------
+# Bulk operations for backup/restore
+# ---------------------------------------------------------------------------
+
+def get_all_student_records_for_class(class_id: str) -> dict:
+    """
+    Lade alle einfach_records und nachweise für alle Schüler einer Klasse.
+    
+    Returns:
+        Dict: {
+            student_id: {
+                "einfach": {comp_id: record, ...},
+                "niveau": {comp_id: [nachweis, ...], ...}
+            }
+        }
+    """
+    result = {}
+    members = get_class_members(class_id)
+    
+    for member in members:
+        student_id = member["id"]
+        result[student_id] = {
+            "student_name": member.get("displayName", ""),
+            "upn": member.get("userPrincipalName", ""),
+            "einfach": get_einfach_records(student_id),
+            "niveau": {},
+        }
+        
+        # Niveau-Nachweise gruppiert nach competency_id
+        nachweise = get_nachweise(student_id)
+        for nw in nachweise:
+            cid = nw["competency_id"]
+            if cid not in result[student_id]["niveau"]:
+                result[student_id]["niveau"][cid] = []
+            result[student_id]["niveau"][cid].append(nw)
+    
+    return result
+
+
+def bulk_upsert_einfach(records: list[dict]) -> int:
+    """
+    Batch-Import für einfach Records.
+    
+    Args:
+        records: Liste von Dicts mit keys:
+            student_id, student_name, competency_id, achieved, updated_by
+    
+    Returns:
+        Anzahl eingefügter/aktualisierter Records
+    """
+    if not records:
+        return 0
+    
+    now = datetime.now(timezone.utc).isoformat()
+    count = 0
+    
+    with _conn() as con:
+        for record in records:
+            con.execute(
+                """INSERT INTO einfach_records
+                   (student_id, student_name, competency_id, achieved, updated_by, updated_at)
+                   VALUES (?, ?, ?, ?, ?, ?)
+                   ON CONFLICT(student_id, competency_id) DO UPDATE SET
+                     student_name = excluded.student_name,
+                     achieved     = excluded.achieved,
+                     updated_by   = excluded.updated_by,
+                     updated_at   = excluded.updated_at""",
+                (
+                    record["student_id"],
+                    record.get("student_name", ""),
+                    record["competency_id"],
+                    int(record.get("achieved", False)),
+                    record.get("updated_by", ""),
+                    record.get("updated_at", now),
+                ),
+            )
+            count += 1
+    
+    return count
+
+
+def bulk_add_nachweise(nachweise: list[dict]) -> int:
+    """
+    Batch-Import für Niveau-Nachweise.
+    
+    Args:
+        nachweise: Liste von Dicts mit keys:
+            student_id, student_name, competency_id, niveau_level,
+            evidence_url, evidence_name, updated_by
+    
+    Returns:
+        Anzahl eingefügter Nachweise
+    """
+    if not nachweise:
+        return 0
+    
+    now = datetime.now(timezone.utc).isoformat()
+    count = 0
+    
+    with _conn() as con:
+        for nw in nachweise:
+            con.execute(
+                """INSERT INTO nachweise
+                   (id, student_id, student_name, competency_id, niveau_level,
+                    evidence_url, evidence_name, updated_by, updated_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    str(uuid.uuid4()),
+                    nw["student_id"],
+                    nw.get("student_name", ""),
+                    nw["competency_id"],
+                    nw.get("niveau_level", 0),
+                    nw.get("evidence_url", ""),
+                    nw.get("evidence_name", ""),
+                    nw.get("updated_by", ""),
+                    nw.get("updated_at", now),
+                ),
+            )
+            count += 1
+    
+    return count
+
+
+def clear_student_records(student_id: str) -> None:
+    """
+    Lösche alle einfach_records und nachweise eines Schülers.
+    Vorsichtig zu verwenden - für Restore im Overwrite-Modus.
+    """
+    with _conn() as con:
+        con.execute("DELETE FROM einfach_records WHERE student_id = ?", (student_id,))
+        con.execute("DELETE FROM nachweise WHERE student_id = ?", (student_id,))

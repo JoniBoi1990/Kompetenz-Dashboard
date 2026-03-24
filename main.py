@@ -2,6 +2,7 @@
 Kompetenz-Dashboard — FastAPI + Jinja2 + Microsoft 365
 No database, no Docker, no React.  M365 is the data layer.
 """
+import asyncio
 import csv
 import io
 import json
@@ -9,15 +10,16 @@ import random
 import secrets
 import uuid
 from pathlib import Path
-from datetime import date, datetime, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from urllib.parse import quote
 
 from fastapi import FastAPI, Request, Depends, Form, File, HTTPException, UploadFile
-from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, RedirectResponse, Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 import auth
+import backup
 import db
 from config import settings
 from pdf_engine import create_pdf
@@ -2387,11 +2389,38 @@ async def admin_class_member_delete(
 async def admin_class_members_import(
     class_id: str,
     file: UploadFile = File(...),
+    merge: bool = Form(default=True),
     user: dict = Depends(auth.require_teacher_user),
 ):
     content = await file.read()
     text = content.decode("utf-8-sig")
-    # Try semicolon first, then comma
+    
+    # Prüfe ob es eine JSON-Backup-Datei ist
+    if file.filename and file.filename.endswith('.json'):
+        try:
+            backup_data = backup.parse_backup_json(text)
+            stats = backup.restore_backup(
+                class_id=class_id,
+                backup_data=backup_data,
+                merge_mode=merge,
+                updated_by=user.get("upn", "teacher"),
+            )
+            msg = (
+                f"Backup wiederhergestellt: {stats['students_added']} neue Schüler, "
+                f"{stats['einfach_restored']} Einfach-Kompetenzen, "
+                f"{stats['niveau_restored']} Niveau-Kompetenzen"
+            )
+            return RedirectResponse(
+                f"/admin/classes/{class_id}?msg={quote(msg)}",
+                status_code=303,
+            )
+        except ValueError as e:
+            return RedirectResponse(
+                f"/admin/classes/{class_id}?msg={quote(f'Fehler beim Backup-Import: {e}')}",
+                status_code=303,
+            )
+    
+    # Standard CSV-Import für Mitglieder
     delimiter = ";" if ";" in text.split("\n")[0] else ","
     reader = csv.DictReader(io.StringIO(text), delimiter=delimiter)
     count = db.import_class_members_csv(class_id, list(reader))
@@ -2399,3 +2428,196 @@ async def admin_class_members_import(
         f"/admin/classes/{class_id}?msg={quote(f'{count} Schüler:innen importiert')}",
         status_code=303,
     )
+
+
+# ---------------------------------------------------------------------------
+# Admin: Backup-Verwaltung
+# ---------------------------------------------------------------------------
+
+@app.get("/admin/classes/{class_id}/backups", response_class=HTMLResponse)
+async def admin_class_backups(
+    class_id: str,
+    request: Request,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Backup-Verwaltung für eine Klasse."""
+    cls = db.get_class(class_id)
+    if not cls:
+        raise HTTPException(status_code=404, detail="Klasse nicht gefunden")
+    
+    backups = backup.list_backups(class_id)
+    return templates.TemplateResponse("admin_class_backups.html", {
+        "request": request,
+        "user": user,
+        "cls": cls,
+        "backups": backups,
+        "msg": request.query_params.get("msg", ""),
+    })
+
+
+@app.post("/admin/classes/{class_id}/backups/create")
+async def create_backup_endpoint(
+    class_id: str,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Manuelles Backup erstellen."""
+    filepath = backup.create_manual_backup(
+        class_id=class_id,
+        created_by=user.get("upn", "teacher"),
+    )
+    if filepath:
+        return RedirectResponse(
+            f"/admin/classes/{class_id}/backups?msg={quote('Backup erstellt')}",
+            status_code=303,
+        )
+    else:
+        return RedirectResponse(
+            f"/admin/classes/{class_id}/backups?msg={quote('Fehler beim Erstellen des Backups')}",
+            status_code=303,
+        )
+
+
+@app.get("/admin/classes/{class_id}/backups/download/{filename}")
+async def download_backup(
+    class_id: str,
+    filename: str,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Backup-Datei herunterladen."""
+    # Sichere Pfad-Konstruktion
+    safe_filename = Path(filename).name  # Keine Unterverzeichnisse erlauben
+    
+    # Suche in auto und manual Verzeichnissen
+    for base_dir in [backup.AUTO_BACKUP_DIR, backup.MANUAL_BACKUP_DIR]:
+        filepath = base_dir / class_id / safe_filename
+        if filepath.exists() and filepath.suffix == '.json':
+            content = filepath.read_text(encoding="utf-8")
+            return Response(
+                content=content,
+                media_type="application/json",
+                headers={
+                    "Content-Disposition": f'attachment; filename="{safe_filename}"'
+                },
+            )
+    
+    raise HTTPException(status_code=404, detail="Backup nicht gefunden")
+
+
+@app.post("/admin/classes/{class_id}/backups/restore")
+async def restore_backup_endpoint(
+    class_id: str,
+    filepath: str = Form(...),
+    merge: bool = Form(default=True),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Backup wiederherstellen."""
+    backup_data = backup.get_backup(filepath)
+    if not backup_data:
+        return RedirectResponse(
+            f"/admin/classes/{class_id}/backups?msg={quote('Backup nicht gefunden')}",
+            status_code=303,
+        )
+    
+    stats = backup.restore_backup(
+        class_id=class_id,
+        backup_data=backup_data,
+        merge_mode=merge,
+        updated_by=user.get("upn", "teacher"),
+    )
+    
+    msg = (
+        f"Backup wiederhergestellt: {stats['students_added']} neue Schüler, "
+        f"{stats['einfach_restored']} Einfach-Kompetenzen, "
+        f"{stats['niveau_restored']} Niveau-Kompetenzen"
+    )
+    return RedirectResponse(
+        f"/admin/classes/{class_id}/backups?msg={quote(msg)}",
+        status_code=303,
+    )
+
+
+@app.post("/admin/classes/{class_id}/backups/delete")
+async def delete_backup_endpoint(
+    class_id: str,
+    filepath: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Backup löschen."""
+    success = backup.delete_backup(filepath)
+    msg = "Backup gelöscht" if success else "Fehler beim Löschen"
+    return RedirectResponse(
+        f"/admin/classes/{class_id}/backups?msg={quote(msg)}",
+        status_code=303,
+    )
+
+
+@app.get("/admin/classes/{class_id}/backups/export")
+async def export_backup_endpoint(
+    class_id: str,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Backup als Download exportieren (aktueller Stand)."""
+    cls = db.get_class(class_id)
+    if not cls:
+        raise HTTPException(status_code=404, detail="Klasse nicht gefunden")
+    
+    json_content = backup.export_backup_json(
+        class_id=class_id,
+        created_by=user.get("upn", "teacher"),
+    )
+    
+    filename = f"backup_{cls.get('name', class_id)}_{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H%M%S')}.json"
+    
+    return Response(
+        content=json_content,
+        media_type="application/json",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Automatische Backups (Background Task)
+# ---------------------------------------------------------------------------
+
+async def backup_scheduler():
+    """
+    Hintergrund-Task für automatische tägliche Backups.
+    Läuft um 03:00 Uhr nachts.
+    """
+    while True:
+        try:
+            # Berechne Zeit bis 03:00 Uhr
+            now = datetime.now(timezone.utc)
+            next_run = datetime.combine(
+                now.date() + timedelta(days=1 if now.time() >= time(3, 0) else 0),
+                time(3, 0),
+            ).replace(tzinfo=timezone.utc)
+            
+            wait_seconds = (next_run - now).total_seconds()
+            await asyncio.sleep(wait_seconds)
+            
+            # Backups für alle Klassen erstellen
+            classes = db.get_classes()
+            for cls in classes:
+                try:
+                    backup.create_automatic_backup(cls["id"])
+                except Exception:
+                    # Einzelne Fehler nicht blockieren
+                    pass
+            
+            # Alte Backups aufräumen
+            backup.cleanup_old_backups()
+            
+        except asyncio.CancelledError:
+            break
+        except Exception:
+            # Bei Fehler 1 Stunde warten und neu versuchen
+            await asyncio.sleep(3600)
+
+
+@app.on_event("startup")
+async def start_backup_scheduler():
+    """Starte den Backup-Scheduler beim App-Start."""
+    asyncio.create_task(backup_scheduler())
