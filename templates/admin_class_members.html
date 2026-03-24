@@ -16,16 +16,26 @@
   <button type="submit">Hinzufügen</button>
 </form>
 
-<h2 style="margin-top:1.5rem">CSV-Import</h2>
+<h2 style="margin-top:1.5rem">Import (CSV oder Backup)</h2>
 <p class="muted" style="margin-top:0">
-  Spalten: <code>Name</code> (oder <code>Vorname</code> + <code>Nachname</code>), optional <code>UPN</code> oder <code>E-Mail</code>.
-  Trennzeichen Semikolon oder Komma, UTF-8.
+  <strong>Mitglieder-CSV:</strong> Spalten <code>Name</code> (oder <code>Vorname</code> + <code>Nachname</code>), optional <code>UPN</code> oder <code>E-Mail</code>.<br>
+  <strong>Backup-JSON:</strong> Stellt Kompetenzstände wieder her (Schüler + erreichte Kompetenzen + Nachweise).
 </p>
 <form method="post" action="/admin/classes/{{ cls.id }}/members/import"
-      enctype="multipart/form-data" style="display:flex;gap:.5rem;align-items:center">
-  <input type="file" name="file" accept=".csv" required>
+      enctype="multipart/form-data" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+  <input type="file" name="file" accept=".csv,.json" required>
+  <label style="display:flex;align-items:center;gap:.25rem;white-space:nowrap">
+    <input type="checkbox" name="merge" value="true" checked>
+    Mit bestehenden Daten mergen
+  </label>
   <button type="submit">Importieren</button>
 </form>
+
+<h2 style="margin-top:1.5rem">Backup herunterladen</h2>
+<p class="muted" style="margin-top:0">
+  Exportiert alle Schüler mit ihren erreichten Kompetenzen als JSON-Datei.
+</p>
+<a href="/admin/classes/{{ cls.id }}/backups/export" class="button">Aktuellen Stand exportieren</a>
 
 <h2 style="margin-top:1.5rem">Mitglieder ({{ members | length }})</h2>
 {% if members %}
