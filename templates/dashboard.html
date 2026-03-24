@@ -66,7 +66,7 @@
             <td class="center">
               <input type="checkbox" id="plan-cb-{{ k.id }}"
                 {% if r and r.achieved %}checked{% endif %}
-                onchange="planState[{{ k.id }}].achieved=this.checked; updateDisplay()">
+                onchange="planState['{{ k.id }}'].achieved=this.checked; updateDisplay()">
             </td>
           </tr>
           {% endfor %}
@@ -86,7 +86,7 @@
             <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
             <td>{{ k.name }}</td>
             <td>
-              <select id="plan-sel-{{ k.id }}" onchange="planState[{{ k.id }}].niveau_level=+this.value; updateDisplay()">
+              <select id="plan-sel-{{ k.id }}" onchange="planState['{{ k.id }}'].niveau_level=+this.value; updateDisplay()">
                 <option value="0" {% if best_niveau == 0 %}selected{% endif %}>noch nicht nachgewiesen</option>
                 <option value="1" {% if best_niveau == 1 %}selected{% endif %}>Beginner</option>
                 <option value="2" {% if best_niveau == 2 %}selected{% endif %}>Advanced</option>
