@@ -335,6 +335,12 @@ with open('kompetenzlisten/klasse-11-chemie.json') as f:
 
 Via web UI: `Admin → Klassen verwalten → Neue Klasse`
 
+⚠️ **Wichtig:** Nach dem Anlegen der Klasse muss im Admin-UI eine Kompetenzliste zugewiesen werden:
+- `Admin → Klassen verwalten → [Klasse anklicken] → Kompetenzliste zuweisen`
+- Wähle z.B. "klasse-9-chemie" für Klasse 9 Chemie
+
+Ohne zugewiesene Liste funktioniert der Unterrichtsstand nicht korrekt!
+
 Or SQL:
 ```sql
 INSERT INTO classes (id, name, grade_level, 
@@ -365,6 +371,7 @@ Via web UI: `Unterrichtsstand → Klasse 11a auswählen → Kompetenzen markiere
 | Missing type prefix | ID collisions between Einfach/Niveau | Add `e.` or `n.` prefix |
 | Wrong sequence padding | `e.1101` vs `e.111` | Always use 2-digit sequence: `e.{grade}{seq:02d}` |
 | Database still has INTEGER column | "datatype mismatch" | Run migration or recreate tables |
+| **Missing competency_list_id** | Unterrichtsstand zeigt 0 Kompetenzen trotz gespeicherter active_ids | Im Admin-UI Kompetenzliste zuweisen |
 
 ### Loading Competency Lists
 
