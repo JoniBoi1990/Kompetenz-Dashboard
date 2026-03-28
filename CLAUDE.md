@@ -214,6 +214,8 @@ Kompetenz-Dashboard/
 | POST | /admin/classes/{class_id}/members/add | teacher | Add student to class |
 | POST | /admin/classes/{class_id}/members/delete | teacher | Remove student from class |
 | POST | /admin/classes/{class_id}/members/import | teacher | Bulk import members from CSV |
+| GET | /admin/classes/{class_id}/members/migrate | teacher | Student migration page (email change) |
+| POST | /admin/classes/{class_id}/members/migrate | teacher | Migrate student to new email/ID |
 
 ## Navigation (role-dependent)
 
@@ -733,6 +735,7 @@ See `KOMPETENZLISTEN_WORKFLOW.md` for detailed workflow.
 | 10 | done | DEV_MODE pre-populated SQLite; Git repo + Uberspace deployment |
 | 11 | done | SQLite persistence for all data (test_requests, kompetenzantraege, classes, members) |
 | 12 | done | Class management admin UI (/admin/classes): add/delete classes, manage + CSV-import members |
+| 13 | done | Student migration: transfer competency records when email changes |
 
 
 ---
@@ -945,6 +948,34 @@ STUDENT_UPN_MAP = {"Name": "upn@..."}  # OneNote-Abschnittsnamen → E-Mail
 
 ---
 
+## Student Migration (Email Change)
+
+When a student changes their email address, use the **"Schüler umziehen"** feature:
+
+### Workflow
+1. Go to **Admin → Klassen verwalten → [Class] → Mitglieder**
+2. Click **"✉️ Schüler umziehen / E-Mail ändern"**
+3. Select student from dropdown (name/current email auto-populated)
+4. Enter new email (and adjust name if needed)
+5. Click **"Schüler umziehen"**
+
+### What Gets Transferred
+- All `einfach_records` (achieved competencies)
+- All `nachweise` (niveau evidence/proofs)
+- All `test_requests` (pending test requests)
+- Class membership
+
+### Data Model
+The migration uses `db.migrate_student()` which:
+1. Reads all existing records for old student_id
+2. Deletes old `class_members` entry
+3. Creates new `class_members` entry with new student_id (email)
+4. Re-inserts all competency records with new student_id
+5. Updates `test_requests` to point to new student_id
+6. Deletes old competency records
+
+---
+
 **Last updated:** 2026-03-28
 **Branch:** agent-dev
-**Commit:** onenote_to_backup + /api/competencies endpoint
+**Commit:** onenote_to_backup + /api/competencies endpoint + student migration
