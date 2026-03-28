@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}{{ cls.displayName }} — Schüler umziehen{% endblock %}
+{% block content %}
+<h1>{{ cls.displayName }}{% if cls.description %} <span class="muted" style="font-size:.8em">— {{ cls.description }}</span>{% endif %}</h1>
+<a href="/admin/classes/{{ cls.id }}">&larr; Zurück zu den Mitgliedern</a>
+
+{% if msg %}
+<div class="error-notice" style="margin-top:1rem">{{ msg }}</div>
+{% endif %}
+
+<div class="info-box" style="margin-top:1.5rem; padding:1rem; background:#f0f7ff; border-radius:6px; border-left:4px solid #3498db;">
+  <h3 style="margin-top:0">ℹ️ Schüler umziehen / E-Mail ändern</h3>
+  <p style="margin-bottom:0">
+    Verwenden Sie diese Funktion, wenn ein Schüler seine E-Mail-Adresse geändert hat.
+    Alle Kompetenznachweise und Test-Anfragen werden automatisch auf die neue Adresse übertragen.
+  </p>
+</div>
+
+<h2 style="margin-top:1.5rem">Schüler auswählen und umziehen</h2>
+{% if members %}
+<form method="post" action="/admin/classes/{{ cls.id }}/members/migrate" style="max-width:500px">
+  <div style="margin-bottom:1rem">
+    <label for="old_student_id" style="display:block; margin-bottom:.25rem; font-weight:500">Schüler auswählen</label>
+    <select name="old_student_id" id="old_student_id" required style="width:100%; padding:.5rem"
+            onchange="fillCurrentData(this)">
+      <option value="">-- Bitte wählen --</option>
+      {% for m in members %}
+      <option value="{{ m.id }}" data-name="{{ m.displayName }}" data-upn="{{ m.userPrincipalName or '' }}">
+        {{ m.displayName }}{% if m.userPrincipalName %} ({{ m.userPrincipalName }}){% endif %}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div style="margin-bottom:1rem">
+    <label for="new_name" style="display:block; margin-bottom:.25rem; font-weight:500">Neuer Name</label>
+    <input type="text" name="new_name" id="new_name" required style="width:100%; padding:.5rem" 
+           placeholder="Max Mustermann">
+  </div>
+
+  <div style="margin-bottom:1.5rem">
+    <label for="new_upn" style="display:block; margin-bottom:.25rem; font-weight:500">Neue E-Mail / UPN</label>
+    <input type="email" name="new_upn" id="new_upn" required style="width:100%; padding:.5rem"
+           placeholder="max.mustermann@schule.de">
+    <p class="muted" style="margin-top:.25rem; font-size:.85rem">
+      Die E-Mail-Adresse wird als neue ID für den Schüler verwendet.
+    </p>
+  </div>
+
+  <div style="display:flex; gap:1rem; align-items:center">
+    <button type="submit" class="btn-primary" onclick="return confirmMigration()">Schüler umziehen</button>
+    <a href="/admin/classes/{{ cls.id }}" style="color:#666">Abbrechen</a>
+  </div>
+</form>
+
+<script>
+function fillCurrentData(select) {
+  const option = select.selectedOptions[0];
+  if (option && option.value) {
+    document.getElementById('new_name').value = option.dataset.name || '';
+    document.getElementById('new_upn').value = option.dataset.upn || '';
+  } else {
+    document.getElementById('new_name').value = '';
+    document.getElementById('new_upn').value = '';
+  }
+}
+
+function confirmMigration() {
+  const studentSelect = document.getElementById('old_student_id');
+  const newUpn = document.getElementById('new_upn').value;
+  const studentName = studentSelect.selectedOptions[0]?.text || 'der Schüler';
+  
+  if (!studentSelect.value) {
+    alert('Bitte wählen Sie einen Schüler aus.');
+    return false;
+  }
+  
+  return confirm(
+    `Sind Sie sicher, dass Sie "${studentName}" auf die neue E-Mail "${newUpn}" umziehen möchten?\n\n` +
+    `Alle Kompetenznachweise und Test-Anfragen werden übertragen.\n` +
+    `Die alten Daten werden gelöscht.\n\n` +
+    `Diese Aktion kann nicht rückgängig gemacht werden.`
+  );
+}
+</script>
+
+{% else %}
+<p class="muted">Keine Schüler in dieser Klasse vorhanden.</p>
+{% endif %}
+
+<style>
+.btn-primary {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: .6rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.btn-primary:hover {
+  background: #2980b9;
+}
+.error-notice {
+  background: #fee;
+  border-left: 4px solid #c00;
+  padding: 1rem;
+  border-radius: 4px;
+  color: #600;
+}
+</style>
+
+{% endblock %}

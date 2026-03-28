@@ -38,6 +38,16 @@
 <a href="/admin/classes/{{ cls.id }}/backups/export" class="button">Aktuellen Stand exportieren</a>
 
 <h2 style="margin-top:1.5rem">Mitglieder ({{ members | length }})</h2>
+
+<div style="margin-bottom:1rem">
+  <a href="/admin/classes/{{ cls.id }}/members/migrate" class="button" style="background:#3498db; color:white; text-decoration:none; padding:.5rem 1rem; border-radius:4px; display:inline-block;">
+    ✉️ Schüler umziehen / E-Mail ändern
+  </a>
+  <span class="muted" style="margin-left:.5rem; font-size:.85rem">
+    Wenn ein Schüler seine E-Mail-Adresse geändert hat
+  </span>
+</div>
+
 {% if members %}
 <table>
   <thead>

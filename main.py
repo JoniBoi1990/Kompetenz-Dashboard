@@ -2423,6 +2423,74 @@ async def admin_class_member_delete(
     return RedirectResponse(f"/admin/classes/{class_id}", status_code=303)
 
 
+@app.get("/admin/classes/{class_id}/members/migrate", response_class=HTMLResponse)
+async def migrate_student_page(
+    class_id: str,
+    request: Request,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Page for migrating a student to a new email/ID."""
+    cls = db.get_class(class_id)
+    if not cls:
+        raise HTTPException(status_code=404, detail="Klasse nicht gefunden")
+    members = db.get_class_members(class_id)
+    return templates.TemplateResponse("admin_migrate_student.html", {
+        "request": request,
+        "user": user,
+        "cls": cls,
+        "members": members,
+        "msg": request.query_params.get("msg", ""),
+    })
+
+
+@app.post("/admin/classes/{class_id}/members/migrate")
+async def migrate_student_handler(
+    class_id: str,
+    old_student_id: str = Form(...),
+    new_upn: str = Form(...),
+    new_name: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Handle student migration to new email."""
+    new_student_id = new_upn.strip()
+    
+    # Validate inputs
+    if not new_upn.strip():
+        return RedirectResponse(
+            f"/admin/classes/{class_id}/members/migrate?msg={quote('Neue E-Mail ist erforderlich')}",
+            status_code=303,
+        )
+    
+    if not new_name.strip():
+        return RedirectResponse(
+            f"/admin/classes/{class_id}/members/migrate?msg={quote('Name ist erforderlich')}",
+            status_code=303,
+        )
+    
+    # Check if new student_id already exists in this class
+    existing_members = db.get_class_members(class_id)
+    if any(m["id"] == new_student_id for m in existing_members):
+        return RedirectResponse(
+            f"/admin/classes/{class_id}/members/migrate?msg={quote('Ein Schüler mit dieser E-Mail existiert bereits in der Klasse')}",
+            status_code=303,
+        )
+    
+    stats = db.migrate_student(
+        class_id=class_id,
+        old_student_id=old_student_id,
+        new_student_id=new_student_id,
+        new_name=new_name.strip(),
+        new_upn=new_upn.strip(),
+        updated_by=user.get("upn", "teacher"),
+    )
+    
+    msg = f"Schüler umgezogen: {stats['einfach_count']} Einfach-, {stats['niveau_count']} Niveau-Kompetenzen übertragen"
+    return RedirectResponse(
+        f"/admin/classes/{class_id}?msg={quote(msg)}",
+        status_code=303,
+    )
+
+
 @app.post("/admin/classes/{class_id}/members/import")
 async def admin_class_members_import(
     class_id: str,
