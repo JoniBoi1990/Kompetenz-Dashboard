@@ -85,6 +85,7 @@ Kompetenz-Dashboard/
 ├── pdf_engine.py        # PDF generation (ported from app5.py, bug-fixed)
 ├── dashboard.db         # SQLite database (auto-created; not in git)
 ├── convert_csv_to_json.py  # CLI tool to convert CSV to JSON competency lists
+├── onenote_to_backup.py # Standalone: reads OneNote class notebook → backup JSON (device flow auth)
 ├── grading_scale.json   # Active grading scale (absent = use default preset)
 ├── static/
 │   ├── logo.png         # School logo (place here manually, not in git)
@@ -185,6 +186,7 @@ Kompetenz-Dashboard/
 | GET | /antraege/pending | teacher | Review pending competency claims |
 | POST | /antraege/accept/{id} | teacher | Accept claim (writes record/nachweis) |
 | POST | /antraege/reject/{id} | teacher | Reject claim (with Begründung for niveau) |
+| GET | /api/competencies/{list_id} | public | Returns [{id, name, typ}] for a system or teacher list — used by onenote_to_backup.py |
 | GET | /api/class-students/{class_id} | teacher | AJAX: student list for a class |
 | GET | /api/student-competencies | teacher | AJAX: proven IDs for student name lookup |
 | GET | /grades/calculator | any | ~~Grade calculator~~ (deprecated for teachers — use planning mode in student detail) |
@@ -905,6 +907,44 @@ e.901 Q2;e.902 Q2;e.903 Q2;e.904 Q2;e.905 Q2
 
 ---
 
-**Last updated:** 2026-03-23
+## Recent Changes (2026-03-28) - agent-dev Branch
+
+### OneNote → Backup-JSON Konvertierung (`onenote_to_backup.py`)
+
+Neues eigenständiges Skript zum Einlesen des Klassennotizbuchs aus OneNote/SharePoint und Erzeugen einer Backup-JSON-Datei, die über `/admin/classes/{class_id}/members/import` hochgeladen werden kann.
+
+**Abhängigkeiten:** `pip install beautifulsoup4` (zusätzlich zu requirements.txt)
+
+**Konfiguration (oben im Skript anpassen):**
+```python
+TENANT_ID = "..."                    # Azure AD Tenant
+CLIENT_ID = "..."                    # Azure AD App (Public Client Flow muss aktiv sein)
+SITE_URL = "https://..."             # SharePoint-Site-URL
+NOTEBOOK_NAME = "..."                # Exakter Name des Notizbuchs
+EINFACH_LIST_ID = "klasse-9-chemie"  # System-Liste oder Teacher-Listen-ID
+NIVEAU_LIST_ID  = "teacher-..."      # Teacher-Listen-ID aus DB (z.B. "9 SJ 25,26")
+CLASS_ID = "..."                     # Klassen-ID im Dashboard (UUID)
+STUDENT_UPN_MAP = {"Name": "upn@..."}  # OneNote-Abschnittsnamen → E-Mail
+```
+
+**Authentifizierung:** MSAL Device Flow (`Notes.Read.All` Scope) — kein Admin-Consent nötig.
+
+**Was wird eingelesen:**
+- **Unterrichtskompetenzen** (`einfach`): Checkbox-Tabelle — ⚠ Graph API exportiert keine Checkbox-Zustände aus Tabellen, daher 0 Ergebnisse. Freitext-Checkboxen (außerhalb von Tabellen) würden funktionieren.
+- **Projektkompetenzen** (`niveau`): Tabelle mit Experte/Advanced/Beginner-Spalten — Link in Zelle = erreicht; höchstes Level wird gespeichert.
+
+**ID-Mapping:** Lädt IDs zuerst vom Live-Server (`/api/competencies/{list_id}`), Fallback auf lokale JSON-Datei. Getrennte Listen für einfach/niveau möglich (relevant wenn Teacher-Liste aktiv ist).
+
+**Kompetenz-Matching:** Exakter → Substring → Word-Overlap (≥60%). Nicht gematchte Namen werden vollständig ausgegeben.
+
+**Robustheit:** Retry-Logik bei 429/5xx (bis zu 4 Versuche, Retry-After Header wird respektiert). Fehler bei einzelnen Schülern überspringen den Schüler statt das Skript zu crashen.
+
+### Neuer API-Endpoint
+
+`GET /api/competencies/{list_id}` — öffentlich (kein Login nötig), gibt `[{id, name, typ}]` zurück. Sucht zuerst in System-Listen (`kompetenzlisten/*.json`), dann in Teacher-Listen (SQLite `teacher_lists`-Tabelle).
+
+---
+
+**Last updated:** 2026-03-28
 **Branch:** agent-dev
-**Commit:** post-live-testing fixes
+**Commit:** onenote_to_backup + /api/competencies endpoint
