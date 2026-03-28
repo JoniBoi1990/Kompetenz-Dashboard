@@ -670,6 +670,83 @@ def delete_class_member(class_id: str, student_id: str) -> None:
         )
 
 
+def migrate_student(
+    class_id: str,
+    old_student_id: str,
+    new_student_id: str,
+    new_name: str,
+    new_upn: str,
+    updated_by: str = "system",
+) -> dict:
+    """
+    Migrate a student to a new ID (e.g., changed email).
+    Transfers all competency records, nachweise, and test requests.
+    Returns stats about migrated data.
+    """
+    # 1. Get all data from old student
+    einfach_records = get_einfach_records(old_student_id)
+    nachweise_list = get_nachweise(old_student_id)
+    
+    # Get test requests for this student
+    test_reqs = get_test_requests()
+    student_test_reqs = [
+        req for req in test_reqs.values() 
+        if req["student_id"] == old_student_id
+    ]
+    
+    # 2. Delete old class_member (but keep records for now)
+    delete_class_member(class_id, old_student_id)
+    
+    # 3. Create new class_member
+    add_class_member(class_id, new_student_id, new_name, new_upn)
+    
+    # 4. Transfer einfach_records with new student_id
+    for comp_id, record in einfach_records.items():
+        upsert_einfach(
+            student_id=new_student_id,
+            student_name=new_name,
+            competency_id=comp_id,
+            achieved=bool(record.get("achieved", False)),
+            updated_by=updated_by,
+        )
+    
+    # 5. Transfer nachweise
+    for nw in nachweise_list:
+        add_nachweis(
+            student_id=new_student_id,
+            student_name=new_name,
+            competency_id=nw["competency_id"],
+            niveau_level=int(nw.get("niveau_level", 0)),
+            evidence_url=nw.get("evidence_url", ""),
+            evidence_name=nw.get("evidence_name", ""),
+            updated_by=updated_by,
+        )
+    
+    # 6. Delete old einfach_records and nachweise
+    with _conn() as con:
+        con.execute(
+            "DELETE FROM einfach_records WHERE student_id = ?",
+            (old_student_id,)
+        )
+        con.execute(
+            "DELETE FROM nachweise WHERE student_id = ?",
+            (old_student_id,)
+        )
+        # Update test_requests to new student_id
+        con.execute(
+            """UPDATE test_requests 
+               SET student_id = ?, student_name = ?
+               WHERE student_id = ?""",
+            (new_student_id, new_name, old_student_id)
+        )
+    
+    return {
+        "einfach_count": len(einfach_records),
+        "niveau_count": len(nachweise_list),
+        "test_requests_count": len(student_test_reqs),
+    }
+
+
 def import_class_members_csv(class_id: str, rows: list[dict]) -> int:
     """
     Bulk-import members from parsed CSV rows.
