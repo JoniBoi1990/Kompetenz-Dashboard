@@ -1792,6 +1792,19 @@ async def finalize_test(pid: str, request: Request, user: dict = Depends(auth.re
     )
 
 
+@app.get("/api/competencies/{list_id}")
+async def api_competencies(list_id: str):
+    """Public: returns competency list (id, name, typ) for a given list_id.
+    Used by external scripts (e.g. onenote_to_backup.py) to ensure IDs match the server.
+    """
+    try:
+        competencies, _ = _load_competency_list(list_id, "system")
+    except FileNotFoundError:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail=f"Liste nicht gefunden: {list_id}")
+    return [{"id": c["id"], "name": c["name"], "typ": c["typ"]} for c in competencies]
+
+
 @app.get("/api/class-students/{class_id}")
 async def api_class_students(class_id: str, user: dict = Depends(auth.require_teacher_user)):
     """AJAX: returns student list for a given class/group."""
