@@ -1809,6 +1809,27 @@ async def api_competencies(list_id: str):
     return [{"id": c["id"], "name": c["name"], "typ": c["typ"]} for c in competencies]
 
 
+@app.get("/api/class/{class_id}/lists")
+async def api_class_lists(class_id: str):
+    """Public: returns the active einfach/niveau list IDs for a class.
+    Used by external scripts (e.g. onenote_to_backup.py) to auto-detect the active lists.
+    """
+    from fastapi import HTTPException
+    cls = db.get_class(class_id)
+    if not cls:
+        raise HTTPException(status_code=404, detail=f"Klasse nicht gefunden: {class_id}")
+    einfach_id = cls.get("einfach_list_id") or cls.get("competency_list_id")
+    einfach_src = cls.get("einfach_list_source") or cls.get("list_source", "system")
+    niveau_id   = cls.get("niveau_list_id") or cls.get("competency_list_id")
+    niveau_src  = cls.get("niveau_list_source") or cls.get("list_source", "system")
+    return {
+        "einfach_list_id":     einfach_id,
+        "einfach_list_source": einfach_src,
+        "niveau_list_id":      niveau_id,
+        "niveau_list_source":  niveau_src,
+    }
+
+
 @app.get("/api/class-students/{class_id}")
 async def api_class_students(class_id: str, user: dict = Depends(auth.require_teacher_user)):
     """AJAX: returns student list for a given class/group."""
