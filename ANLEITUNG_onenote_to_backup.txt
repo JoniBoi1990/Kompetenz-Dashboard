@@ -1,0 +1,199 @@
+ANLEITUNG: onenote_to_backup.py
+================================
+Stand: 2026-03-29
+
+Was macht dieses Skript?
+------------------------
+Liest das Klassennotizbuch aus OneNote (SharePoint) aus und erzeugt
+eine Backup-JSON-Datei. Diese Datei kann direkt über das Dashboard
+unter Admin → Klassen → [Klasse] → Mitglieder importieren hochgeladen
+werden, um alle Kompetenzbewertungen einer Klasse zu übertragen.
+
+Eingelesen wird:
+  - Unterrichtskompetenzen (einfach): Checkbox-Tabelle auf der Seite
+    "Unterrichtskompetenzen" im Abschnitt "Kompetenznachweise"
+  - Projektkompetenzen (niveau): Tabelle auf der Seite
+    "Projektkompetenzen" im selben Abschnitt
+    (Spalten: Experte / Advanced / Beginner oder gleichwertige Begriffe)
+
+ACHTUNG – bekannte Einschränkung:
+  Die Graph API exportiert KEINE Checkbox-Zustände aus OneNote-Tabellen.
+  D.h. Unterrichtskompetenzen werden mit 0 Ergebnissen eingelesen,
+  selbst wenn im Notizbuch Häkchen gesetzt sind.
+  Nur freitext-Checkboxen (außerhalb von Tabellen) würden funktionieren.
+  → Projektkompetenzen (niveau) funktionieren dagegen zuverlässig.
+
+
+Voraussetzungen
+---------------
+1. Python 3.10 oder neuer
+2. Abhängigkeiten installieren:
+
+       pip install msal httpx beautifulsoup4
+
+   (msal und httpx sind bereits in requirements.txt; beautifulsoup4 muss
+    zusätzlich installiert werden)
+
+3. Azure AD App-Registrierung mit aktiviertem Public Client Flow
+   (kein Admin-Consent nötig, nur der angemeldete Lehrer braucht Zugriff)
+   Benötigte Berechtigung: Notes.Read.All
+
+
+Konfiguration (oben im Skript anpassen)
+-----------------------------------------
+Öffne onenote_to_backup.py und passe den Abschnitt "KONFIGURATION" an:
+
+  TENANT_ID        Azure AD Tenant-ID (Azure Portal → Übersicht)
+  CLIENT_ID        App-ID der Azure-Registrierung
+
+  SITE_URL         URL der SharePoint-Site, z.B.:
+                   https://meineschule.sharepoint.com/sites/Kl9ChKa2526
+
+  NOTEBOOK_NAME    Exakter Name des Notizbuchs (Groß-/Kleinschreibung!)
+                   z.B. "9 Ch Ht 2526-Notizbuch"
+
+  DASHBOARD_URL    URL des Dashboards, z.B. https://bhof.uber.space
+                   (Leer lassen = nur lokale JSON-Datei als Fallback)
+
+  COMPETENCY_LIST_FILE
+                   Lokale Fallback-Datei, wenn Server nicht erreichbar
+                   z.B. "kompetenzlisten/klasse-9-chemie.json"
+
+  CLASS_ID         UUID der Klasse im Dashboard
+                   (Admin → Klassen verwalten → URL der Klasse)
+
+  CLASS_NAME       Anzeigename der Klasse, z.B. "9"
+  GRADE_LEVEL      Klassenstufe als Zahl, z.B. 9
+  COMPETENCY_LIST_ID  ID der System-Kompetenzliste, z.B. "klasse-9-chemie"
+  CREATED_BY       E-Mail des Lehrers, der das Backup erstellt
+
+  STUDENT_UPN_MAP  Dict: Abschnittsname im Notizbuch → E-Mail im Dashboard
+                   Jeder Schüler muss hier eingetragen sein!
+
+Beispiel STUDENT_UPN_MAP:
+  STUDENT_UPN_MAP = {
+      "Mustermann, Max":   "max.mustermann@s.meineschule.de",
+      "Beispiel, Anna":    "anna.beispiel@s.meineschule.de",
+  }
+
+Sonderfälle im Namensmapping (mit ⚠-Kommentar im Skript markiert):
+  - Mehrere Vornamen: nur den ersten verwenden, der in der E-Mail steht
+  - Umlaute: ä→ae, ö→oe, ü→ue, ß→ss in der E-Mail
+  - Adelsprädikate: z.B. "von Moltke" → E-Mail prüfen
+  - Spitznamen in Klammern: ignorieren, richtigen Vornamen nehmen
+
+
+Nutzung
+-------
+1. Terminal öffnen, ins Projektverzeichnis wechseln:
+
+       cd ~/Desktop/Coding_veschiedenes/Kompetenz-Dashboard
+
+2. Skript starten:
+
+       python onenote_to_backup.py
+
+3. Device-Flow-Login: Das Skript zeigt einen Code und eine URL an.
+   Im Browser aufrufen, Code eingeben, mit Schulkonto anmelden.
+   (Einmalig – der Token wird im Speicher gecacht.)
+
+4. Das Skript läuft durch alle Schüler und gibt Fortschritt aus:
+     - Gefundene Kompetenzen pro Schüler
+     - Warnungen bei nicht zuordenbaren Kompetenzen
+     - Warnungen bei fehlenden UPNs
+
+5. Am Ende wird eine Datei erstellt:
+       backup_onenote_2026-03-29_143022.json  (Beispiel)
+
+6. Diese Datei im Dashboard hochladen:
+       Admin → Klassen verwalten → [Klasse] → Mitglieder importieren
+       → JSON-Datei auswählen → Importieren
+
+
+Ausgabe verstehen
+-----------------
+Normale Ausgabe (Beispiel):
+
+  Aktive Listen für Klasse abc-123 vom Server abfragen …
+    → Einfach: klasse-9-chemie  |  Niveau: klasse-9-chemie
+  Einfach-Liste vom Server: 88 Einträge
+  Niveau-Liste vom Server: 33 Einträge
+    → 88 einfach, 33 niveau bereit.
+  Login erfolgreich.
+  Site-ID: birklehofde.sharepoint.com,...
+  Notizbuch gefunden: 9 Ch Ht 2526-Notizbuch
+
+  Verarbeite: Mustermann, Max (max.mustermann@s.meineschule.de)
+    Unterrichtskompetenzen: 0 erreicht
+    Projektkompetenzen: 4 erreicht
+
+Warnungen:
+  ⚠ kein UPN         → Schüler in STUDENT_UPN_MAP nachtragen
+  ⚠ Abschnitt 'Kompetenznachweise' nicht gefunden
+                     → Notizbuch-Struktur prüfen (Abschnitt fehlt oder
+                       anders benannt)
+  ⚠ Nicht zugeordnete Niveau-Kompetenzen
+                     → Kompetenzname im Notizbuch weicht zu stark vom
+                       JSON-Namen ab; ggf. COMPETENCY_LIST_FILE prüfen
+  ✗ Fehler bei Seitenverarbeitung
+                     → Graph API Fehler; Schüler wird übersprungen
+
+
+Kompetenz-Matching (automatisch)
+----------------------------------
+Das Skript versucht Kompetenznamen aus OneNote den IDs im Dashboard
+zuzuordnen – in drei Stufen:
+
+  1. Exakter Match (nach Normalisierung: Kleinschreibung, Leerzeichen)
+  2. Substring-Match (einer enthält den anderen)
+  3. Word-Overlap ≥ 60% (bei Texten mit ≥3 Wörtern)
+
+Wenn keine Zuordnung möglich ist, erscheint eine Warnung mit dem
+genauen Text aus OneNote – so lässt sich das Problem gezielt beheben.
+
+
+Niveau-Spalten (erkannte Begriffe)
+-------------------------------------
+Die Tabelle im Notizbuch muss Spaltenüberschriften mit diesen Begriffen
+enthalten (Groß-/Kleinschreibung egal):
+
+  Level 3 (Experte):      experte, expert
+  Level 2 (Fortgeschr.):  advanced, fortgeschritten
+  Level 1 (Beginner):     beginner, anfänger, anfaenger
+
+Zelle gilt als erreicht, wenn sie Text oder einen Link enthält.
+Das höchste erreichte Niveau wird gespeichert.
+
+
+Häufige Probleme
+-----------------
+Problem:  Notizbuch nicht gefunden
+Ursache:  NOTEBOOK_NAME stimmt nicht exakt überein
+Lösung:   Das Skript gibt alle verfügbaren Notizbücher aus –
+          den genauen Namen kopieren
+
+Problem:  Unterrichtskompetenzen: 0 erreicht (obwohl Häkchen gesetzt)
+Ursache:  Graph API exportiert keine Checkbox-Zustände aus Tabellen
+Lösung:   Bekannte Einschränkung – nur Projektkompetenzen funktionieren
+
+Problem:  "403 Forbidden" bei Graph API
+Ursache:  Notes.Read.All Berechtigung fehlt oder nicht eingewilligt
+Lösung:   Im Azure Portal prüfen; ggf. App-Admin informieren
+
+Problem:  Schüler im Backup hat keine UPN
+Ursache:  Name in STUDENT_UPN_MAP fehlt oder weicht vom Abschnittsnamen ab
+Lösung:   Genauer Abschnittsname wird in der Ausgabe angezeigt –
+          exakt so in STUDENT_UPN_MAP eintragen
+
+Problem:  Dashboard nicht erreichbar (Server-Fallback)
+Ursache:  DASHBOARD_URL falsch oder Server offline
+Lösung:   Lokale COMPETENCY_LIST_FILE wird als Fallback genutzt;
+          ggf. DASHBOARD_URL leer lassen
+
+
+Nächste Schritte nach dem Import
+----------------------------------
+1. Im Dashboard prüfen: Admin → Klassen → [Klasse] → Mitglieder
+   Alle Schüler sollten sichtbar sein
+2. Einzelnen Schüler aufrufen: Kompetenzen sollten eingetragen sein
+3. Bei Problemen: backup_onenote_*.json manuell prüfen (JSON-Editor)
