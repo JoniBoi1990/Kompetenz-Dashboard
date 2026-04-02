@@ -11,6 +11,13 @@
   <div class="grade-big">{{ grade.note }}</div>
   <p>{{ grade.gesamtpunkte }} / {{ grade.max_punkte }} Punkte ({{ grade.prozent }} %)</p>
 </section>
+
+{# --- XP-Fortschrittsbalken (RPG Style) --- #}
+<div class="xp-bar-label">Kompetenzfortschritt:</div>
+<div class="xp-bar-container" id="xp-bar-main">
+  <div class="xp-bar-fill" id="xp-bar-fill" style="width: {{ grade.prozent }}%;"></div>
+  <div class="xp-bar-text" id="xp-bar-text">{{ grade.prozent }}% XP</div>
+</div>
 {% endif %}
 
 <button id="btn-planmode" class="btn-secondary" style="margin-bottom:1rem;">Planungsmodus aktivieren</button>
@@ -22,6 +29,13 @@
     <span class="score-pts" id="plan-pts">– von – Punkten</span>
     <span class="score-pct" id="plan-pct">– %</span>
     <span class="score-note" id="plan-note">Note: –</span>
+  </div>
+
+  {# XP-Bar für Planungsmodus #}
+  <div class="xp-bar-label">Kompetenzfortschritt (Planung):</div>
+  <div class="xp-bar-container" id="xp-bar-plan-container">
+    <div class="xp-bar-fill" id="xp-bar-plan-fill" style="width: 0%;"></div>
+    <div class="xp-bar-text" id="xp-bar-plan-text">0% XP</div>
   </div>
 
   <div class="basis-toggle" style="margin:0.75rem 0;">
@@ -352,6 +366,15 @@ function updateDisplay() {
     document.getElementById('plan-pts').textContent  = `${r.pts} von ${r.max} Punkten`;
     document.getElementById('plan-pct').textContent  = `${r.pct}\u2009%`;
     document.getElementById('plan-note').textContent = `Note: ${r.note}`;
+    
+    // Update XP-Bar im Planungsmodus
+    const xpBarFill = document.getElementById('xp-bar-plan-fill');
+    const xpBarText = document.getElementById('xp-bar-plan-text');
+    if (xpBarFill && xpBarText) {
+        xpBarFill.style.width = `${r.pct}%`;
+        xpBarText.textContent = `${r.pct}% XP`;
+    }
+    
     updateRowHighlight(basis);
 }
 
