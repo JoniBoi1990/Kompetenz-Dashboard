@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     BOOKINGS_PAGE_URL: str = ""
     # SharePoint site ID that holds the MS Lists for competency records
     SHAREPOINT_SITE_ID: str = ""
+    # Initial admin UPN for first-time setup (can be removed after adding teachers)
+    INITIAL_ADMIN_UPN: str = "jonas.haut@birklehof.de"
 
     class Config:
         env_file = ".env"

@@ -11,6 +11,7 @@ from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from fastapi import Request, HTTPException, status
 
 from config import settings
+import db
 
 AUTHORITY = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}"
 # Only User.Read — identity + role detection.  No SharePoint or Group scopes needed.
@@ -92,16 +93,23 @@ def _extract_claims(id_token: str) -> dict:
 
 
 def is_teacher(claims: dict) -> bool:
-    if "Lehrer" in claims.get("roles", []):
-        return True
     upn = claims.get("preferred_username", "").lower()
-    # Birklehof: Schüler @s.birklehof.de, Lehrer @birklehof.de
-    if upn.endswith("@s.birklehof.de"):
-        return False
-    if upn.endswith("@birklehof.de"):
+    
+    # DEV_MODE: fallback für Entwicklung
+    if settings.DEV_MODE:
+        return "@lehrer." in upn or upn.endswith("@birklehof.de")
+    
+    # Prüfe ob UPN in approved_teachers Tabelle
+    if db.is_approved_teacher(upn):
         return True
-    # Fallback für andere Umgebungen (Entwicklung)
-    return "@lehrer." in upn
+    
+    # Wenn noch keine Lehrer genehmigt sind, erlaube Initial-Admin
+    if not db.has_any_approved_teacher():
+        if settings.INITIAL_ADMIN_UPN and upn == settings.INITIAL_ADMIN_UPN.lower():
+            return True
+    
+    # Sonst kein Lehrer (auch Eltern mit @birklehof.de nicht)
+    return False
 
 
 def build_user_info(token_response: dict) -> dict:

@@ -1,0 +1,2882 @@
+{
+  "backup_meta": {
+    "version": "1.0",
+    "created_at": "2026-03-28T22:14:06.466464+00:00",
+    "class_id": "ceadfc53-502a-4763-a120-0e249cad609e",
+    "class_name": "9",
+    "grade_level": 9,
+    "competency_list_id": "klasse-9-chemie",
+    "created_by": "lehrer@schule.de"
+  },
+  "students": [
+    {
+      "student_id": "Leopold.Brunet-Moret@s.birklehof.de",
+      "student_name": "Brunet-Moret, Leopold",
+      "upn": "Leopold.Brunet-Moret@s.birklehof.de",
+      "niveau": {
+        "n.907": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={18AA0A05-486B-461F-9E31-736AD8EE73A4}&page-id={2E68BB52-DD51-4523-9479-5A80312D7759}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Brunet-Moret,%20Leopold/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={18AA0A05-486B-461F-9E31-736AD8EE73A4}&page-id={C65920CB-EA31-4D14-B1AC-4BA24CCBC279}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Brunet-Moret,%20Leopold/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={18AA0A05-486B-461F-9E31-736AD8EE73A4}&page-id={C65920CB-EA31-4D14-B1AC-4BA24CCBC279}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Brunet-Moret,%20Leopold/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={18AA0A05-486B-461F-9E31-736AD8EE73A4}&page-id={C65920CB-EA31-4D14-B1AC-4BA24CCBC279}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Brunet-Moret,%20Leopold/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={18AA0A05-486B-461F-9E31-736AD8EE73A4}&page-id={2E68BB52-DD51-4523-9479-5A80312D7759}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Brunet-Moret,%20Leopold/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "NgoAnhEva.Chu@s.birklehof.de",
+      "student_name": "Chu , Ngoc Anh Eva",
+      "upn": "NgoAnhEva.Chu@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={9D0E4261-8767-4130-B93A-B2F9A630DD71}&page-id={5AE19236-91ED-4A2C-95E1-A802E08E2752}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Chu%20,%20Ngoc%20Anh%20Eva/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={9D0E4261-8767-4130-B93A-B2F9A630DD71}&page-id={7ED368EC-A48F-4090-8C0A-23B4A17A2D14}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Chu%20,%20Ngoc%20Anh%20Eva/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={9D0E4261-8767-4130-B93A-B2F9A630DD71}&page-id={7ED368EC-A48F-4090-8C0A-23B4A17A2D14}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Chu%20,%20Ngoc%20Anh%20Eva/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={9D0E4261-8767-4130-B93A-B2F9A630DD71}&page-id={DEAB5B6E-9199-4C58-A1E3-70F2878A66CB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Chu%20,%20Ngoc%20Anh%20Eva/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={9D0E4261-8767-4130-B93A-B2F9A630DD71}&page-id={7ED368EC-A48F-4090-8C0A-23B4A17A2D14}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Chu%20,%20Ngoc%20Anh%20Eva/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={9D0E4261-8767-4130-B93A-B2F9A630DD71}&page-id={161EFCFD-2B05-43AA-BAA4-848BC43C27A2}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Chu%20,%20Ngoc%20Anh%20Eva/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={9D0E4261-8767-4130-B93A-B2F9A630DD71}&page-id={5AE19236-91ED-4A2C-95E1-A802E08E2752}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Chu%20,%20Ngoc%20Anh%20Eva/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={9D0E4261-8767-4130-B93A-B2F9A630DD71}&page-id={0221341C-8CFC-4C29-9998-C542C4E1EC6E}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Chu%20,%20Ngoc%20Anh%20Eva/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Concept-Map%20Ionen-%20und%20Ionenverbindungen&section-id={9D0E4261-8767-4130-B93A-B2F9A630DD71}&page-id={1AB61B24-C05F-455A-BF91-CA193F783778}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Chu%20,%20Ngoc%20Anh%20Eva/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={9D0E4261-8767-4130-B93A-B2F9A630DD71}&page-id={57D147AF-CFF1-49C1-A14E-268B59292B81}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Chu%20,%20Ngoc%20Anh%20Eva/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Amelie.Czech@s.birklehof.de",
+      "student_name": "Czech, Amelie",
+      "upn": "Amelie.Czech@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={AF3788E0-991F-45D2-811D-7525537DC190}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={633C9D52-E5B6-41C8-93EE-C9C4CB3BABF0}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={A945D8FE-9911-4A39-8633-02D3122BDD98}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={AF3788E0-991F-45D2-811D-7525537DC190}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={A945D8FE-9911-4A39-8633-02D3122BDD98}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={B993EFFB-0FE6-4DC3-B15E-2F8BDA78B06B}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={782084FD-CD31-4CAA-8EF5-2E051650B98F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={633C9D52-E5B6-41C8-93EE-C9C4CB3BABF0}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={A945D8FE-9911-4A39-8633-02D3122BDD98}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.911": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Elektronenpaarabstoßungs-Modell&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={5FA68C79-DD37-4BEC-AF36-F50F0DBE7C68}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={1B664F41-AE15-4DDD-9548-75855EB6FD9B}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={1B664F41-AE15-4DDD-9548-75855EB6FD9B}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.919": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={AF3788E0-991F-45D2-811D-7525537DC190}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={A945D8FE-9911-4A39-8633-02D3122BDD98}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={CC3AEE42-B49F-4CEC-9FBF-8D12A0CF771F}&page-id={782084FD-CD31-4CAA-8EF5-2E051650B98F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Czech,%20Amelie/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Soeren.Dreyer@s.birklehof.de",
+      "student_name": "Dreyer, Sören",
+      "upn": "Soeren.Dreyer@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={AD338326-C0CB-42C0-92FF-19FE84F74143}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={AD338326-C0CB-42C0-92FF-19FE84F74143}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={2DB47271-E6E0-44EE-9D6E-772DB371BE69}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={AD338326-C0CB-42C0-92FF-19FE84F74143}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={2DB47271-E6E0-44EE-9D6E-772DB371BE69}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={AD338326-C0CB-42C0-92FF-19FE84F74143}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={27CD55E9-2968-4BEE-8D14-0B428AB59DE9}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={14856440-EF1D-4916-9E16-3D432D4129B9}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={1307DC93-9A7C-4345-82FC-DF996BF62D6F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={1307DC93-9A7C-4345-82FC-DF996BF62D6F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={2DB47271-E6E0-44EE-9D6E-772DB371BE69}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={6D4FDD16-B559-4141-AFD8-868DED4C56CF}&page-id={27CD55E9-2968-4BEE-8D14-0B428AB59DE9}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Dreyer,%20Sören/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Rafael.Eckert@s.birklehof.de",
+      "student_name": "Eckert, Rafael William Thomas",
+      "upn": "Rafael.Eckert@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={EAFF3023-4B0A-411A-87F3-7805A4213DB0}&page-id={74C91992-AE6C-4554-9C1E-FBC274914A5A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Eckert,%20Rafael%20William%20Thomas/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={EAFF3023-4B0A-411A-87F3-7805A4213DB0}&page-id={98BFC36F-13F3-4699-8175-266D52621ABD}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Eckert,%20Rafael%20William%20Thomas/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={EAFF3023-4B0A-411A-87F3-7805A4213DB0}&page-id={98BFC36F-13F3-4699-8175-266D52621ABD}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Eckert,%20Rafael%20William%20Thomas/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={EAFF3023-4B0A-411A-87F3-7805A4213DB0}&page-id={6C90440D-C357-4D75-B888-86ABA40C7645}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Eckert,%20Rafael%20William%20Thomas/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={EAFF3023-4B0A-411A-87F3-7805A4213DB0}&page-id={6C90440D-C357-4D75-B888-86ABA40C7645}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Eckert,%20Rafael%20William%20Thomas/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Thais.Egger@s.birklehof.de",
+      "student_name": "Egger, Thais",
+      "upn": "Thais.Egger@s.birklehof.de",
+      "niveau": {
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={CAF56446-47DE-4639-B1E6-0D0C6DFD0F64}&page-id={00C720AA-498D-4AFA-9D6E-CE806DA5D9D1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Egger,%20Thais/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={CAF56446-47DE-4639-B1E6-0D0C6DFD0F64}&page-id={C0BC14F6-782A-4D8C-B19F-BB42FD6E9D46}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Egger,%20Thais/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={CAF56446-47DE-4639-B1E6-0D0C6DFD0F64}&page-id={C0BC14F6-782A-4D8C-B19F-BB42FD6E9D46}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Egger,%20Thais/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={CAF56446-47DE-4639-B1E6-0D0C6DFD0F64}&page-id={00C720AA-498D-4AFA-9D6E-CE806DA5D9D1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Egger,%20Thais/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Louis.Finke@s.birklehof.de",
+      "student_name": "Finke, Louis",
+      "upn": "Louis.Finke@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={E60E1D38-A67B-4AC4-90E3-94372176B77F}&page-id={901945A1-899C-42EC-9136-948E4DA19A58}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Finke,%20Louis/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={E60E1D38-A67B-4AC4-90E3-94372176B77F}&page-id={901945A1-899C-42EC-9136-948E4DA19A58}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Finke,%20Louis/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={E60E1D38-A67B-4AC4-90E3-94372176B77F}&page-id={901945A1-899C-42EC-9136-948E4DA19A58}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Finke,%20Louis/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={E60E1D38-A67B-4AC4-90E3-94372176B77F}&page-id={07D402C4-01EC-44E4-A775-4F4CEB0ED259}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Finke,%20Louis/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={E60E1D38-A67B-4AC4-90E3-94372176B77F}&page-id={901945A1-899C-42EC-9136-948E4DA19A58}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Finke,%20Louis/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={E60E1D38-A67B-4AC4-90E3-94372176B77F}&page-id={45EAF875-FA6E-4B42-BC55-4A79AD335CA2}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Finke,%20Louis/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={E60E1D38-A67B-4AC4-90E3-94372176B77F}&page-id={34026E74-4939-4A9D-9CB4-4D8906638D49}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Finke,%20Louis/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={E60E1D38-A67B-4AC4-90E3-94372176B77F}&page-id={34026E74-4939-4A9D-9CB4-4D8906638D49}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Finke,%20Louis/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={E60E1D38-A67B-4AC4-90E3-94372176B77F}&page-id={45EAF875-FA6E-4B42-BC55-4A79AD335CA2}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Finke,%20Louis/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Levi.Goette@s.birklehof.de",
+      "student_name": "Götte, Levi",
+      "upn": "Levi.Goette@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={FB2B1E73-B8BD-4709-B005-B7A4D3AB58FF}&page-id={981148A2-0A2A-4DE6-90F8-1E1FC4A7B2FB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Götte,%20Levi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={FB2B1E73-B8BD-4709-B005-B7A4D3AB58FF}&page-id={1CC9277D-A568-49F2-882D-B59CFFC8C947}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Götte,%20Levi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={FB2B1E73-B8BD-4709-B005-B7A4D3AB58FF}&page-id={1CC9277D-A568-49F2-882D-B59CFFC8C947}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Götte,%20Levi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={FB2B1E73-B8BD-4709-B005-B7A4D3AB58FF}&page-id={965775DE-09A0-4A35-A084-B0D8023AC8E1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Götte,%20Levi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={FB2B1E73-B8BD-4709-B005-B7A4D3AB58FF}&page-id={981148A2-0A2A-4DE6-90F8-1E1FC4A7B2FB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Götte,%20Levi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={FB2B1E73-B8BD-4709-B005-B7A4D3AB58FF}&page-id={9A596BAD-26B6-4516-8DBB-FA55A5302343}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Götte,%20Levi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={FB2B1E73-B8BD-4709-B005-B7A4D3AB58FF}&page-id={9A596BAD-26B6-4516-8DBB-FA55A5302343}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Götte,%20Levi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={FB2B1E73-B8BD-4709-B005-B7A4D3AB58FF}&page-id={965775DE-09A0-4A35-A084-B0D8023AC8E1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Götte,%20Levi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Sarah.Heinkel@s.birklehof.de",
+      "student_name": "Heinkel, Sarah",
+      "upn": "Sarah.Heinkel@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={2FC35DD2-FB79-49D1-8CC2-0F1450ED45F8}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={2FC35DD2-FB79-49D1-8CC2-0F1450ED45F8}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={DD0C3976-6DD7-481A-B085-E443800DFFCB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={DD0C3976-6DD7-481A-B085-E443800DFFCB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={F611A934-0B6E-4FB9-BF69-A6D9B297B332}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={A44557EE-530E-4F9B-83F3-43918F76C2F1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={E48E1377-F3BA-467F-8C28-0B7553D5E276}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Concept-Map%20Ionen-%20und%20Ionenverbindungen&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={65EB523A-B83E-451B-86B0-61B0039FFD7B}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.919": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={2FC35DD2-FB79-49D1-8CC2-0F1450ED45F8}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={DD0C3976-6DD7-481A-B085-E443800DFFCB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={C51A1B01-4B58-46AD-94BD-D0CE42BAC77F}&page-id={DD0C3976-6DD7-481A-B085-E443800DFFCB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Heinkel,%20Sarah/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Isabel.Saenger@s.birklehof.de",
+      "student_name": "Isabel Sänger",
+      "upn": "Isabel.Saenger@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={8079F928-266C-47F5-BB16-D74A7470D5C7}&page-id={F833F257-CBF8-4F36-A1F6-69FE265610FD}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Isabel%20Sänger/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={8079F928-266C-47F5-BB16-D74A7470D5C7}&page-id={F833F257-CBF8-4F36-A1F6-69FE265610FD}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Isabel%20Sänger/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={8079F928-266C-47F5-BB16-D74A7470D5C7}&page-id={C47F377D-1E4B-40D8-8B78-2FBBEBFECB52}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Isabel%20Sänger/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={8079F928-266C-47F5-BB16-D74A7470D5C7}&page-id={093C8B2D-49B6-4CFF-BCC7-A67CCE5A6E46}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Isabel%20Sänger/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={8079F928-266C-47F5-BB16-D74A7470D5C7}&page-id={EF82E4A8-C920-4B33-96C7-677543812FBD}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Isabel%20Sänger/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={8079F928-266C-47F5-BB16-D74A7470D5C7}&page-id={EF82E4A8-C920-4B33-96C7-677543812FBD}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Isabel%20Sänger/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.919": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={8079F928-266C-47F5-BB16-D74A7470D5C7}&page-id={F833F257-CBF8-4F36-A1F6-69FE265610FD}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Isabel%20Sänger/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Firdavs.Komiljonov@s.birklehof.de",
+      "student_name": "Komiljonov, Firdavs",
+      "upn": "Firdavs.Komiljonov@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={C10E923E-357A-49C0-AC9E-32FC6876AE57}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={C10E923E-357A-49C0-AC9E-32FC6876AE57}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={8C901081-1DC4-4351-8862-E9E6CA1FF50E}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={C10E923E-357A-49C0-AC9E-32FC6876AE57}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={8C901081-1DC4-4351-8862-E9E6CA1FF50E}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={C10E923E-357A-49C0-AC9E-32FC6876AE57}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={F094A38E-B1ED-4916-9E2E-0BFAFCA2FDB1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={5674520A-12BA-49B3-A691-C20C7813BE42}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={A2D15F24-165C-4C31-A0E4-739D7574BA83}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Video%20Atombaukonferenz&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={9D004609-3A10-45BA-8B76-9B10E0D207D4}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Video%20Atombaukonferenz&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={9D004609-3A10-45BA-8B76-9B10E0D207D4}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.919": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={C10E923E-357A-49C0-AC9E-32FC6876AE57}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={A2D15F24-165C-4C31-A0E4-739D7574BA83}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={ECD695D6-91ED-41F5-920D-D40533A96CF0}&page-id={F094A38E-B1ED-4916-9E2E-0BFAFCA2FDB1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Komiljonov,%20Firdavs/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Tianshuo.Liu@s.birklehof.de",
+      "student_name": "Liu, Tianshuo (Leo)",
+      "upn": "Tianshuo.Liu@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={17EB4254-30C3-44E1-B95D-5F4DC9CEF839}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={17EB4254-30C3-44E1-B95D-5F4DC9CEF839}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={67BEF073-A562-45A4-B0D4-984ECAB9AE8A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={C179FEEC-F95F-45A0-AE39-50CB4D377A84}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={67BEF073-A562-45A4-B0D4-984ECAB9AE8A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={BE8E4B0F-4116-451A-A0C9-66B37B0DFFD2}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={B8759B9B-2DFB-44E7-BC1A-9F2D2D3BE947}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={17EB4254-30C3-44E1-B95D-5F4DC9CEF839}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.911": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Elektronenpaarabstoßungs-Modell&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={6607FBFD-A88C-4269-818B-6BA070A321D0}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={C179FEEC-F95F-45A0-AE39-50CB4D377A84}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={46207744-50DE-41A1-B870-37D42A762C2D}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Concept-Map%20Ionen-%20und%20Ionenverbindungen&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={559A5B98-77AC-4BA1-8A3B-168D9107AC16}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.919": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={C179FEEC-F95F-45A0-AE39-50CB4D377A84}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={67BEF073-A562-45A4-B0D4-984ECAB9AE8A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={1F8E5AD5-8272-4869-B5AC-C4AF93A586EF}&page-id={67BEF073-A562-45A4-B0D4-984ECAB9AE8A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Liu,%20Tianshuo%20(Leo)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Kaleb.Metzeroth@s.birklehof.de",
+      "student_name": "Metzeroth, Kaleb",
+      "upn": "Kaleb.Metzeroth@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={85A9CDD1-3E57-44B7-8B50-18935ED76DDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={85A9CDD1-3E57-44B7-8B50-18935ED76DDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={F29B0A8E-1FD8-4C86-8303-E93C8A4E80FF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={7368E744-46CF-449D-8C28-63824655B661}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={6401E949-4EC2-4F8A-B8B1-7343FA5CBE36}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={85A9CDD1-3E57-44B7-8B50-18935ED76DDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={56C28885-918E-4285-85FE-77DD277F0D95}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={85A9CDD1-3E57-44B7-8B50-18935ED76DDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={F29B0A8E-1FD8-4C86-8303-E93C8A4E80FF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={FD062915-D64F-44EE-8B9E-82AAE9D9ACF1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Concept-Map%20Ionen-%20und%20Ionenverbindungen&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={EE58A5B7-2A69-402A-A4CB-EE80F3B78F1B}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={F29B0A8E-1FD8-4C86-8303-E93C8A4E80FF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={D42F7220-4814-46E3-B4BF-DFB50770BEBD}&page-id={56C28885-918E-4285-85FE-77DD277F0D95}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Metzeroth,%20Kaleb/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Leopold.vonMoltke@s.birklehof.de",
+      "student_name": "Moltke, Leopold von",
+      "upn": "Leopold.vonMoltke@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={359D5CBB-BD87-45DE-B6A3-F8C2BFCD0599}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={ECC1FB42-63DF-428E-8D74-6DB00767B463}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={A4C79073-3C18-4790-998B-1FF049B4A85D}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={541C4AFF-D801-4D9C-BE10-A442A83509FB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={A4C79073-3C18-4790-998B-1FF049B4A85D}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={3391CE34-DA32-41D4-9EED-EDECAE0C217A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.911": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Elektronenpaarabstoßungs-Modell&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={0AD8DEDC-4C10-4EBD-9BD4-8724C56F54FE}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Concept-Map%20Ionen-%20und%20Ionenverbindungen&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={A4268D6F-57B4-483F-9277-408490630856}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={BF5062AB-9106-4E31-90F6-4A8714713225}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.919": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={359D5CBB-BD87-45DE-B6A3-F8C2BFCD0599}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={00162BDF-E49E-4848-929F-8F2FB8697D19}&page-id={541C4AFF-D801-4D9C-BE10-A442A83509FB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Moltke,%20Leopold%20von/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Tom.Poellath@s.birklehof.de",
+      "student_name": "Pöllath, Tom",
+      "upn": "Tom.Poellath@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={AB02B245-909C-47EE-BE2F-56550B2A3E2D}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={DEF3989C-82BF-46F2-A82E-45B6E9D843C0}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={858F3146-EE5E-455E-A422-38AA1CA9CA9F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={DEF3989C-82BF-46F2-A82E-45B6E9D843C0}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={54741CA5-6296-4747-AFD8-EE05A7756107}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={50832B3F-D98F-4497-884F-A84393CD1AC1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={AB02B245-909C-47EE-BE2F-56550B2A3E2D}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={858F3146-EE5E-455E-A422-38AA1CA9CA9F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.911": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Elektronenpaarabstoßungs-Modell&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={D1518A1D-5A15-4415-8183-2C0EC81FAC3B}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={52A55B3A-AF4A-486D-8E0C-F7B82FD65C07}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={52A55B3A-AF4A-486D-8E0C-F7B82FD65C07}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.919": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={AB02B245-909C-47EE-BE2F-56550B2A3E2D}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={858F3146-EE5E-455E-A422-38AA1CA9CA9F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={1BF58F06-F09F-4903-BB21-F03AC426F0E2}&page-id={50832B3F-D98F-4497-884F-A84393CD1AC1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Pöllath,%20Tom/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Marlon.Rennscheidt@s.birklehof.de",
+      "student_name": "Rennscheidt, Marlon",
+      "upn": "Marlon.Rennscheidt@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={0D51ED55-7059-4AFC-BE49-CCF83BD41CFF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={0D51ED55-7059-4AFC-BE49-CCF83BD41CFF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={7C78BD64-7DEE-4262-A883-7B7CEBD44A5E}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={7A6565E9-3DB3-4E46-B2D6-D8A1FF971133}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={083BB425-5C80-47F0-88CB-8002244BDB9B}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.911": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Elektronenpaarabstoßungs-Modell&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={99DAD0FB-4932-4019-8547-4235EA6F88C7}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.915": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Elektronenpaarabstoßungs-Modell&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={99DAD0FB-4932-4019-8547-4235EA6F88C7}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={B1DB1AD6-2E59-4F5F-9DFA-27D863E377E4}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Concept-Map%20Ionen-%20und%20Ionenverbindungen&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={F8467FCD-A53F-4E42-BE9D-A1B5116BEB18}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.919": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={0D51ED55-7059-4AFC-BE49-CCF83BD41CFF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={083BB425-5C80-47F0-88CB-8002244BDB9B}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={C2290183-6FB9-4C7F-971C-B38E103755BC}&page-id={7C78BD64-7DEE-4262-A883-7B7CEBD44A5E}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Rennscheidt,%20Marlon/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Dinah.Senghaas@s.birklehof.de",
+      "student_name": "Senghaas, Dinah",
+      "upn": "Dinah.Senghaas@s.birklehof.de"
+    },
+    {
+      "student_id": "Diana.Shcherbak@s.birklehof.de",
+      "student_name": "Shcherbak, Diana",
+      "upn": "Diana.Shcherbak@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={C8B17C74-C989-4CB2-B25C-481CB8E71CE6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={563D8CB7-4753-4638-A5E8-863E2B1E7DD6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={EFE80C82-6720-4F37-A7F4-2B1F3428283A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={563D8CB7-4753-4638-A5E8-863E2B1E7DD6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={EFE80C82-6720-4F37-A7F4-2B1F3428283A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={6651EC1F-16B1-4B63-AD33-39CBB10B469F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={C8B17C74-C989-4CB2-B25C-481CB8E71CE6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.915": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Concept-Map%20Ionen-%20und%20Ionenverbindungen&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={4C4643AC-A302-4666-A9AF-65EB7326D165}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={5CE9B554-6217-4150-9E81-71E69FF22627}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={5CE9B554-6217-4150-9E81-71E69FF22627}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={EFE80C82-6720-4F37-A7F4-2B1F3428283A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={6D6821D9-C219-43B6-BCB6-132AF30AD567}&page-id={6651EC1F-16B1-4B63-AD33-39CBB10B469F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shcherbak,%20Diana/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Zhengqi.Shen@s.birklehof.de",
+      "student_name": "Shen, Zhengqi (Kai)",
+      "upn": "Zhengqi.Shen@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={8058BEB5-9A62-40F0-861B-60972DC3B86D}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={F33C4190-692E-4673-86E5-B1D762550A29}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={EF77939D-1563-41D8-BCAB-F808CC1CABF9}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={C02586CA-6A5B-4639-A5FB-17B8B48459BD}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={EF77939D-1563-41D8-BCAB-F808CC1CABF9}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={C02586CA-6A5B-4639-A5FB-17B8B48459BD}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={93433234-6817-40C5-923A-E46324B15B07}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={8058BEB5-9A62-40F0-861B-60972DC3B86D}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={584609C6-7A51-419D-B3BB-A6BA7AEAC3FF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={584609C6-7A51-419D-B3BB-A6BA7AEAC3FF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.919": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={8058BEB5-9A62-40F0-861B-60972DC3B86D}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={EF77939D-1563-41D8-BCAB-F808CC1CABF9}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={9502223D-232C-4F52-991D-82E82A969730}&page-id={93433234-6817-40C5-923A-E46324B15B07}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Shen,%20Zhengqi%20(Kai)/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Artem.Stenianskyi@s.birklehof.de",
+      "student_name": "Stenianskyi, Artem",
+      "upn": "Artem.Stenianskyi@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={AEBDD0C1-B54F-3541-8104-42C6A84922F1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={AEBDD0C1-B54F-3541-8104-42C6A84922F1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={BADB73E6-B4DA-45EA-9094-77DB69D23AAF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={AEBDD0C1-B54F-3541-8104-42C6A84922F1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={7DA77468-1D0F-4B8B-9385-815E6C2D95DB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Aluminiumbromid-Synthese&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={9A9E1073-525C-4F12-992F-90468DE0EFB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={2A7A7D40-93CE-4187-80A2-3790F7906DE4}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={BADB73E6-B4DA-45EA-9094-77DB69D23AAF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={1C6947EF-AE66-4267-B83D-1D4D9551F093}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={1C6947EF-AE66-4267-B83D-1D4D9551F093}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={BADB73E6-B4DA-45EA-9094-77DB69D23AAF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={C75984B5-EBFA-4CE8-B584-D305BA48273B}&page-id={BADB73E6-B4DA-45EA-9094-77DB69D23AAF}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Stenianskyi,%20Artem/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Test.Schueler_haut@s.birklehof.de",
+      "student_name": "Test Schueler_haut",
+      "upn": "Test.Schueler_haut@s.birklehof.de",
+      "niveau": {
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={8836A0CE-B897-4133-8753-4DBCE593D9D1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={0AA50F00-4E41-4B0A-BA33-79CEDE65ABD7}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={0AA50F00-4E41-4B0A-BA33-79CEDE65ABD7}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={8836A0CE-B897-4133-8753-4DBCE593D9D1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Junes.Vollmer@s.birklehof.de",
+      "student_name": "Vollmer, Junes",
+      "upn": "Junes.Vollmer@s.birklehof.de",
+      "niveau": {
+        "n.901": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={BBA21DED-821D-46CD-A8E5-863D702D8A2C}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.902": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={1EA85D21-D626-45B1-BE3D-EE300E95AFAE}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={DB8775B9-50ED-4395-8FB5-016A275D329A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={1EA85D21-D626-45B1-BE3D-EE300E95AFAE}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={DB8775B9-50ED-4395-8FB5-016A275D329A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.906": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={1EA85D21-D626-45B1-BE3D-EE300E95AFAE}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={8836A0CE-B897-4133-8753-4DBCE593D9D1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Halogenid-Nachweis&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={1EA85D21-D626-45B1-BE3D-EE300E95AFAE}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={E4494D87-FF71-477A-8F50-12D74DEC67C8}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={0AA50F00-4E41-4B0A-BA33-79CEDE65ABD7}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={0AA50F00-4E41-4B0A-BA33-79CEDE65ABD7}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.919": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Aufgaben%20Eigenschaften%20von%20Salzen&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={BBA21DED-821D-46CD-A8E5-863D702D8A2C}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={DB8775B9-50ED-4395-8FB5-016A275D329A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={8C6D2083-F39B-48AF-B3B2-97C2F8B783C7}&page-id={DB8775B9-50ED-4395-8FB5-016A275D329A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Vollmer,%20Junes/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "student_id": "Qi.Wang@s.birklehof.de",
+      "student_name": "Wang, Qi",
+      "upn": "Qi.Wang@s.birklehof.de",
+      "niveau": {
+        "n.902": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={CDB915EA-EAA9-4A89-B53F-9CB2A0642B61}&page-id={425DEDEC-016D-4B26-BF13-0AA6DAC6BBA7}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Wang,%20Qi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.903": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.904": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Protokoll%20Flammenfärbung&section-id={CDB915EA-EAA9-4A89-B53F-9CB2A0642B61}&page-id={425DEDEC-016D-4B26-BF13-0AA6DAC6BBA7}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Wang,%20Qi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.905": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Eigenschaften%20von%20Salzen&section-id={CDB915EA-EAA9-4A89-B53F-9CB2A0642B61}&page-id={37C0DFC4-19F8-41C8-BDF5-A7AE67DAA9D0}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Wang,%20Qi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.907": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={CDB915EA-EAA9-4A89-B53F-9CB2A0642B61}&page-id={073CF23D-EFBA-4D81-B5EB-779F857B373A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Wang,%20Qi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.908": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.909": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Praktikum%20Halogenid-Nachweise&section-id={CDB915EA-EAA9-4A89-B53F-9CB2A0642B61}&page-id={5A6D2FE5-752D-42E9-AA92-AA50D28399A1}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Wang,%20Qi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.912": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#28.02.%20EPA-Modelle&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={EC8E7081-371D-C048-A9C4-B2876941BDDB}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.916": {
+          "level": 2,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={CDB915EA-EAA9-4A89-B53F-9CB2A0642B61}&page-id={2E785FC7-D112-47F5-8E0F-6F01E11F121F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Wang,%20Qi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.917": {
+          "level": 1,
+          "nachweise": [
+            {
+              "url": "onenote:#Poster%20Atombaukonferenz&section-id={CDB915EA-EAA9-4A89-B53F-9CB2A0642B61}&page-id={2E785FC7-D112-47F5-8E0F-6F01E11F121F}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Wang,%20Qi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.921": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:..\\_Collaboration%20Space\\Versuchsgallerie.one#21.03.%20Wasser%20vs%20n-Heptan&section-id={E94C5EC0-0C46-414F-B3E1-257AF758B65D}&page-id={F1382F4A-41B9-7848-B8EF-7550529B0DB6}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        },
+        "n.924": {
+          "level": 3,
+          "nachweise": [
+            {
+              "url": "onenote:#Teamarbeit%20Atombaukonferenz&section-id={CDB915EA-EAA9-4A89-B53F-9CB2A0642B61}&page-id={073CF23D-EFBA-4D81-B5EB-779F857B373A}&end&base-path=https://birklehofde.sharepoint.com/sites/Kl.8ChKa2425/SiteAssets/9%20Ch%20Ht%202526-Notizbuch/Wang,%20Qi/Kompetenznachweise.one",
+              "name": "Nachweis aus Klassennotizbuch",
+              "updated_at": "2026-03-28T22:12:36.688470+00:00"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

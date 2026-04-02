@@ -2684,6 +2684,79 @@ async def export_backup_endpoint(
 
 
 # ---------------------------------------------------------------------------
+# Admin: Lehrerverwaltung
+# ---------------------------------------------------------------------------
+
+@app.get("/admin/teachers", response_class=HTMLResponse)
+async def admin_teachers(request: Request, user: dict = Depends(auth.require_teacher_user), msg: str = ""):
+    """Admin-Seite zur Verwaltung genehmigter Lehrer."""
+    teachers = db.get_approved_teachers()
+    return templates.TemplateResponse("admin_teachers.html", {
+        "request": request,
+        "user": user,
+        "teachers": teachers,
+        "msg": msg,
+        "initial_admin": settings.INITIAL_ADMIN_UPN,
+    })
+
+
+@app.post("/admin/teachers/add")
+async def admin_teachers_add(
+    request: Request,
+    upn: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Fügt einen neuen Lehrer hinzu."""
+    upn_clean = upn.strip().lower()
+    if not upn_clean.endswith("@birklehof.de"):
+        return RedirectResponse(
+            url="/admin/teachers?msg=UPN+muss+mit+@birklehof.de+enden",
+            status_code=302
+        )
+    
+    success = db.add_approved_teacher(upn_clean, user.get("upn", ""))
+    if success:
+        return RedirectResponse(
+            url=f"/admin/teachers?msg=Lehrer+{upn_clean}+hinzugefügt",
+            status_code=302
+        )
+    else:
+        return RedirectResponse(
+            url="/admin/teachers?msg=Fehler+beim+Hinzufügen",
+            status_code=302
+        )
+
+
+@app.post("/admin/teachers/remove")
+async def admin_teachers_remove(
+    request: Request,
+    upn: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Entfernt einen Lehrer."""
+    upn_clean = upn.strip().lower()
+    
+    # Verhindere, dass man sich selbst entfernt
+    if upn_clean == user.get("upn", "").lower():
+        return RedirectResponse(
+            url="/admin/teachers?msg=Sie+können+sich+nicht+selbst+entfernen",
+            status_code=302
+        )
+    
+    success = db.remove_approved_teacher(upn_clean)
+    if success:
+        return RedirectResponse(
+            url=f"/admin/teachers?msg=Lehrer+{upn_clean}+entfernt",
+            status_code=302
+        )
+    else:
+        return RedirectResponse(
+            url="/admin/teachers?msg=Fehler+beim+Entfernen",
+            status_code=302
+        )
+
+
+# ---------------------------------------------------------------------------
 # Automatische Backups (Background Task)
 # ---------------------------------------------------------------------------
 

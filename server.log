@@ -1,0 +1,29 @@
+INFO:     Started server process [54003]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:49751 - "GET /teacher/student/max%40schule.de?class_id=dev-class-10&student_name=Max%20Mustermann HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49755 - "POST /logout HTTP/1.1" 302 Found
+INFO:     127.0.0.1:49755 - "GET /login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54001 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54002 - "GET /push-filter HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54010 - "POST /register-device HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54010 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54020 - "PUT /push-filter HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54025 - "PUT /push-filter HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54026 - "PUT /push-filter HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54028 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54131 - "PUT /push-filter HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54133 - "PUT /push-filter HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54134 - "PUT /push-filter HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54141 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54141 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54141 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54141 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54144 - "PUT /push-filter HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54141 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54199 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54199 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54243 - "GET /news?limit=20&offset=0 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54244 - "GET /push-filter HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54243 - "POST /register-device HTTP/1.1" 404 Not Found
