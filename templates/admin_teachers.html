@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Lehrkräfte verwalten{% endblock %}
+{% block content %}
+<h1>Lehrkräfte verwalten</h1>
+
+<p class="muted">
+  Nur explizit genehmigte Lehrkräfte haben Zugriff auf die Lehrer-Funktionen.
+  Eltern mit <code>@birklehof.de</code> werden nicht automatisch als Lehrer erkannt.
+</p>
+
+{% if msg %}
+<div class="success-notice">{{ msg }}</div>
+{% endif %}
+
+{% if initial_admin %}
+<div class="info-notice">
+  <strong>Initial-Admin:</strong> {{ initial_admin }}<br>
+  Dieser Account hat Zugriff, bis mindestens ein Lehrer in der Liste eingetragen ist.
+</div>
+{% endif %}
+
+<h2>Neue Lehrkraft hinzufügen</h2>
+<form method="post" action="/admin/teachers/add" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+  <input type="text" name="upn" placeholder="vorname.nachname@birklehof.de" required style="width:20rem">
+  <button type="submit">Hinzufügen</button>
+</form>
+
+<h2 style="margin-top:2rem">Genehmigte Lehrkräfte</h2>
+{% if teachers %}
+<table>
+  <thead>
+    <tr>
+      <th>UPN</th>
+      <th>Hinzugefügt von</th>
+      <th>Datum</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for teacher in teachers %}
+    <tr>
+      <td><code>{{ teacher.upn }}</code></td>
+      <td>{{ teacher.added_by or "—" }}</td>
+      <td>{{ teacher.added_at[:10] if teacher.added_at else "—" }}</td>
+      <td>
+        <form method="post" action="/admin/teachers/remove" style="display:inline">
+          <input type="hidden" name="upn" value="{{ teacher.upn }}">
+          <button type="submit" class="btn-sm" onclick="return confirm('Lehrer {{ teacher.upn }} entfernen?')">Entfernen</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">Noch keine Lehrkräfte eingetragen. Der Initial-Admin hat Zugriff.</p>
+{% endif %}
+
+{% endblock %}

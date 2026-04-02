@@ -98,6 +98,11 @@ def init_db() -> None:
             data          TEXT NOT NULL,  -- JSON mit competencies
             questions     TEXT DEFAULT '{}'  -- JSON mit questions
         );
+        CREATE TABLE IF NOT EXISTS approved_teachers (
+            upn         TEXT PRIMARY KEY,
+            added_by    TEXT NOT NULL,
+            added_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
         """)
         
         # Migration: Add questions column if table exists without it
@@ -1007,3 +1012,53 @@ def clear_student_records(student_id: str) -> None:
     with _conn() as con:
         con.execute("DELETE FROM einfach_records WHERE student_id = ?", (student_id,))
         con.execute("DELETE FROM nachweise WHERE student_id = ?", (student_id,))
+
+
+
+def add_approved_teacher(upn: str, added_by: str) -> bool:
+    """Fügt einen genehmigten Lehrer hinzu."""
+    try:
+        with _conn() as con:
+            con.execute(
+                "INSERT OR REPLACE INTO approved_teachers (upn, added_by) VALUES (?, ?)",
+                (upn.lower(), added_by)
+            )
+        return True
+    except sqlite3.Error:
+        return False
+
+
+def remove_approved_teacher(upn: str) -> bool:
+    """Entfernt einen genehmigten Lehrer."""
+    try:
+        with _conn() as con:
+            con.execute("DELETE FROM approved_teachers WHERE upn = ?", (upn.lower(),))
+        return True
+    except sqlite3.Error:
+        return False
+
+
+def is_approved_teacher(upn: str) -> bool:
+    """Prüft ob ein UPN ein genehmigter Lehrer ist."""
+    with _conn() as con:
+        row = con.execute(
+            "SELECT 1 FROM approved_teachers WHERE upn = ?",
+            (upn.lower(),)
+        ).fetchone()
+        return row is not None
+
+
+def get_approved_teachers() -> list[dict]:
+    """Gibt alle genehmigten Lehrer zurück."""
+    with _conn() as con:
+        rows = con.execute(
+            "SELECT upn, added_by, added_at FROM approved_teachers ORDER BY added_at DESC"
+        ).fetchall()
+        return [dict(row) for row in rows]
+
+
+def has_any_approved_teacher() -> bool:
+    """Prüft ob überhaupt genehmigte Lehrer existieren."""
+    with _conn() as con:
+        row = con.execute("SELECT 1 FROM approved_teachers LIMIT 1").fetchone()
+        return row is not None
