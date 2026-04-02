@@ -532,6 +532,31 @@ async def auth_me(user: dict = Depends(auth.require_user)):
 # Student routes
 # ---------------------------------------------------------------------------
 
+def calculate_average_progress() -> dict:
+    """Calculate average progress across all students with data."""
+    # Get all students from all classes
+    all_members = db.get_all_class_members()
+    
+    if not all_members:
+        return {"prozent": 0, "gesamtpunkte": 0, "max_punkte": 0}
+    
+    total_percent = 0
+    count = 0
+    
+    for member in all_members:
+        einfach_map, nachweise_by_comp, _, grade = _load_student_data("", member["student_id"])
+        if grade and grade.get("prozent") is not None:
+            total_percent += grade["prozent"]
+            count += 1
+    
+    avg_percent = round(total_percent / count, 1) if count > 0 else 0
+    return {
+        "prozent": avg_percent,
+        "gesamtpunkte": 0,  # Not used for average display
+        "max_punkte": 0,
+    }
+
+
 def _get_student_competencies(student_id: str) -> tuple[list[dict], list[dict], set[int], str | None]:
     """Get competencies for a student based on their class.
     Returns: (einfach_list, niveau_list, active_ids, class_id)"""
@@ -579,6 +604,30 @@ def _get_student_competencies(student_id: str) -> tuple[list[dict], list[dict], 
 async def student_dashboard(request: Request, user: dict = Depends(auth.require_user)):
     if user["is_teacher"]:
         return RedirectResponse("/teacher")
+    
+    # Check if student is authorized (member of a class)
+    upn = user.get("upn", "").lower()
+    is_birklehof_teacher = upn.endswith("@birklehof.de") and not upn.endswith("@s.birklehof.de")
+    is_birklehof_student = upn.endswith("@s.birklehof.de")
+    
+    # If @birklehof.de but not a teacher -> unauthorized
+    if is_birklehof_teacher and not user.get("is_teacher"):
+        avg_progress = calculate_average_progress()
+        return templates.TemplateResponse("unauthorized.html", {
+            "request": request,
+            "user": user,
+            "avg_progress": avg_progress,
+        })
+    
+    # If @s.birklehof.de but not in any class -> unauthorized
+    if is_birklehof_student:
+        if not db.is_student_in_any_class(user["oid"]):
+            avg_progress = calculate_average_progress()
+            return templates.TemplateResponse("unauthorized.html", {
+                "request": request,
+                "user": user,
+                "avg_progress": avg_progress,
+            })
 
     einfach_map, nachweise_by_comp, best_nachweis_by_comp, _ = _load_student_data(
         user["access_token"], user["oid"]

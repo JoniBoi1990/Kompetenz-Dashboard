@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zugriff nicht möglich - Kompetenz-Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<nav>
+  <span class="nav-brand">Kompetenz-Dashboard</span>
+  <div class="nav-links">
+    <span class="nav-user">{{ user.display_name }}</span>
+    <form action="/logout" method="post" style="display:inline">
+      <button type="submit" class="btn-link">Abmelden</button>
+    </form>
+  </div>
+</nav>
+<main>
+  <div class="unauthorized-container">
+    <img src="/static/logo.png" alt="Birklehof Logo" class="unauthorized-logo">
+    
+    {# XP-Bar mit Durchschnittsfortschritt aller Schüler #}
+    <div style="margin: 1.5rem auto; max-width: 400px;">
+      <div class="xp-bar-label">Durchschnittlicher Kompetenzfortschritt aller Schüler:</div>
+      <div class="xp-bar-container" style="margin: 0 auto;">
+        <div class="xp-bar-fill" style="width: {{ avg_progress.prozent }}%;"></div>
+        <div class="xp-bar-text">{{ avg_progress.prozent }}% XP</div>
+      </div>
+    </div>
+    
+    <div class="unauthorized-text">
+      <p>
+        Diese Website dient zur Übersicht des Kompetenzstands im Fach Chemie.
+      </p>
+      <p>
+        Du kannst das Kompetenz-Dashboard nur nutzen, wenn du den 
+        Chemie-Unterricht am Birklehof besuchst.
+      </p>
+    </div>
+    
+    <div class="unauthorized-hint">
+      <p class="muted">
+        Bei Fragen wende dich bitte an deine Chemie-Lehrkraft.
+      </p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

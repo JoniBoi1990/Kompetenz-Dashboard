@@ -1062,3 +1062,29 @@ def has_any_approved_teacher() -> bool:
     with _conn() as con:
         row = con.execute("SELECT 1 FROM approved_teachers LIMIT 1").fetchone()
         return row is not None
+
+
+def is_student_in_any_class(student_id: str) -> bool:
+    """Check if a student is member of any class."""
+    with _conn() as con:
+        row = con.execute(
+            "SELECT 1 FROM class_members WHERE student_id = ? LIMIT 1",
+            (student_id,)
+        ).fetchone()
+        return row is not None
+
+
+def get_all_class_members() -> list[dict]:
+    """Get all students from all classes.
+    
+    Returns:
+        List of dicts with keys: student_id, student_name, upn, class_id
+    """
+    with _conn() as con:
+        rows = con.execute(
+            """SELECT m.student_id, m.student_name, m.upn, m.class_id, c.name as class_name
+               FROM class_members m
+               JOIN classes c ON m.class_id = c.id
+               ORDER BY c.name, m.student_name"""
+        ).fetchall()
+    return [dict(row) for row in rows]
