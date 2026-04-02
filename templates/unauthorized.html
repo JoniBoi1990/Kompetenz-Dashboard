@@ -24,7 +24,17 @@
     <div style="margin: 1.5rem auto; max-width: 400px;">
       <div class="xp-bar-label">Durchschnittlicher Kompetenzfortschritt aller Schüler:</div>
       <div class="xp-bar-container" style="margin: 0 auto;">
-        <div class="xp-bar-fill" style="width: {{ avg_progress.prozent }}%;"></div>
+        {% set xp_pct = avg_progress.prozent|float %}
+        {% if xp_pct < 20 %}
+          {% set xp_class = 'xp-red' %}
+        {% elif xp_pct < 45 %}
+          {% set xp_class = 'xp-yellow' %}
+        {% elif xp_pct < 80 %}
+          {% set xp_class = 'xp-green' %}
+        {% else %}
+          {% set xp_class = 'xp-blue' %}
+        {% endif %}
+        <div class="xp-bar-fill {{ xp_class }}" style="width: {{ avg_progress.prozent }}%;"></div>
         <div class="xp-bar-text">{{ avg_progress.prozent }}% XP</div>
       </div>
     </div>

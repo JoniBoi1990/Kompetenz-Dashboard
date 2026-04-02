@@ -422,18 +422,31 @@ tr.thema-header td {
 
 .xp-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, 
-        #4caf50 0%, 
-        #4caf50 33%, 
-        #2196f3 33%, 
-        #2196f3 66%, 
-        #9c27b0 66%, 
-        #9c27b0 100%);
-    background-size: 100% 100%;
     border-radius: 14px;
-    transition: width 0.5s ease-out;
+    transition: width 0.5s ease-out, background-color 0.3s ease;
     position: relative;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Color classes for XP bar based on percentage */
+.xp-bar-fill.xp-red {
+    background: linear-gradient(180deg, #ff6b6b 0%, #d32f2f 100%);
+    box-shadow: 0 0 10px rgba(211, 47, 47, 0.4);
+}
+
+.xp-bar-fill.xp-yellow {
+    background: linear-gradient(180deg, #ffd54f 0%, #f9a825 100%);
+    box-shadow: 0 0 10px rgba(249, 168, 37, 0.4);
+}
+
+.xp-bar-fill.xp-green {
+    background: linear-gradient(180deg, #81c784 0%, #388e3c 100%);
+    box-shadow: 0 0 10px rgba(56, 142, 60, 0.4);
+}
+
+.xp-bar-fill.xp-blue {
+    background: linear-gradient(180deg, #64b5f6 0%, #1976d2 100%);
+    box-shadow: 0 0 10px rgba(25, 118, 210, 0.4);
 }
 
 .xp-bar-fill::after {
