@@ -292,6 +292,13 @@ function updateRowHighlight(basis) {
     });
 }
 
+function getXpColorClass(pct) {
+    if (pct < 20) return 'xp-red';
+    if (pct < 45) return 'xp-yellow';
+    if (pct < 80) return 'xp-green';
+    return 'xp-blue';
+}
+
 function updateDisplay() {
     const basis = getBasis();
     const r = calcScore(basis);
@@ -304,6 +311,7 @@ function updateDisplay() {
     const xpBarText = document.getElementById('xp-bar-plan-text');
     if (xpBarFill && xpBarText) {
         xpBarFill.style.width = `${r.pct}%`;
+        xpBarFill.className = 'xp-bar-fill ' + getXpColorClass(r.pct);
         xpBarText.textContent = `${r.pct}% XP`;
     }
     
@@ -339,5 +347,14 @@ document.getElementById('btn-planmode').addEventListener('click', () => {
         visible ? 'Planungsmodus aktivieren' : 'Planungsmodus schließen';
     if (!visible) updateDisplay();
 });
+
+// Set initial XP bar color
+(function setInitialXpColor() {
+    const xpBarFill = document.getElementById('xp-bar-fill');
+    if (xpBarFill) {
+        const pct = parseFloat(xpBarFill.style.width) || 0;
+        xpBarFill.className = 'xp-bar-fill ' + getXpColorClass(pct);
+    }
+})();
 </script>
 {% endblock %}
