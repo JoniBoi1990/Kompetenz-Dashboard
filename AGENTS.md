@@ -193,13 +193,19 @@ RPG-style progress indicator displayed in:
 - Teacher student detail view
 - Unauthorized page (showing average of all students)
 
-**Features:**
-- Gradient colors: green (0-33%), blue (33-66%), purple (66-100%)
-- Animated width transition
-- "XP: X%" text overlay
-- Updates dynamically in planning mode when basis toggles (Unterrichtsstand vs. Schuljahr)
+**Color Scheme (based on percentage):**
+- 🔴 **Red** (`xp-red`): < 20% — needs attention
+- 🟡 **Yellow** (`xp-yellow`): 20% - 45% — getting started
+- 🟢 **Green** (`xp-green`): 45% - 80% — good progress
+- 🔵 **Blue** (`xp-blue`): ≥ 80% — excellent
 
-**CSS classes:** `.xp-bar-container`, `.xp-bar-fill`, `.xp-bar-text`
+**Features:**
+- Color changes dynamically based on percentage
+- Animated width transition
+- "X% XP" text overlay
+- Updates in real-time in planning mode when basis toggles (Unterrichtsstand vs. Schuljahr)
+
+**CSS classes:** `.xp-bar-container`, `.xp-bar-fill`, `.xp-bar-text`, plus color classes `.xp-red`, `.xp-yellow`, `.xp-green`, `.xp-blue`
 
 ### Unauthorized Access Handling
 
