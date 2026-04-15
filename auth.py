@@ -14,8 +14,8 @@ from config import settings
 import db
 
 AUTHORITY = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}"
-# Only User.Read — identity + role detection.  No SharePoint or Group scopes needed.
-SCOPES = ["User.Read"]
+# User.Read for identity + Notes.Read.All for OneNote sync
+SCOPES = ["User.Read", "Notes.Read.All"]
 
 
 def _build_redirect_uri(request: Request) -> str:
