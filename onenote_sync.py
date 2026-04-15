@@ -435,7 +435,7 @@ class OneNoteSyncService:
                         einfach_count += 1
                         student_details["einfach"].append(comp_id)
             
-            # Merge niveau competencies (add new nachweis, never overwrite)
+            # Merge niveau competencies (add new nachweis, skip duplicates)
             niveau_data = student.get("niveau", {})
             if niveau_data:
                 for comp_id, comp_info in niveau_data.items():
@@ -445,7 +445,11 @@ class OneNoteSyncService:
                     if level == 0:
                         continue
                     
-                    # Always add as new nachweis (appends to history)
+                    # Skip if identical nachweis already exists
+                    if db.has_identical_nachweis(student_id, comp_id, level, url):
+                        continue
+                    
+                    # Add new nachweis
                     db.add_nachweis(
                         student_id=student_id,
                         student_name=student_name,
