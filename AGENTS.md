@@ -243,7 +243,7 @@ Each class can be configured independently via `Lehrer → Klasse → OneNote Ko
 3. **Niveau Competencies:** Parsed from "Projektkompetenzen" page (level columns)
 4. **Merge Behavior:** 
    - Einfach: Added only if not already achieved
-   - Niveau: Always appended as new evidence entry (highest level wins for grade)
+   - Niveau: Added only if no identical entry exists (same URL + same level). Multiple evidence entries per competency are allowed (different URLs or different levels).
 5. **Scheduling:** Automatic daily sync at 02:00 UTC, or manual trigger anytime
 
 ### Database Tables
@@ -356,7 +356,7 @@ WantedBy=default.target
 ## Security Considerations
 
 ### Authentication
-- MSAL scope: `User.Read` only — do NOT add broader scopes
+- MSAL scopes: `User.Read` (identity), `Notes.Read.All` (OneNote sync)
 - Session cookies: 8h TTL, httponly, samesite=lax
 - Role detection based on Azure AD claims + UPN patterns
 
