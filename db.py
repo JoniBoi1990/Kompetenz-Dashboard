@@ -163,6 +163,9 @@ def init_db() -> None:
         # Migration: Convert competency_id from INTEGER to TEXT with prefix
         # This requires recreating tables due to SQLite limitations
         _migrate_competency_ids_to_text(con)
+        
+        # Initialize OneNote sync tables
+        init_onenote_sync_tables()
 
 
 def _migrate_competency_ids_to_text(con) -> None:
@@ -1088,3 +1091,276 @@ def get_all_class_members() -> list[dict]:
                ORDER BY c.name, m.student_name"""
         ).fetchall()
     return [dict(row) for row in rows]
+
+
+# ---------------------------------------------------------------------------
+# OneNote Sync Configuration & History
+# ---------------------------------------------------------------------------
+
+def init_onenote_sync_tables() -> None:
+    """Create OneNote sync tables if they don't exist."""
+    with _conn() as con:
+        con.executescript("""
+        CREATE TABLE IF NOT EXISTS onenote_sync_config (
+            class_id TEXT PRIMARY KEY,
+            enabled INTEGER NOT NULL DEFAULT 0,
+            site_url TEXT NOT NULL,
+            notebook_name TEXT NOT NULL,
+            section_name TEXT DEFAULT 'Kompetenznachweise',
+            student_mapping TEXT DEFAULT '{}',
+            last_sync_at TEXT,
+            last_sync_status TEXT,
+            last_sync_error TEXT,
+            created_by TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
+        );
+        
+        CREATE TABLE IF NOT EXISTS onenote_sync_history (
+            id TEXT PRIMARY KEY,
+            class_id TEXT NOT NULL,
+            started_at TEXT NOT NULL,
+            finished_at TEXT,
+            status TEXT NOT NULL,
+            error_message TEXT,
+            students_processed INTEGER DEFAULT 0,
+            einfach_added INTEGER DEFAULT 0,
+            niveau_added INTEGER DEFAULT 0,
+            details TEXT DEFAULT '{}',
+            triggered_by TEXT DEFAULT 'auto',
+            FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
+        );
+        
+        CREATE INDEX IF NOT EXISTS idx_sync_history_class ON onenote_sync_history(class_id);
+        CREATE INDEX IF NOT EXISTS idx_sync_history_started ON onenote_sync_history(started_at);
+        """)
+
+
+def get_onenote_sync_config(class_id: str) -> dict | None:
+    """Get OneNote sync configuration for a class."""
+    with _conn() as con:
+        row = con.execute(
+            "SELECT * FROM onenote_sync_config WHERE class_id = ?",
+            (class_id,)
+        ).fetchone()
+    
+    if not row:
+        return None
+    
+    return {
+        "class_id": row["class_id"],
+        "enabled": bool(row["enabled"]),
+        "site_url": row["site_url"],
+        "notebook_name": row["notebook_name"],
+        "section_name": row["section_name"],
+        "student_mapping": json.loads(row["student_mapping"]),
+        "last_sync_at": row["last_sync_at"],
+        "last_sync_status": row["last_sync_status"],
+        "last_sync_error": row["last_sync_error"],
+        "created_by": row["created_by"],
+        "created_at": row["created_at"],
+        "updated_at": row["updated_at"],
+    }
+
+
+def save_onenote_sync_config(
+    class_id: str,
+    enabled: bool,
+    site_url: str,
+    notebook_name: str,
+    section_name: str = "Kompetenznachweise",
+    student_mapping: dict | None = None,
+    created_by: str = "system",
+) -> None:
+    """Save or update OneNote sync configuration."""
+    now = datetime.now(timezone.utc).isoformat()
+    
+    with _conn() as con:
+        con.execute(
+            """INSERT OR REPLACE INTO onenote_sync_config
+               (class_id, enabled, site_url, notebook_name, section_name, 
+                student_mapping, created_by, created_at, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, 
+                       COALESCE((SELECT created_at FROM onenote_sync_config WHERE class_id = ?), ?),
+                       ?)""",
+            (
+                class_id,
+                int(enabled),
+                site_url,
+                notebook_name,
+                section_name,
+                json.dumps(student_mapping or {}),
+                created_by,
+                class_id,
+                now,
+                now,
+            ),
+        )
+
+
+def update_onenote_sync_status(
+    class_id: str,
+    status: str,
+    error: str | None = None,
+) -> None:
+    """Update last sync status for a class."""
+    now = datetime.now(timezone.utc).isoformat()
+    
+    with _conn() as con:
+        con.execute(
+            """UPDATE onenote_sync_config 
+               SET last_sync_at = ?, last_sync_status = ?, last_sync_error = ?
+               WHERE class_id = ?""",
+            (now, status, error, class_id),
+        )
+
+
+def delete_onenote_sync_config(class_id: str) -> None:
+    """Delete OneNote sync configuration for a class."""
+    with _conn() as con:
+        con.execute("DELETE FROM onenote_sync_config WHERE class_id = ?", (class_id,))
+        con.execute("DELETE FROM onenote_sync_history WHERE class_id = ?", (class_id,))
+
+
+def get_enabled_onenote_sync_configs() -> list[dict]:
+    """Get all enabled OneNote sync configurations."""
+    with _conn() as con:
+        rows = con.execute(
+            "SELECT * FROM onenote_sync_config WHERE enabled = 1"
+        ).fetchall()
+    
+    return [
+        {
+            "class_id": row["class_id"],
+            "enabled": bool(row["enabled"]),
+            "site_url": row["site_url"],
+            "notebook_name": row["notebook_name"],
+            "section_name": row["section_name"],
+            "student_mapping": json.loads(row["student_mapping"]),
+            "last_sync_at": row["last_sync_at"],
+            "last_sync_status": row["last_sync_status"],
+            "last_sync_error": row["last_sync_error"],
+            "created_by": row["created_by"],
+        }
+        for row in rows
+    ]
+
+
+# ---------------------------------------------------------------------------
+# OneNote Sync History
+# ---------------------------------------------------------------------------
+
+def create_sync_history(class_id: str, triggered_by: str = "auto") -> str:
+    """Create a new sync history entry and return its ID."""
+    history_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    with _conn() as con:
+        con.execute(
+            """INSERT INTO onenote_sync_history
+               (id, class_id, started_at, status, triggered_by)
+               VALUES (?, ?, ?, 'running', ?)""",
+            (history_id, class_id, now, triggered_by),
+        )
+    
+    return history_id
+
+
+def finish_sync_history(
+    history_id: str,
+    status: str,
+    students_processed: int = 0,
+    einfach_added: int = 0,
+    niveau_added: int = 0,
+    details: dict | None = None,
+    error_message: str | None = None,
+) -> None:
+    """Finish a sync history entry with results."""
+    now = datetime.now(timezone.utc).isoformat()
+    
+    with _conn() as con:
+        con.execute(
+            """UPDATE onenote_sync_history
+               SET finished_at = ?, status = ?, 
+                   students_processed = ?, einfach_added = ?, niveau_added = ?,
+                   details = ?, error_message = ?
+               WHERE id = ?""",
+            (
+                now,
+                status,
+                students_processed,
+                einfach_added,
+                niveau_added,
+                json.dumps(details or {}),
+                error_message,
+                history_id,
+            ),
+        )
+
+
+def get_sync_history(class_id: str, limit: int = 50) -> list[dict]:
+    """Get sync history for a class."""
+    with _conn() as con:
+        rows = con.execute(
+            """SELECT * FROM onenote_sync_history 
+               WHERE class_id = ? 
+               ORDER BY started_at DESC 
+               LIMIT ?""",
+            (class_id, limit),
+        ).fetchall()
+    
+    return [
+        {
+            "id": row["id"],
+            "class_id": row["class_id"],
+            "started_at": row["started_at"],
+            "finished_at": row["finished_at"],
+            "status": row["status"],
+            "error_message": row["error_message"],
+            "students_processed": row["students_processed"],
+            "einfach_added": row["einfach_added"],
+            "niveau_added": row["niveau_added"],
+            "details": json.loads(row["details"]),
+            "triggered_by": row["triggered_by"],
+        }
+        for row in rows
+    ]
+
+
+def get_sync_history_entry(history_id: str) -> dict | None:
+    """Get a single sync history entry with details."""
+    with _conn() as con:
+        row = con.execute(
+            "SELECT * FROM onenote_sync_history WHERE id = ?",
+            (history_id,)
+        ).fetchone()
+    
+    if not row:
+        return None
+    
+    return {
+        "id": row["id"],
+        "class_id": row["class_id"],
+        "started_at": row["started_at"],
+        "finished_at": row["finished_at"],
+        "status": row["status"],
+        "error_message": row["error_message"],
+        "students_processed": row["students_processed"],
+        "einfach_added": row["einfach_added"],
+        "niveau_added": row["niveau_added"],
+        "details": json.loads(row["details"]),
+        "triggered_by": row["triggered_by"],
+    }
+
+
+def cleanup_old_sync_history(days: int = 90) -> int:
+    """Delete sync history older than specified days."""
+    cutoff = datetime.now(timezone.utc).timestamp() - (days * 86400)
+    
+    with _conn() as con:
+        cursor = con.execute(
+            "DELETE FROM onenote_sync_history WHERE started_at < ?",
+            (datetime.fromtimestamp(cutoff, tz=timezone.utc).isoformat(),)
+        )
+        return cursor.rowcount

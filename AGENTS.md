@@ -17,6 +17,7 @@
 - **PDF Test Generator:** Creates personalized competency tests with randomized questions
 - **Grade Calculation:** Automatic grade calculation based on achieved competencies
 - **Backup/Restore:** JSON-based backup system for competency records
+- **OneNote Sync:** Automatic synchronization of competencies from OneNote class notebooks (daily at 02:00 or manual trigger)
 - **XP Progress Bar:** RPG-style visual progress indicator with gradient colors (green→blue→purple)
 - **Unauthorized Access Page:** Info page for non-chemistry students with average progress display
 
@@ -58,6 +59,7 @@ Kompetenz-Dashboard/
 │
 ├── convert_csv_to_json.py    # CLI: Convert CSV → JSON competency lists
 ├── onenote_to_backup.py      # Standalone: OneNote → Backup JSON import
+├── onenote_sync.py           # Service: OneNote Graph API integration for auto-sync
 │
 ├── grading_scale.json        # Active grading scale (auto-created)
 ├── static/logo.png           # School logo (place manually, NOT in git)
@@ -69,7 +71,9 @@ Kompetenz-Dashboard/
 │   ├── teacher.html          # Teacher class overview
 │   ├── student_detail.html   # Individual student view (with XP progress bar)
 │   ├── unauthorized.html     # Info page for non-chemistry students
-│   └── ... (25 templates total)
+│   ├── onenote_config.html   # OneNote sync configuration
+│   ├── onenote_history.html  # OneNote sync history
+│   └── ... (27 templates total)
 │
 ├── kompetenzlisten/          # Class-specific competency lists (JSON)
 │   ├── klasse-9-chemie.json
@@ -216,6 +220,48 @@ Users with `@birklehof.de` (non-teachers) or `@s.birklehof.de` (not in any class
 - Logout button
 
 Implemented in `main.py:student_dashboard()` with helper `calculate_average_progress()`.
+
+---
+
+## OneNote Sync Integration
+
+Automatic synchronization of competencies from OneNote class notebooks to the dashboard.
+
+### Configuration
+
+Each class can be configured independently via `Lehrer → Klasse → OneNote Konfiguration`:
+
+- **SharePoint Site URL:** The site hosting the class notebook
+- **Notebook Name:** Exact name of the OneNote notebook
+- **Student Mapping:** Optional JSON mapping of OneNote names to UPNs
+- **Enabled:** Toggle to activate/deactivate sync
+
+### How It Works
+
+1. **Data Source:** Reads from "Kompetenznachweise" section in each student's notebook
+2. **Einfach Competencies:** Parsed from "Unterrichtskompetenzen" page (checkboxes)
+3. **Niveau Competencies:** Parsed from "Projektkompetenzen" page (level columns)
+4. **Merge Behavior:** 
+   - Einfach: Added only if not already achieved
+   - Niveau: Always appended as new evidence entry (highest level wins for grade)
+5. **Scheduling:** Automatic daily sync at 02:00 UTC, or manual trigger anytime
+
+### Database Tables
+
+- `onenote_sync_config`: Per-class configuration
+- `onenote_sync_history`: Sync run history with details of added competencies
+
+### Files
+
+- `onenote_sync.py`: Service module with Graph API integration
+- `templates/onenote_config.html`: Configuration UI
+- `templates/onenote_history.html`: History view with detail modal
+
+### Authentication Note
+
+Manual sync uses the triggering teacher's access token. Automatic scheduled sync requires either:
+- Azure AD Service Principal with Application permissions, OR
+- Stored refresh token (with periodic re-authorization)
 
 ---
 
@@ -434,4 +480,4 @@ Der Skill analysiert Python-Code und erstellt konkrete Verbesserungsvorschläge 
 
 ---
 
-*Last updated: 2026-04-02 by AI agent analysis*
+*Last updated: 2026-04-14 by AI agent analysis*
