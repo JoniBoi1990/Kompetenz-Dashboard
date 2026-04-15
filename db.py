@@ -412,6 +412,30 @@ def delete_nachweis(nachweis_id: str) -> None:
         con.execute("DELETE FROM nachweise WHERE id = ?", (nachweis_id,))
 
 
+def has_identical_nachweis(
+    student_id: str,
+    competency_id: str,
+    niveau_level: int,
+    evidence_url: str,
+) -> bool:
+    """Check if an identical nachweis already exists.
+    
+    Returns True if a nachweis with the same student_id, competency_id,
+    niveau_level AND evidence_url already exists.
+    """
+    with _conn() as con:
+        row = con.execute(
+            """SELECT 1 FROM nachweise 
+               WHERE student_id = ? 
+                 AND competency_id = ? 
+                 AND niveau_level = ? 
+                 AND evidence_url = ?
+               LIMIT 1""",
+            (student_id, competency_id, niveau_level, evidence_url or ""),
+        ).fetchone()
+    return row is not None
+
+
 # ---------------------------------------------------------------------------
 # Test requests
 # ---------------------------------------------------------------------------
