@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}OneNote Sync Konfiguration{% endblock %}
+{% block content %}
+<h1>OneNote Sync: {{ class_name }}</h1>
+
+<p class="muted">
+  <a href="/teacher/class/{{ class_id }}">&larr; Zurück zur Klasse</a>
+</p>
+
+{% if request.query_params.get('msg') %}
+<div class="success-notice">{{ request.query_params.get('msg') }}</div>
+{% endif %}
+
+<div class="info-box" style="background: #e3f2fd; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+  <h3 style="margin-top: 0;">ℹ️ Wie funktioniert der OneNote Sync?</h3>
+  <p>Diese Funktion synchronisiert automatisch Kompetenzen aus dem OneNote Klassennotizbuch in das Dashboard.</p>
+  <ul>
+    <li><strong>Einfach-Kompetenzen:</strong> Werden aus der Tabelle "Unterrichtskompetenzen" übernommen (Checkboxen)</li>
+    <li><strong>Niveau-Kompetenzen:</strong> Werden aus der Tabelle "Projektkompetenzen" übernommen (erreichte Level)</li>
+    <li><strong>Merge-Modus:</strong> Bereits im Dashboard vorhandene Kompetenzen werden <strong>nicht</strong> überschrieben</li>
+    <li><strong>Automatisch:</strong> Täglich um 02:00 Uhr (sofern aktiviert)</li>
+    <li><strong>Manuell:</strong> Jederzeit über den "Jetzt synchronisieren"-Button</li>
+  </ul>
+  <p class="muted" style="margin-bottom: 0;">
+    <strong>Hinweis:</strong> Der automatische Sync erfordert eine einmalige Azure AD Autorisierung durch einen Administrator.
+  </p>
+</div>
+
+<h2>Konfiguration</h2>
+
+<form method="post" action="/teacher/class/{{ class_id }}/onenote-config" class="form-card">
+  <div class="form-group">
+    <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+      <input type="checkbox" name="enabled" value="true" 
+             {% if config and config.enabled %}checked{% endif %}
+             style="width: auto;">
+      <span>OneNote Sync aktivieren</span>
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label for="site_url">SharePoint Site-URL</label>
+    <input type="url" id="site_url" name="site_url" 
+           value="{{ config.site_url if config else '' }}"
+           placeholder="https://birklehofde.sharepoint.com/sites/Klasse9"
+           required>
+    <small class="muted">Die URL der SharePoint Site, auf der das Klassennotizbuch gespeichert ist</small>
+  </div>
+
+  <div class="form-group">
+    <label for="notebook_name">Name des Notizbuchs</label>
+    <input type="text" id="notebook_name" name="notebook_name"
+           value="{{ config.notebook_name if config else '' }}"
+           placeholder="9 Ch Ht 2526-Notizbuch"
+           required>
+    <small class="muted">Exakter Name des OneNote Notizbuchs</small>
+  </div>
+
+  <h3 style="margin-top: 1.5rem;">Schüler-Mapping (optional)</h3>
+  <p class="muted">
+    Falls die Namen im OneNote vom Dashboard abweichen, können Sie hier Korrekturen hinterlegen.
+    Das System versucht automatisch eine Zuordnung.
+  </p>
+  
+  <div class="form-group">
+    <label for="student_mapping">Mapping JSON</label>
+    <textarea id="student_mapping" name="student_mapping" rows="6"
+              placeholder='{&quot;Nachname, Vorname&quot;: &quot;vorname.nachname@s.birklehof.de&quot;}'>{% if config and config.student_mapping %}{{ config.student_mapping | tojson }}{% else %}{}{% endif %}</textarea>
+    <small class="muted">
+      JSON-Format: {"OneNote Name": "UPN"}<br>
+      Beispiel: {"Müller, Max": "max.mueller@s.birklehof.de"}
+    </small>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn-primary">Konfiguration speichern</button>
+  </div>
+</form>
+
+{% if config and config.enabled %}
+<h2 style="margin-top: 2rem;">Manuelle Synchronisierung</h2>
+<form method="post" action="/teacher/class/{{ class_id }}/onenote-sync/trigger"
+      onsubmit="return confirm('Sync jetzt starten? Dies kann einige Minuten dauern.');">
+  <button type="submit" class="btn-primary">Jetzt synchronisieren</button>
+</form>
+{% endif %}
+
+{% if history %}
+<h2 style="margin-top: 2rem;">Letzte Sync-Läufe</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Zeitpunkt</th>
+      <th>Status</th>
+      <th>Schüler</th>
+      <th>Einfach</th>
+      <th>Niveau</th>
+      <th>Ausgelöst durch</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for h in history %}
+    <tr>
+      <td>{{ h.started_at[:16].replace('T', ' ') if h.started_at else '-' }}</td>
+      <td>
+        {% if h.status == 'success' %}
+        <span style="color: #4caf50;">✓ Erfolg</span>
+        {% elif h.status == 'error' %}
+        <span style="color: #f44336;">✗ Fehler</span>
+        {% else %}
+        <span style="color: #ff9800;">⏳ Läuft</span>
+        {% endif %}
+      </td>
+      <td>{{ h.students_processed }}</td>
+      <td>{{ h.einfach_added }}</td>
+      <td>{{ h.niveau_added }}</td>
+      <td>
+        {% if h.triggered_by == 'auto' %}Automatisch
+        {% else %}{{ h.triggered_by }}
+        {% endif %}
+      </td>
+    </tr>
+    {% if h.error_message %}
+    <tr>
+      <td colspan="6" style="color: #f44336; font-size: 0.875rem; background: #ffebee;">
+        Fehler: {{ h.error_message }}
+      </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+
+<p>
+  <a href="/teacher/class/{{ class_id }}/onenote-history" class="btn-sm">Vollständige Historie anzeigen →</a>
+</p>
+{% endif %}
+
+{% if config %}
+<div class="sync-status" style="margin-top: 2rem; padding: 1rem; background: #f5f5f5; border-radius: 0.5rem;">
+  <h3 style="margin-top: 0;">Aktueller Status</h3>
+  <p>
+    <strong>Letzter Sync:</strong> 
+    {% if config.last_sync_at %}
+      {{ config.last_sync_at[:16].replace('T', ' ') }}
+    {% else %}
+      Noch nie
+    {% endif %}
+  </p>
+  <p>
+    <strong>Status:</strong> 
+    {% if config.last_sync_status == 'success' %}
+      <span style="color: #4caf50;">✓ Erfolgreich</span>
+    {% elif config.last_sync_status == 'error' %}
+      <span style="color: #f44336;">✗ Fehler</span>
+      {% if config.last_sync_error %}
+        <br><small style="color: #f44336;">{{ config.last_sync_error }}</small>
+      {% endif %}
+    {% else %}
+      <span style="color: #757575;">-</span>
+    {% endif %}
+  </p>
+</div>
+{% endif %}
+
+<style>
+.form-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+}
+
+.checkbox-label input {
+  width: auto;
+  transform: scale(1.2);
+}
+
+.form-actions {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.info-box ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.info-box li {
+  margin: 0.25rem 0;
+}
+</style>
+{% endblock %}
