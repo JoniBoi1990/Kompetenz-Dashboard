@@ -199,6 +199,47 @@ def _reload_questions() -> None:
 templates.env.globals["NIVEAU_LABELS"] = NIVEAU_LABELS
 templates.env.globals["config"] = settings
 
+# Custom Jinja2 filters
+from datetime import datetime as _datetime
+from zoneinfo import ZoneInfo
+
+def to_datetime_filter(value):
+    """Parse ISO datetime string to datetime object."""
+    if not value:
+        return _datetime.now()
+    # Handle ISO format with Z or +00:00
+    value = value.replace('Z', '+00:00')
+    try:
+        return _datetime.fromisoformat(value)
+    except ValueError:
+        return _datetime.now()
+
+def to_local_time_filter(value, fmt="%d.%m.%Y %H:%M"):
+    """Convert UTC ISO datetime string to Europe/Berlin local time.
+    
+    Args:
+        value: ISO datetime string (assumed UTC if no timezone)
+        fmt: strftime format string (default: "%d.%m.%Y %H:%M")
+    """
+    if not value:
+        return "-"
+    # Handle ISO format with Z or +00:00
+    value = value.replace('Z', '+00:00')
+    try:
+        dt = _datetime.fromisoformat(value)
+        # If no timezone info, assume UTC
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        # Convert to Europe/Berlin
+        berlin = ZoneInfo("Europe/Berlin")
+        local_dt = dt.astimezone(berlin)
+        return local_dt.strftime(fmt)
+    except (ValueError, TypeError):
+        return "-"
+
+templates.env.filters["to_datetime"] = to_datetime_filter
+templates.env.filters["to_local_time"] = to_local_time_filter
+
 # Initial load
 _reload_kompetenzen()
 _reload_questions()
@@ -731,6 +772,12 @@ async def teacher_overview(request: Request, user: dict = Depends(auth.require_t
     pending_antraege_count = sum(
         1 for a in db.get_all_kompetenzantraege().values() if a["status"] == "pending"
     )
+    
+    # Add OneNote sync status to groups
+    for g in groups:
+        config = db.get_onenote_sync_config(g["id"])
+        g["onenote_sync_enabled"] = config["enabled"] if config else False
+    
     return templates.TemplateResponse("teacher.html", {
         "request": request, "user": user, "groups": groups,
         "pending_count": pending_count, "pending_antraege_count": pending_antraege_count,
@@ -740,8 +787,11 @@ async def teacher_overview(request: Request, user: dict = Depends(auth.require_t
 @app.get("/teacher/class/{class_id}", response_class=HTMLResponse)
 async def teacher_class(class_id: str, request: Request, user: dict = Depends(auth.require_teacher_user)):
     members = db.get_class_members(class_id)
+    onenote_config = db.get_onenote_sync_config(class_id)
+    
     return templates.TemplateResponse("class_detail.html", {
         "request": request, "user": user, "class_id": class_id, "members": members,
+        "onenote_config": onenote_config,
     })
 
 
@@ -2849,3 +2899,215 @@ async def backup_scheduler():
 async def start_backup_scheduler():
     """Starte den Backup-Scheduler beim App-Start."""
     asyncio.create_task(backup_scheduler())
+
+
+# ---------------------------------------------------------------------------
+# OneNote Sync Integration
+# ---------------------------------------------------------------------------
+
+@app.get("/teacher/class/{class_id}/onenote-config", response_class=HTMLResponse)
+async def onenote_config_page(
+    class_id: str,
+    request: Request,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Zeigt die OneNote-Konfigurationsseite für eine Klasse."""
+    cls = db.get_class(class_id)
+    if not cls:
+        raise HTTPException(status_code=404, detail="Klasse nicht gefunden")
+    
+    config = db.get_onenote_sync_config(class_id)
+    history = db.get_sync_history(class_id, limit=5) if config else []
+    
+    # Get class members for auto-mapping suggestions
+    members = db.get_class_members(class_id)
+    
+    return templates.TemplateResponse("onenote_config.html", {
+        "request": request,
+        "user": user,
+        "class_id": class_id,
+        "class_name": cls.get("name", ""),
+        "config": config,
+        "history": history,
+        "members": members,
+    })
+
+
+@app.post("/teacher/class/{class_id}/onenote-config")
+async def onenote_config_save(
+    class_id: str,
+    request: Request,
+    enabled: str = Form("false"),
+    site_url: str = Form(""),
+    notebook_name: str = Form(""),
+    student_mapping: str = Form("{}"),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Speichert die OneNote-Konfiguration."""
+    cls = db.get_class(class_id)
+    if not cls:
+        raise HTTPException(status_code=404, detail="Klasse nicht gefunden")
+    
+    try:
+        mapping_dict = json.loads(student_mapping) if student_mapping else {}
+    except json.JSONDecodeError:
+        mapping_dict = {}
+    
+    db.save_onenote_sync_config(
+        class_id=class_id,
+        enabled=(enabled == "true" or enabled == "on"),
+        site_url=site_url,
+        notebook_name=notebook_name,
+        student_mapping=mapping_dict,
+        created_by=user["upn"],
+    )
+    
+    return RedirectResponse(
+        url=f"/teacher/class/{class_id}/onenote-config?msg=Gespeichert",
+        status_code=302,
+    )
+
+
+@app.post("/teacher/class/{class_id}/onenote-sync/trigger")
+async def onenote_sync_trigger(
+    class_id: str,
+    request: Request,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Manuelles Triggern eines Sync."""
+    cls = db.get_class(class_id)
+    if not cls:
+        raise HTTPException(status_code=404, detail="Klasse nicht gefunden")
+    
+    config = db.get_onenote_sync_config(class_id)
+    if not config:
+        raise HTTPException(status_code=400, detail="Keine OneNote-Konfiguration")
+    
+    # Für manuelle Syncs brauchen wir ein Access Token
+    # Da der Sync serverseitig läuft, nutzen wir einen App-Token oder den User-Token
+    # Hier verwenden wir den Token des auslösenden Users
+    access_token = user.get("access_token", "")
+    
+    if not access_token:
+        # Im DEV_MODE oder wenn kein Token verfügbar, Fehler
+        return RedirectResponse(
+            url=f"/teacher/class/{class_id}/onenote-config?msg=Fehler:+Kein+Access+Token",
+            status_code=302,
+        )
+    
+    # Starte Sync im Hintergrund
+    import onenote_sync
+    result = await onenote_sync.run_sync_for_class(
+        class_id=class_id,
+        access_token=access_token,
+        triggered_by=user["upn"],
+    )
+    
+    if result["status"] == "success":
+        msg = f"Sync+erfolgreich:+{result['einfach_added']}+Einfach,+{result['niveau_added']}+Niveau"
+    else:
+        msg = f"Fehler:+{result.get('error', 'Unbekannt')}"
+    
+    return RedirectResponse(
+        url=f"/teacher/class/{class_id}/onenote-config?msg={msg}",
+        status_code=302,
+    )
+
+
+@app.get("/teacher/class/{class_id}/onenote-history", response_class=HTMLResponse)
+async def onenote_history_page(
+    class_id: str,
+    request: Request,
+    limit: int = 50,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Zeigt die vollständige Sync-Historie."""
+    cls = db.get_class(class_id)
+    if not cls:
+        raise HTTPException(status_code=404, detail="Klasse nicht gefunden")
+    
+    config = db.get_onenote_sync_config(class_id)
+    history = db.get_sync_history(class_id, limit=limit)
+    
+    return templates.TemplateResponse("onenote_history.html", {
+        "request": request,
+        "user": user,
+        "class_id": class_id,
+        "class_name": cls.get("name", ""),
+        "config": config,
+        "history": history,
+    })
+
+
+@app.get("/api/class/{class_id}/onenote-history/{history_id}")
+async def onenote_history_details(
+    class_id: str,
+    history_id: str,
+    user: dict = Depends(auth.require_teacher_user),
+) -> dict:
+    """API: Details eines Sync-Laufs."""
+    entry = db.get_sync_history_entry(history_id)
+    if not entry or entry["class_id"] != class_id:
+        raise HTTPException(status_code=404, detail="Eintrag nicht gefunden")
+    
+    return entry
+
+
+# ---------------------------------------------------------------------------
+# OneNote Sync Scheduler (täglich um 02:00 Uhr)
+# ---------------------------------------------------------------------------
+
+async def onenote_sync_scheduler():
+    """
+    Hintergrund-Task für automatische tägliche OneNote-Syncs.
+    Läuft um 02:00 Uhr nachts.
+    """
+    while True:
+        try:
+            # Berechne Zeit bis 02:00 Uhr
+            now = datetime.now(timezone.utc)
+            next_run = datetime.combine(
+                now.date() + timedelta(days=1 if now.time() >= time(2, 0) else 0),
+                time(2, 0),
+            ).replace(tzinfo=timezone.utc)
+            
+            wait_seconds = (next_run - now).total_seconds()
+            print(f"[OneNote Sync] Nächster Lauf in {wait_seconds/3600:.1f} Stunden")
+            await asyncio.sleep(wait_seconds)
+            
+            # Sync für alle aktivierten Klassen
+            print("[OneNote Sync] Starte automatischen Sync...")
+            
+            # Hinweis: Für automatische Syncs brauchen wir einen Service-Account
+            # oder Refresh Token. Hier loggen wir nur, dass der Sync anstehen würde.
+            # In Produktion müsste hier ein App-Token oder Refresh-Token genutzt werden.
+            
+            configs = db.get_enabled_onenote_sync_configs()
+            print(f"[OneNote Sync] {len(configs)} aktivierte Klassen gefunden")
+            
+            for config in configs:
+                try:
+                    db.update_onenote_sync_status(
+                        config["class_id"],
+                        "error",
+                        "Automatischer Sync erfordert Service-Account-Konfiguration",
+                    )
+                except Exception as e:
+                    print(f"[OneNote Sync] Fehler bei Klasse {config['class_id']}: {e}")
+            
+            # Alte Historie aufräumen (älter als 90 Tage)
+            deleted = db.cleanup_old_sync_history(days=90)
+            if deleted > 0:
+                print(f"[OneNote Sync] {deleted} alte Historie-Einträge gelöscht")
+            
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            print(f"[OneNote Sync] Scheduler-Fehler: {e}")
+            await asyncio.sleep(3600)  # Bei Fehler 1 Stunde warten
+
+
+@app.on_event("startup")
+async def start_onenote_sync_scheduler():
+    """Starte den OneNote Sync-Scheduler beim App-Start."""
+    asyncio.create_task(onenote_sync_scheduler())

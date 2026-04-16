@@ -13,7 +13,7 @@
   <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:baseline;margin-bottom:.5rem">
     <strong>{{ a.student_name }}</strong>
     <span class="muted" style="font-size:.85rem">{{ a.competency_name }} (ID {{ a.competency_id }})</span>
-    <span class="muted" style="font-size:.8rem">eingereicht {{ a.created_at[:10] }}</span>
+    <span class="muted" style="font-size:.8rem">eingereicht {{ a.created_at|to_local_time("%d.%m.%Y") }}</span>
     <span class="niveau-badge niveau-0" style="font-size:.75rem">{{ "einfach" if a.typ == "einfach" else "Niveau" }}</span>
   </div>
 

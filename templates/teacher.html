@@ -20,6 +20,9 @@
   <li>
     <a href="/teacher/class/{{ g.id }}">{{ g.displayName }}</a>
     {% if g.description %}<span class="muted">— {{ g.description }}</span>{% endif %}
+    {% if g.onenote_sync_enabled %}
+    <span class="badge-onenote" title="OneNote Sync aktiv">📓</span>
+    {% endif %}
   </li>
   {% endfor %}
 </ul>
@@ -38,4 +41,11 @@
   <a href="/logout" style="color:#c00">Abmelden → als Anna einloggen</a>
 </div>
 {% endif %}
+
+<style>
+.badge-onenote {
+  font-size: 0.875rem;
+  margin-left: 0.5rem;
+}
+</style>
 {% endblock %}

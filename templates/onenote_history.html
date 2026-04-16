@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% block title %}OneNote Sync Historie{% endblock %}
+{% block content %}
+<h1>OneNote Sync Historie: {{ class_name }}</h1>
+
+<p class="muted">
+  <a href="/teacher/class/{{ class_id }}/onenote-config">&larr; Zurück zur Konfiguration</a>
+</p>
+
+{% if history %}
+<table class="history-table">
+  <thead>
+    <tr>
+      <th>Datum</th>
+      <th>Status</th>
+      <th>Schüler</th>
+      <th>Einfach</th>
+      <th>Niveau</th>
+      <th>Ausgelöst</th>
+      <th>Dauer</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for h in history %}
+    <tr class="history-row" onclick="showDetails('{{ h.id }}')">
+      <td>{{ h.started_at|to_local_time }}</td>
+      <td>
+        {% if h.status == 'success' %}
+        <span class="status-success">✓</span>
+        {% elif h.status == 'error' %}
+        <span class="status-error">✗</span>
+        {% else %}
+        <span class="status-pending">⏳</span>
+        {% endif %}
+      </td>
+      <td>{{ h.students_processed }}</td>
+      <td>{{ h.einfach_added }}</td>
+      <td>{{ h.niveau_added }}</td>
+      <td>
+        {% if h.triggered_by == 'auto' %}
+        <span class="badge badge-auto">Auto</span>
+        {% else %}
+        <span class="badge badge-manual">{{ h.triggered_by.split('@')[0] }}</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if h.finished_at and h.started_at %}
+          {% set start = h.started_at %}
+          {% set end = h.finished_at %}
+          {% set duration = (end[:19]|to_datetime - start[:19]|to_datetime).total_seconds() // 60 %}
+          {{ duration|int }} min
+        {% else %}
+          -
+        {% endif %}
+      </td>
+    </tr>
+    {% if h.error_message %}
+    <tr class="error-row">
+      <td colspan="7">
+        Fehler: {{ h.error_message }}
+      </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Detail Modal -->
+<div id="detailModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Sync Details</h3>
+      <button onclick="closeModal()" class="close-btn">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      Laden...
+    </div>
+  </div>
+</div>
+
+<script>
+async function showDetails(historyId) {
+  const modal = document.getElementById('detailModal');
+  const body = document.getElementById('modalBody');
+  modal.style.display = 'block';
+  body.innerHTML = 'Laden...';
+  
+  try {
+    const response = await fetch(`/api/class/{{ class_id }}/onenote-history/${historyId}`);
+    const data = await response.json();
+    
+    let html = '<div class="detail-section">';
+    html += `<p><strong>Status:</strong> ${data.status}</p>`;
+    html += `<p><strong>Schüler verarbeitet:</strong> ${data.students_processed}</p>`;
+    html += `<p><strong>Einfach hinzugefügt:</strong> ${data.einfach_added}</p>`;
+    html += `<p><strong>Niveau hinzugefügt:</strong> ${data.niveau_added}</p>`;
+    html += '</div>';
+    
+    if (data.details && Object.keys(data.details).length > 0) {
+      html += '<h4>Hinzugefügte Kompetenzen</h4>';
+      html += '<div class="details-list">';
+      
+      for (const [studentId, info] of Object.entries(data.details)) {
+        html += `<div class="student-details">`;
+        html += `<strong>${info.name || studentId}</strong>`;
+        
+        if (info.added && info.added.einfach && info.added.einfach.length > 0) {
+          html += '<div class="comp-list">Einfach: ' + info.added.einfach.join(', ') + '</div>';
+        }
+        
+        if (info.added && info.added.niveau && info.added.niveau.length > 0) {
+          const niveauStr = info.added.niveau.map(n => `${n.id} (L${n.level})`).join(', ');
+          html += '<div class="comp-list">Niveau: ' + niveauStr + '</div>';
+        }
+        
+        html += '</div>';
+      }
+      
+      html += '</div>';
+    } else {
+      html += '<p class="muted">Keine neuen Kompetenzen hinzugefügt.</p>';
+    }
+    
+    body.innerHTML = html;
+  } catch (e) {
+    body.innerHTML = '<p class="error">Fehler beim Laden der Details.</p>';
+  }
+}
+
+function closeModal() {
+  document.getElementById('detailModal').style.display = 'none';
+}
+
+window.onclick = function(event) {
+  const modal = document.getElementById('detailModal');
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+}
+</script>
+
+<style>
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-row {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.history-row:hover {
+  background: #f5f5f5;
+}
+
+.status-success { color: #4caf50; font-weight: bold; }
+.status-error { color: #f44336; font-weight: bold; }
+.status-pending { color: #ff9800; }
+
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.badge-auto {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.badge-manual {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.error-row td {
+  color: #f44336;
+  font-size: 0.875rem;
+  background: #ffebee;
+  padding: 0.5rem 1rem;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  margin: 5% auto;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 700px;
+  border-radius: 0.5rem;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.detail-section {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.student-details {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background: #fafafa;
+  border-radius: 0.25rem;
+}
+
+.comp-list {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.error {
+  color: #f44336;
+}
+</style>
+
+{% else %}
+<p class="muted">Noch keine Sync-Historie vorhanden.</p>
+{% endif %}
+{% endblock %}

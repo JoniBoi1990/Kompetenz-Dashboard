@@ -4,6 +4,32 @@
 <h1>Schülerinnen &amp; Schüler</h1>
 <a href="/teacher">&larr; Zurück</a>
 
+{% if onenote_config %}
+<div class="onenote-status {% if onenote_config.enabled %}enabled{% else %}disabled{% endif %}">
+  <span class="onenote-icon">📓</span>
+  <span class="onenote-text">
+    {% if onenote_config.enabled %}
+      OneNote Sync aktiv 
+      {% if onenote_config.last_sync_at %}
+        (letzter Sync: {{ onenote_config.last_sync_at[:10] }})
+      {% endif %}
+    {% else %}
+      OneNote Sync inaktiv
+    {% endif %}
+  </span>
+  <a href="/teacher/class/{{ class_id }}/onenote-config" class="btn-sm">Konfigurieren</a>
+  {% if onenote_config.enabled %}
+  <a href="/teacher/class/{{ class_id }}/onenote-history" class="btn-sm">Historie</a>
+  {% endif %}
+</div>
+{% else %}
+<div class="onenote-status disabled">
+  <span class="onenote-icon">📓</span>
+  <span class="onenote-text">OneNote Sync nicht konfiguriert</span>
+  <a href="/teacher/class/{{ class_id }}/onenote-config" class="btn-sm">Einrichten</a>
+</div>
+{% endif %}
+
 {% if members %}
 <ul class="student-list">
   {% for m in members %}
@@ -16,4 +42,36 @@
 {% else %}
 <p>Keine Mitglieder gefunden.</p>
 {% endif %}
+
+<style>
+.onenote-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  background: #f5f5f5;
+  border-radius: 0.5rem;
+  border-left: 4px solid #ccc;
+}
+
+.onenote-status.enabled {
+  background: #e8f5e9;
+  border-left-color: #4caf50;
+}
+
+.onenote-status.disabled {
+  background: #fafafa;
+  border-left-color: #9e9e9e;
+}
+
+.onenote-icon {
+  font-size: 1.25rem;
+}
+
+.onenote-text {
+  flex: 1;
+  font-size: 0.9375rem;
+}
+</style>
 {% endblock %}
