@@ -318,26 +318,27 @@ class OneNoteSyncService:
                     unmatched.append(comp_name)
                     continue
                 
-                # Find best level
-                best_level = 0
-                best_url = None
-                
+                # Collect all evidence entries (not just best level)
                 for col_idx, level in col_to_level.items():
                     if col_idx >= len(cells):
                         continue
                     
                     cell = cells[col_idx]
                     cell_text = cell.get_text(separator=" ", strip=True)
-                    link = cell.find("a")
-                    url = link["href"] if link and link.has_attr("href") else None
                     
-                    if cell_text or url:
-                        if level > best_level:
-                            best_level = level
-                            best_url = url or cell_text or None
-                
-                if best_level > 0:
-                    result[comp["id"]] = {"level": best_level, "url": best_url}
+                    # Find all links in this cell
+                    links = cell.find_all("a")
+                    urls = [link["href"] for link in links if link.has_attr("href")]
+                    
+                    # If no links but text present, use text as evidence
+                    if cell_text and not urls:
+                        urls = [cell_text]
+                    
+                    # Create entry for each URL/text found
+                    for url in urls:
+                        if comp["id"] not in result:
+                            result[comp["id"]] = []
+                        result[comp["id"]].append({"level": level, "url": url})
         
         return result, unmatched
     
@@ -438,29 +439,31 @@ class OneNoteSyncService:
             # Merge niveau competencies (add new nachweis, skip duplicates)
             niveau_data = student.get("niveau", {})
             if niveau_data:
-                for comp_id, comp_info in niveau_data.items():
-                    level = comp_info.get("level", 0)
-                    url = comp_info.get("url", "")
-                    
-                    if level == 0:
-                        continue
-                    
-                    # Skip if identical nachweis already exists
-                    if db.has_identical_nachweis(student_id, comp_id, level, url):
-                        continue
-                    
-                    # Add new nachweis
-                    db.add_nachweis(
-                        student_id=student_id,
-                        student_name=student_name,
-                        competency_id=comp_id,
-                        niveau_level=level,
-                        evidence_url=url,
-                        evidence_name=url or f"OneNote Sync ({level})",
-                        updated_by=updated_by,
-                    )
-                    niveau_count += 1
-                    student_details["niveau"].append({"id": comp_id, "level": level})
+                for comp_id, comp_entries in niveau_data.items():
+                    # comp_entries is now a list of {level, url} dicts
+                    for entry in comp_entries:
+                        level = entry.get("level", 0)
+                        url = entry.get("url", "")
+                        
+                        if level == 0:
+                            continue
+                        
+                        # Skip if identical nachweis already exists
+                        if db.has_identical_nachweis(student_id, comp_id, level, url):
+                            continue
+                        
+                        # Add new nachweis
+                        db.add_nachweis(
+                            student_id=student_id,
+                            student_name=student_name,
+                            competency_id=comp_id,
+                            niveau_level=level,
+                            evidence_url=url,
+                            evidence_name=url or f"OneNote Sync ({level})",
+                            updated_by=updated_by,
+                        )
+                        niveau_count += 1
+                        student_details["niveau"].append({"id": comp_id, "level": level})
             
             if student_details["einfach"] or student_details["niveau"]:
                 details[student_id] = {
