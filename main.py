@@ -201,6 +201,8 @@ templates.env.globals["config"] = settings
 
 # Custom Jinja2 filters
 from datetime import datetime as _datetime
+from zoneinfo import ZoneInfo
+
 def to_datetime_filter(value):
     """Parse ISO datetime string to datetime object."""
     if not value:
@@ -212,7 +214,31 @@ def to_datetime_filter(value):
     except ValueError:
         return _datetime.now()
 
+def to_local_time_filter(value, fmt="%d.%m.%Y %H:%M"):
+    """Convert UTC ISO datetime string to Europe/Berlin local time.
+    
+    Args:
+        value: ISO datetime string (assumed UTC if no timezone)
+        fmt: strftime format string (default: "%d.%m.%Y %H:%M")
+    """
+    if not value:
+        return "-"
+    # Handle ISO format with Z or +00:00
+    value = value.replace('Z', '+00:00')
+    try:
+        dt = _datetime.fromisoformat(value)
+        # If no timezone info, assume UTC
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        # Convert to Europe/Berlin
+        berlin = ZoneInfo("Europe/Berlin")
+        local_dt = dt.astimezone(berlin)
+        return local_dt.strftime(fmt)
+    except (ValueError, TypeError):
+        return "-"
+
 templates.env.filters["to_datetime"] = to_datetime_filter
+templates.env.filters["to_local_time"] = to_local_time_filter
 
 # Initial load
 _reload_kompetenzen()
