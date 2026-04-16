@@ -13,7 +13,7 @@
   <div class="request-header">
     <strong>{{ req.student_name }}</strong>
     <span class="request-title">{{ req.title }}</span>
-    <span class="muted">{{ req.created_at[:10] }}</span>
+    <span class="muted">{{ req.created_at|to_local_time("%d.%m.%Y") }}</span>
     <span class="badge-count">{{ req.competency_ids | length }} Komp.</span>
   </div>
 

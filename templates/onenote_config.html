@@ -101,7 +101,7 @@
   <tbody>
     {% for h in history %}
     <tr>
-      <td>{{ h.started_at[:19].replace('T', ' ') + ' UTC' if h.started_at else '-' }}</td>
+      <td>{{ h.started_at|to_local_time }}</td>
       <td>
         {% if h.status == 'success' %}
         <span style="color: #4caf50;">✓ Erfolg</span>
