@@ -23,7 +23,7 @@
   <tbody>
     {% for h in history %}
     <tr class="history-row" onclick="showDetails('{{ h.id }}')">
-      <td>{{ h.started_at[:16].replace('T', ' ') if h.started_at else '-' }}</td>
+      <td>{{ h.started_at[:19].replace('T', ' ') + ' UTC' if h.started_at else '-' }}</td>
       <td>
         {% if h.status == 'success' %}
         <span class="status-success">✓</span>
