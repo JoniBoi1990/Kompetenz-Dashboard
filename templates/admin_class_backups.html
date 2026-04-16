@@ -35,7 +35,7 @@
   <tbody>
     {% for b in backups %}
     <tr>
-      <td>{{ b.created_at[:16] | replace('T', ' ') }}</td>
+      <td>{{ b.created_at|to_local_time }}</td>
       <td>
         {% if b.is_manual %}
           <span class="badge badge-info">Manuell</span>
@@ -52,7 +52,7 @@
         
         <form method="post" action="/admin/classes/{{ cls.id }}/backups/restore" 
               style="display:inline;margin-left:.25rem"
-              onsubmit="return confirm('Backup vom {{ b.created_at[:16] }} wiederherstellen?\\n\\nDies fügt fehlende Kompetenzen hinzu (Merge-Modus).')">
+              onsubmit="return confirm('Backup vom {{ b.created_at|to_local_time }} wiederherstellen?\\n\\nDies fügt fehlende Kompetenzen hinzu (Merge-Modus).')">
           <input type="hidden" name="filepath" value="{{ b.filepath }}">
           <input type="hidden" name="merge" value="true">
           <button type="submit" class="btn-sm">Wiederherstellen</button>
@@ -60,7 +60,7 @@
         
         <form method="post" action="/admin/classes/{{ cls.id }}/backups/delete" 
               style="display:inline;margin-left:.25rem"
-              onsubmit="return confirm('Backup vom {{ b.created_at[:16] }} löschen?')">
+              onsubmit="return confirm('Backup vom {{ b.created_at|to_local_time }} löschen?')">
           <input type="hidden" name="filepath" value="{{ b.filepath }}">
           <button type="submit" class="btn-danger">Löschen</button>
         </form>
