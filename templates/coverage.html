@@ -6,6 +6,9 @@
   Markierte Kompetenzen werden im Notenrechner als Berechnungsgrundlage für "Unterrichtsstand" verwendet
   und für Schüler farblich hervorgehoben.
 </p>
+<p style="margin-bottom:1rem;color:#0078d4;font-size:.85rem">
+  💡 <strong>Tipp:</strong> Klicken Sie auf eine einfache Kompetenz, um sie mehreren Schülern gleichzeitig zuzuweisen.
+</p>
 
 {% if classes|length > 1 %}
 <div style="margin-bottom:1rem;padding:.75rem;background:#f0f0f0;border-radius:4px;">
@@ -47,13 +50,17 @@
             </td>
           </tr>
           {% endif %}
-          <tr class="{% if k.id in active_ids %}comp-covered{% else %}comp-not-covered{% endif %}" data-thema="{{ k.thema or 0 }}">
+          <tr class="{% if k.id in active_ids %}comp-covered{% else %}comp-not-covered{% endif %} comp-row" data-thema="{{ k.thema or 0 }}" data-comp-id="{{ k.id }}" data-comp-name="{{ k.name }}">
             <td class="center">
               <input type="checkbox" name="active_id" value="{{ k.id }}"
-                {% if k.id in active_ids %}checked{% endif %}>
+                {% if k.id in active_ids %}checked{% endif %}
+                onclick="event.stopPropagation();">
             </td>
             <td>{{ k.id }}</td>
-            <td>{{ k.name }}</td>
+            <td>
+              {{ k.name }}
+              <span class="bulk-hint" title="An Schüler vergeben">👥</span>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -85,13 +92,240 @@
   </div>
 </form>
 
+<!-- Modal für Bulk-Assignment -->
+<div id="student-modal" class="modal" style="display:none">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Kompetenz vergeben</h3>
+      <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <p class="modal-subtitle" id="modal-comp-display"></p>
+    
+    <div class="bulk-actions">
+      <button type="button" class="btn-sm" onclick="selectAllStudents(true)">Alle wählen</button>
+      <button type="button" class="btn-sm" onclick="selectAllStudents(false)">Keine wählen</button>
+      <button type="button" class="btn-sm" onclick="toggleSelection()">Auswahl umkehren</button>
+    </div>
+    
+    <form id="bulk-form" action="/teacher/coverage/bulk-assign" method="post">
+      <input type="hidden" name="class_id" value="{{ selected_class_id }}">
+      <input type="hidden" name="competency_id" id="modal-comp-id">
+      
+      <div class="student-checkboxes">
+        {% for student in class_members %}
+        <label class="student-checkbox">
+          <input type="checkbox" name="student_ids" value="{{ student.id }}">
+          <span class="student-name">{{ student.displayName }}</span>
+          <span class="student-email">{{ student.userPrincipalName }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" onclick="closeModal()" class="btn-secondary">Abbrechen</button>
+        <button type="submit" class="btn-primary">Speichern</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+/* Clickable competency rows */
+.comp-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.comp-row:hover {
+  background: #f0f8ff !important;
+}
+.comp-row td:first-child {
+  cursor: default;
+}
+.bulk-hint {
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+  opacity: 0.5;
+}
+.comp-row:hover .bulk-hint {
+  opacity: 1;
+}
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--muted);
+  line-height: 1;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+.modal-close:hover {
+  background: #f0f0f0;
+  color: var(--text);
+}
+.modal-subtitle {
+  padding: 0.75rem 1.25rem;
+  margin: 0;
+  background: #f8f9fa;
+  color: var(--blue);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+}
+.bulk-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+}
+.student-checkboxes {
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 0.5rem 1.25rem;
+}
+.student-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.student-checkbox:hover {
+  background: #f5f5f5;
+}
+.student-checkbox input[type="checkbox"] {
+  flex-shrink: 0;
+}
+.student-name {
+  font-weight: 500;
+}
+.student-email {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-left: auto;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: #fafafa;
+  border-radius: 0 0 8px 8px;
+}
+.btn-secondary {
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.btn-secondary:hover {
+  background: #f0f0f0;
+}
+</style>
+
 <script>
 function setAll(state) {
   document.querySelectorAll('input[name=active_id]').forEach(cb => cb.checked = state);
 }
 function selectThema(thema, state) {
-  document.querySelectorAll(`tr[data-thema="${thema}"] input[type=checkbox]`)
+  document.querySelectorAll(`tr[data-thema="${thema}"] input[name=active_id]`)
     .forEach(cb => { if (!cb.disabled) cb.checked = state; });
 }
+
+// Bulk assignment modal functions
+function openStudentModal(compId, compName) {
+  document.getElementById('modal-comp-id').value = compId;
+  document.getElementById('modal-comp-display').textContent = compId + ' – ' + compName;
+  document.getElementById('student-modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('student-modal').style.display = 'none';
+  document.querySelectorAll('.student-checkbox input').forEach(cb => cb.checked = false);
+}
+
+function selectAllStudents(state) {
+  document.querySelectorAll('.student-checkbox input').forEach(cb => cb.checked = state);
+}
+
+function toggleSelection() {
+  document.querySelectorAll('.student-checkbox input').forEach(cb => cb.checked = !cb.checked);
+}
+
+// Add click handlers to competency rows
+document.querySelectorAll('.comp-row').forEach(row => {
+  row.addEventListener('click', function(e) {
+    // Don't open modal if clicking the checkbox directly
+    if (e.target.type === 'checkbox') return;
+    
+    const compId = this.dataset.compId;
+    const compName = this.dataset.compName;
+    if (compId && compName) {
+      openStudentModal(compId, compName);
+    }
+  });
+});
+
+// Close modal when clicking outside
+document.getElementById('student-modal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeModal();
+  }
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
 </script>
 {% endblock %}

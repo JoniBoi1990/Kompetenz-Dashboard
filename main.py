@@ -1585,6 +1585,9 @@ async def teacher_coverage(
     
     active_ids = db.get_active_ids(class_id) if class_id is not None else db.get_active_ids()
     
+    # Get class members for bulk assignment modal
+    class_members = db.get_class_members(class_id) if class_id else []
+    
     return templates.TemplateResponse("coverage.html", {
         "request": request, 
         "user": user, 
@@ -1593,6 +1596,7 @@ async def teacher_coverage(
         "selected_class_id": class_id,
         "einfach_kompetenzen": einfach,
         "niveau_kompetenzen": niveau,
+        "class_members": class_members,
     })
 
 
@@ -1609,6 +1613,33 @@ async def teacher_coverage_update(
         db.set_active_ids(ids, class_id)
     else:
         db.set_active_ids(ids)
+    
+    return RedirectResponse(url=f"/teacher/coverage?class_id={class_id}", status_code=302)
+
+
+@app.post("/teacher/coverage/bulk-assign")
+async def teacher_coverage_bulk_assign(
+    request: Request,
+    class_id: str = Form(...),
+    competency_id: str = Form(...),
+    student_ids: list[str] = Form(default=[]),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Assign a competency to multiple students at once."""
+    # Get class members for names
+    members = db.get_class_members(class_id)
+    member_map = {m["id"]: m["displayName"] for m in members}
+    
+    # Assign competency to each selected student
+    for student_id in student_ids:
+        student_name = member_map.get(student_id, student_id)
+        db.upsert_einfach(
+            student_id=student_id,
+            student_name=student_name,
+            competency_id=competency_id,
+            achieved=True,
+            updated_by=user["upn"],
+        )
     
     return RedirectResponse(url=f"/teacher/coverage?class_id={class_id}", status_code=302)
 
