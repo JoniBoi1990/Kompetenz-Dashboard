@@ -190,6 +190,19 @@ note = first match from grading_scale where prozent >= min_percent
 
 **Unterrichtsstand basis** = `active_ids ∪ proven_ids` (self-taught competencies count).
 
+### Bulk Competency Assignment
+
+Teachers can assign "einfach" competencies to multiple students simultaneously from the **Unterrichtsstand** page:
+
+1. Click on a competency row (not the checkbox) to open the bulk assignment modal
+2. Select students via checkboxes (with "All/None/Invert" filter buttons)
+3. Save assigns the competency to all selected students
+
+**Implementation:**
+- Route: `POST /teacher/coverage/bulk-assign`
+- Template: `templates/coverage.html` (modal with inline JavaScript/CSS)
+- Only "einfach" competencies support bulk assignment (niveau requires evidence URL)
+
 ### XP Progress Bar
 
 RPG-style progress indicator displayed in:
@@ -480,4 +493,4 @@ Der Skill analysiert Python-Code und erstellt konkrete Verbesserungsvorschläge 
 
 ---
 
-*Last updated: 2026-04-16 by AI agent analysis*
+*Last updated: 2026-04-17 by AI agent analysis*
