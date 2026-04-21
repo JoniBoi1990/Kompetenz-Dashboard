@@ -11,7 +11,7 @@
 
 ### Key Capabilities
 
-- **Competency Tracking:** Two types of competencies — "einfach" (basic, achieved/not achieved) and "niveau" (leveled: Beginner/Advanced/Expert)
+- **Competency Tracking:** Two types of competencies — "Unterricht" (einfach, basic, achieved/not achieved) and "Projekte" (niveau, leveled: Beginner/Advanced/Expert). Note: Technical identifiers remain `einfach`/`niveau` in code and database.
 - **Student Dashboard:** Students view their progress, plan scenarios, and submit competency claims
 - **Teacher Interface:** Class overview, individual student competency grids, test generation, and administrative functions
 - **Class Grade Overview:** Teachers see grades for all students at a glance (current coverage + full year), with color coding (red < 4, green < 2)
@@ -163,8 +163,8 @@ When `DEV_MODE=true`:
 
 | Table | Purpose |
 |-------|---------|
-| `einfach_records` | Basic competency achievements (student_id, competency_id, achieved) |
-| `nachweise` | Niveau competency proofs with evidence URLs |
+| `einfach_records` | Unterricht (basic) competency achievements (student_id, competency_id, achieved) |
+| `nachweise` | Projekt (niveau) competency proofs with evidence URLs |
 | `active_ids` | Unterrichtsstand (currently teaching) per class |
 | `test_requests` | Pending student test requests |
 | `kompetenzantraege` | Student competency claims pending review |
@@ -173,18 +173,18 @@ When `DEV_MODE=true`:
 | `teacher_lists` | Custom competency lists uploaded by teachers |
 
 **Competency ID Format:**
-- **Always strings with type prefix:** `e.901` (einfach), `n.989` (niveau)
+- **Always strings with type prefix:** `e.901` (Unterricht/einfach), `n.989` (Projekt/niveau)
 - **Never integers** — this was a major migration
-- Ranges: Klasse 9 Einfach `e.901`–`e.988`, Niveau `n.989`–`n.1021`
-- Ranges: Klasse 10 Einfach `e.1001`–`e.1070`, Niveau `n.1071`–`n.1103`
+- Ranges: Klasse 9 Unterricht `e.901`–`e.988`, Projekte `n.989`–`n.1021`
+- Ranges: Klasse 10 Unterricht `e.1001`–`e.1070`, Projekte `n.1071`–`n.1103`
 
 See `kompetenzlisten/CLAUDE.md` for complete ID specification.
 
 ### Grade Calculation
 
 ```python
-max_punkte = Σ(3 if niveau else 1) for active competencies
-gesamtpunkte = Σ(1 for einfach achieved) + Σ(niveau_level for niveau)
+max_punkte = Σ(3 if Projekt/niveau else 1) for active competencies
+gesamtpunkte = Σ(1 for Unterricht/einfach achieved) + Σ(niveau_level for Projekt)
 prozent = gesamtpunkte / max_punkte × 100
 note = first match from grading_scale where prozent >= min_percent
 ```
@@ -215,7 +215,7 @@ From the class detail page (`/teacher/class/{class_id}`), teachers see a grade o
 
 ### Bulk Competency Assignment
 
-Teachers can assign "einfach" competencies to multiple students simultaneously from the **Unterrichtsstand** page:
+Teachers can assign "Unterricht" (einfach) competencies to multiple students simultaneously from the **Unterrichtsstand** page:
 
 1. Click on a competency row (not the checkbox) to open the bulk assignment modal
 2. Select students via checkboxes (with "All/None/Invert" filter buttons)
@@ -224,7 +224,7 @@ Teachers can assign "einfach" competencies to multiple students simultaneously f
 **Implementation:**
 - Route: `POST /teacher/coverage/bulk-assign`
 - Template: `templates/coverage.html` (modal with inline JavaScript/CSS)
-- Only "einfach" competencies support bulk assignment (niveau requires evidence URL)
+- Only "Unterricht" (einfach) competencies support bulk assignment (Projekt/niveau requires evidence URL)
 
 ### XP Progress Bar
 
@@ -275,11 +275,11 @@ Each class can be configured independently via `Lehrer → Klasse → OneNote Ko
 ### How It Works
 
 1. **Data Source:** Reads from "Kompetenznachweise" section in each student's notebook
-2. **Einfach Competencies:** Parsed from "Unterrichtskompetenzen" page (checkboxes)
-3. **Niveau Competencies:** Parsed from "Projektkompetenzen" page (level columns)
+2. **Unterricht Competencies:** Parsed from "Unterrichtskompetenzen" page (checkboxes)
+3. **Projekt Competencies:** Parsed from "Projektkompetenzen" page (level columns)
 4. **Merge Behavior:** 
-   - Einfach: Added only if not already achieved
-   - Niveau: Added only if no identical entry exists (same URL + same level). Multiple evidence entries per competency are allowed (different URLs or different levels).
+   - Unterricht: Added only if not already achieved
+   - Projekt: Added only if no identical entry exists (same URL + same level). Multiple evidence entries per competency are allowed (different URLs or different levels).
 5. **Scheduling:** Automatic daily sync at 02:00 UTC, or manual trigger anytime
 
 ### Database Tables
