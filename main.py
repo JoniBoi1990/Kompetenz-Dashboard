@@ -789,9 +789,59 @@ async def teacher_class(class_id: str, request: Request, user: dict = Depends(au
     members = db.get_class_members(class_id)
     onenote_config = db.get_onenote_sync_config(class_id)
     
+    # Noten für alle Schüler berechnen
+    student_grades = []
+    for member in members:
+        student_id = member["id"]
+        
+        # Klassen-spezifische Kompetenzen laden
+        class_einfach, class_niveau, active_ids, _ = _get_student_competencies(student_id)
+        class_comps = class_einfach + class_niveau
+        
+        if not class_comps:
+            # Fallback zu Default-Kompetenzen wenn keine Klasse zugeordnet
+            class_comps = _EINFACH + _NIVEAU
+            active_ids = db.get_active_ids()
+        
+        # Schülerdaten laden
+        einfach_map, nachweise_by_comp, _, _ = _load_student_data(user.get("access_token", ""), student_id)
+        
+        # Filter auf Klassen-Kompetenzen
+        class_comp_ids = {c["id"] for c in class_comps}
+        einfach_map_filtered = {k: v for k, v in einfach_map.items() if k in class_comp_ids}
+        nachweise_filtered = {k: v for k, v in nachweise_by_comp.items() if k in class_comp_ids}
+        
+        # Bereits nachgewiesene Kompetenzen
+        proven_ids = (
+            {cid for cid, r in einfach_map_filtered.items() if r.get("achieved")}
+            | {cid for cid, entries in nachweise_filtered.items()
+               if any(e.get("niveau_level", 0) > 0 for e in entries)}
+        )
+        
+        # 1. Note für Unterrichtsstand (aktive IDs + nachgewiesene)
+        if active_ids:
+            basis_ids = active_ids | proven_ids
+            basis_comps = [k for k in class_comps if k["id"] in basis_ids]
+        else:
+            basis_comps = class_comps
+        
+        records_basis = _build_grade_records(einfach_map_filtered, nachweise_filtered, basis_comps)
+        grade_basis = calculate_grade(records_basis, basis_comps)
+        
+        # 2. Note für Gesamtjahr (alle Kompetenzen)
+        records_all = _build_grade_records(einfach_map_filtered, nachweise_filtered, class_comps)
+        grade_all = calculate_grade(records_all, class_comps)
+        
+        student_grades.append({
+            "student": member,
+            "grade_basis": grade_basis,
+            "grade_all": grade_all,
+        })
+    
     return templates.TemplateResponse("class_detail.html", {
         "request": request, "user": user, "class_id": class_id, "members": members,
-        "onenote_config": onenote_config,
+        "onenote_config": onenote_config, "student_grades": student_grades,
+        "grading_scale": _GRADING_SCALE,
     })
 
 

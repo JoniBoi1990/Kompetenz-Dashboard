@@ -14,6 +14,7 @@
 - **Competency Tracking:** Two types of competencies — "einfach" (basic, achieved/not achieved) and "niveau" (leveled: Beginner/Advanced/Expert)
 - **Student Dashboard:** Students view their progress, plan scenarios, and submit competency claims
 - **Teacher Interface:** Class overview, individual student competency grids, test generation, and administrative functions
+- **Class Grade Overview:** Teachers see grades for all students at a glance (current coverage + full year), with color coding (red < 4, green < 2)
 - **PDF Test Generator:** Creates personalized competency tests with randomized questions
 - **Grade Calculation:** Automatic grade calculation based on achieved competencies
 - **Backup/Restore:** JSON-based backup system for competency records
@@ -189,6 +190,26 @@ note = first match from grading_scale where prozent >= min_percent
 ```
 
 **Unterrichtsstand basis** = `active_ids ∪ proven_ids` (self-taught competencies count).
+
+### Class Grade Overview
+
+From the class detail page (`/teacher/class/{class_id}`), teachers see a grade overview table showing:
+
+| Column | Description |
+|--------|-------------|
+| Name | Student name (link to detail view) |
+| Unterrichtsstand | Current grade based on active competencies + proven ones |
+| Gesamtjahr | Grade based on all class competencies |
+
+**Color Coding (Gesamtjahr column):**
+- 🔴 **Red** (`grade-bad`): Grade > 4 (worse than 4)
+- 🟢 **Green** (`grade-good`): Grade < 2 (better than 2)
+- ⚪ **Neutral**: Grades between 2 and 4
+
+**Implementation:**
+- Route: `GET /teacher/class/{class_id}`
+- Template: `templates/class_detail.html`
+- CSS: `static/style.css` (`.student-grades-table`, `.grade-bad`, `.grade-good`)
 
 ### Bulk Competency Assignment
 
