@@ -49,13 +49,17 @@
   <tbody>
     {% for sg in student_grades %}
     {% set ns = namespace(grade_class='grade-neutral') %}
-    {% for entry in grading_scale %}
-      {% if entry.note == sg.grade_all.note %}
-        {% if entry.dezimal > 4 %}{% set ns.grade_class = 'grade-bad' %}
-        {% elif entry.dezimal < 2 %}{% set ns.grade_class = 'grade-good' %}
+    {% if sg.grade_all.note == '6' %}
+      {% set ns.grade_class = 'grade-bad' %}
+    {% else %}
+      {% for entry in grading_scale %}
+        {% if entry.note == sg.grade_all.note %}
+          {% if entry.dezimal > 4 %}{% set ns.grade_class = 'grade-bad' %}
+          {% elif entry.dezimal < 2 %}{% set ns.grade_class = 'grade-good' %}
+          {% endif %}
         {% endif %}
-      {% endif %}
-    {% endfor %}
+      {% endfor %}
+    {% endif %}
     <tr>
       <td>
         <a href="/teacher/student/{{ sg.student.id }}?class_id={{ class_id }}&student_name={{ sg.student.displayName | urlencode }}">
@@ -145,11 +149,13 @@
 .student-grades-table td.grade-bad,
 .student-grades-table td.percent.grade-bad {
   color: #d13438;
+  background: #fdeded;
 }
 
 .student-grades-table td.grade-good,
 .student-grades-table td.percent.grade-good {
   color: #107c10;
+  background: #e8f5e9;
 }
 
 .student-grades-table td.grade-neutral {
