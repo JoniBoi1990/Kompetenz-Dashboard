@@ -202,9 +202,11 @@ From the class detail page (`/teacher/class/{class_id}`), teachers see a grade o
 | Gesamtjahr | Grade based on all class competencies |
 
 **Color Coding (Gesamtjahr column):**
-- 🔴 **Red** (`grade-bad`): Grade > 4 (worse than 4)
-- 🟢 **Green** (`grade-good`): Grade < 2 (better than 2)
-- ⚪ **Neutral**: Grades between 2 and 4
+- 🔴 **Red** (`grade-bad`): Grade > 4 (worse than 4) — text color `#d13438`, background `#fdeded`
+- 🟢 **Green** (`grade-good`): Grade < 2 (better than 2) — text color `#107c10`, background `#e8f5e9`
+- ⚪ **Neutral**: Grades between 2 and 4 — default text color, no background
+
+**Note:** Grade "6" is explicitly handled as `grade-bad` since it's not defined in the standard grading scale JSON.
 
 **Implementation:**
 - Route: `GET /teacher/class/{class_id}`
