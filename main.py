@@ -537,6 +537,20 @@ async def auth_callback(request: Request, code: str = "", error: str = ""):
     except ValueError as e:
         return HTMLResponse(f"<h1>Token-Fehler</h1><p>{e}</p>", status_code=400)
     user_info = auth.build_user_info(token_response)
+    
+    # Save refresh token for teachers (for auto-sync)
+    if user_info["is_teacher"] and user_info.get("refresh_token"):
+        from datetime import datetime, timedelta, timezone
+        access_token = user_info.get("access_token", "")
+        # Access token typically valid for 1 hour
+        expires_at = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
+        db.save_teacher_token(
+            teacher_id=user_info["upn"],
+            refresh_token=user_info["refresh_token"],
+            access_token=access_token,
+            expires_at=expires_at,
+        )
+    
     response = RedirectResponse(url="/teacher" if user_info["is_teacher"] else "/", status_code=302)
     auth.set_session(response, user_info)
     return response
@@ -3142,6 +3156,7 @@ async def onenote_sync_scheduler():
     """
     Hintergrund-Task für automatische tägliche OneNote-Syncs.
     Läuft um 02:00 Uhr nachts.
+    Nutzt gespeicherte Refresh Tokens von Lehrern.
     """
     while True:
         try:
@@ -3159,20 +3174,79 @@ async def onenote_sync_scheduler():
             # Sync für alle aktivierten Klassen
             print("[OneNote Sync] Starte automatischen Sync...")
             
-            # Hinweis: Für automatische Syncs brauchen wir einen Service-Account
-            # oder Refresh Token. Hier loggen wir nur, dass der Sync anstehen würde.
-            # In Produktion müsste hier ein App-Token oder Refresh-Token genutzt werden.
-            
             configs = db.get_enabled_onenote_sync_configs()
             print(f"[OneNote Sync] {len(configs)} aktivierte Klassen gefunden")
             
-            for config in configs:
-                try:
+            if not configs:
+                continue
+            
+            # Get all teacher tokens
+            teacher_tokens = db.get_all_teacher_tokens()
+            if not teacher_tokens:
+                print("[OneNote Sync] Keine gespeicherten Teacher-Tokens gefunden")
+                for config in configs:
                     db.update_onenote_sync_status(
                         config["class_id"],
                         "error",
-                        "Automatischer Sync erfordert Service-Account-Konfiguration",
+                        "Kein Lehrer mit gespeichertem Token. Bitte einmalig anmelden.",
                     )
+                continue
+            
+            # Build a map of teacher_id -> access_token
+            teacher_access_tokens = {}
+            for token_data in teacher_tokens:
+                teacher_id = token_data["teacher_id"]
+                access_token = auth.get_access_token_for_teacher(teacher_id)
+                if access_token:
+                    teacher_access_tokens[teacher_id] = access_token
+            
+            if not teacher_access_tokens:
+                print("[OneNote Sync] Keine gültigen Access Tokens verfügbar")
+                for config in configs:
+                    db.update_onenote_sync_status(
+                        config["class_id"],
+                        "error",
+                        "Token abgelaufen. Bitte erneut anmelden.",
+                    )
+                continue
+            
+            # Get class creators to determine which teacher to use
+            for config in configs:
+                try:
+                    cls = db.get_class(config["class_id"])
+                    if not cls:
+                        continue
+                    
+                    # Try to find a teacher token for this class
+                    # Priority: class creator, then any available teacher
+                    creator = cls.get("created_by", "")
+                    access_token = None
+                    
+                    if creator and creator in teacher_access_tokens:
+                        access_token = teacher_access_tokens[creator]
+                    else:
+                        # Use any available teacher token
+                        access_token = list(teacher_access_tokens.values())[0]
+                    
+                    if not access_token:
+                        db.update_onenote_sync_status(
+                            config["class_id"],
+                            "error",
+                            "Kein gültiges Token für diese Klasse verfügbar",
+                        )
+                        continue
+                    
+                    # Run sync
+                    import onenote_sync
+                    result = await onenote_sync.run_sync_for_class(
+                        class_id=config["class_id"],
+                        access_token=access_token,
+                        triggered_by="auto",
+                    )
+                    
+                    if result["status"] != "success":
+                        print(f"[OneNote Sync] Fehler bei Klasse {config['class_id']}: {result.get('error')}")
+                
                 except Exception as e:
                     print(f"[OneNote Sync] Fehler bei Klasse {config['class_id']}: {e}")
             

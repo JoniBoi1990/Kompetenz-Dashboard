@@ -1158,6 +1158,15 @@ def init_onenote_sync_tables() -> None:
         
         CREATE INDEX IF NOT EXISTS idx_sync_history_class ON onenote_sync_history(class_id);
         CREATE INDEX IF NOT EXISTS idx_sync_history_started ON onenote_sync_history(started_at);
+        
+        CREATE TABLE IF NOT EXISTS teacher_tokens (
+            teacher_id TEXT PRIMARY KEY,
+            refresh_token TEXT NOT NULL,  -- encrypted
+            access_token TEXT,            -- encrypted, optional cache
+            expires_at TEXT,              -- ISO timestamp when access_token expires
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (teacher_id) REFERENCES approved_teachers(upn) ON DELETE CASCADE
+        );
         """)
 
 
@@ -1388,3 +1397,77 @@ def cleanup_old_sync_history(days: int = 90) -> int:
             (datetime.fromtimestamp(cutoff, tz=timezone.utc).isoformat(),)
         )
         return cursor.rowcount
+
+
+# ---------------------------------------------------------------------------
+# Teacher Token Storage (for OneNote auto-sync)
+# ---------------------------------------------------------------------------
+
+def save_teacher_token(
+    teacher_id: str,
+    refresh_token: str,
+    access_token: str | None = None,
+    expires_at: str | None = None,
+) -> None:
+    """Save or update a teacher's encrypted tokens."""
+    now = datetime.now(timezone.utc).isoformat()
+    with _conn() as con:
+        con.execute(
+            """INSERT INTO teacher_tokens 
+               (teacher_id, refresh_token, access_token, expires_at, updated_at)
+               VALUES (?, ?, ?, ?, ?)
+               ON CONFLICT(teacher_id) DO UPDATE SET
+               refresh_token=excluded.refresh_token,
+               access_token=excluded.access_token,
+               expires_at=excluded.expires_at,
+               updated_at=excluded.updated_at""",
+            (teacher_id, refresh_token, access_token, expires_at, now),
+        )
+
+
+def get_teacher_token(teacher_id: str) -> dict | None:
+    """Get a teacher's stored tokens."""
+    with _conn() as con:
+        row = con.execute(
+            "SELECT * FROM teacher_tokens WHERE teacher_id = ?",
+            (teacher_id,),
+        ).fetchone()
+    
+    if not row:
+        return None
+    
+    return {
+        "teacher_id": row["teacher_id"],
+        "refresh_token": row["refresh_token"],
+        "access_token": row["access_token"],
+        "expires_at": row["expires_at"],
+        "updated_at": row["updated_at"],
+    }
+
+
+def delete_teacher_token(teacher_id: str) -> None:
+    """Delete a teacher's tokens (e.g., on logout or token revocation)."""
+    with _conn() as con:
+        con.execute(
+            "DELETE FROM teacher_tokens WHERE teacher_id = ?",
+            (teacher_id,),
+        )
+
+
+def get_all_teacher_tokens() -> list[dict]:
+    """Get all stored teacher tokens (for auto-sync)."""
+    with _conn() as con:
+        rows = con.execute(
+            "SELECT * FROM teacher_tokens ORDER BY updated_at DESC"
+        ).fetchall()
+    
+    return [
+        {
+            "teacher_id": row["teacher_id"],
+            "refresh_token": row["refresh_token"],
+            "access_token": row["access_token"],
+            "expires_at": row["expires_at"],
+            "updated_at": row["updated_at"],
+        }
+        for row in rows
+    ]
