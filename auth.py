@@ -123,7 +123,8 @@ def build_user_info(token_response: dict) -> dict:
         "roles": claims.get("roles", []),
         "is_teacher": is_teacher(claims),
         "access_token": token_response.get("access_token", ""),
-        "refresh_token": token_response.get("refresh_token", ""),
+        # Note: refresh_token is NOT stored in cookie (too large)
+        # It is saved to database in auth_callback instead
     }
 
 

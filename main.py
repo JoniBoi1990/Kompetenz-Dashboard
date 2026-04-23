@@ -539,14 +539,16 @@ async def auth_callback(request: Request, code: str = "", error: str = ""):
     user_info = auth.build_user_info(token_response)
     
     # Save refresh token for teachers (for auto-sync)
-    if user_info["is_teacher"] and user_info.get("refresh_token"):
+    # Get refresh_token directly from token_response (not from user_info - it's too large for cookie)
+    refresh_token = token_response.get("refresh_token")
+    if user_info["is_teacher"] and refresh_token:
         from datetime import datetime, timedelta, timezone
         access_token = user_info.get("access_token", "")
         # Access token typically valid for 1 hour
         expires_at = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
         db.save_teacher_token(
             teacher_id=user_info["upn"],
-            refresh_token=user_info["refresh_token"],
+            refresh_token=refresh_token,
             access_token=access_token,
             expires_at=expires_at,
         )
