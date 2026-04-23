@@ -14,8 +14,9 @@ from config import settings
 import db
 
 AUTHORITY = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}"
-# User.Read for identity + Notes.Read.All for OneNote sync + offline_access for refresh tokens
-SCOPES = ["User.Read", "Notes.Read.All", "offline_access"]
+# User.Read for identity + Notes.Read.All for OneNote sync
+# offline_access is automatically added by MSAL when using acquire_token_by_authorization_code
+SCOPES = ["User.Read", "Notes.Read.All"]
 
 
 def _build_redirect_uri(request: Request) -> str:
