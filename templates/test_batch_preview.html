@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Batch-Testvorschau — {{ batch.title }}{% endblock %}
+{% block content %}
+<h1>Testvorschau — Mehrere Schüler</h1>
+
+<div class="score-display" style="margin-bottom:1.25rem;">
+  <span class="score-pts">{{ batch.student_count }} Schüler</span>
+  <span class="score-pct">{{ batch.title }}</span>
+</div>
+
+<div class="info-box" style="background: var(--bg-secondary); padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+  <p class="muted" style="margin: 0;">
+    <strong>Hinweis:</strong> Die Fragen werden für jeden Schüler individuell zufällig ausgewählt. 
+    Du kannst einzelne Tests bearbeiten, bevor du alle herunterlädst.
+  </p>
+</div>
+
+<h2>Schüler-Übersicht</h2>
+<table class="kompetenz-table">
+  <thead>
+    <tr>
+      <th>Schüler/in</th>
+      <th>Kompetenzen</th>
+      <th>Fragen</th>
+      <th>Aktionen</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for preview in batch.previews %}
+    <tr>
+      <td>{{ preview.student_name }}</td>
+      <td>{{ preview.question_count }}</td>
+      <td>
+        {% if preview.questions_with_options > 0 %}
+          {{ preview.questions_with_options }} mit Alternativen
+        {% else %}
+          <span class="muted">-</span>
+        {% endif %}
+      </td>
+      <td>
+        <a href="/tests/preview/{{ preview.id }}" class="btn-small">Fragen bearbeiten</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2 style="margin-top: 2rem;">Download</h2>
+<div class="download-options" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+  <form action="/tests/finalize/batch/{{ batch.id }}" method="post" style="display: inline;">
+    <input type="hidden" name="format" value="zip">
+    <button type="submit" class="btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Als ZIP herunterladen
+    </button>
+  </form>
+  
+  <form action="/tests/finalize/batch/{{ batch.id }}" method="post" style="display: inline;">
+    <input type="hidden" name="format" value="merged">
+    <button type="submit" class="btn-secondary" style="display: flex; align-items: center; gap: 0.5rem;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+      Als ein PDF herunterladen
+    </button>
+  </form>
+</div>
+
+<p class="muted" style="margin-top: 1rem; font-size: 0.85rem;">
+  <strong>ZIP:</strong> Jeder Schüler bekommt eine eigene PDF-Datei.<br>
+  <strong>Ein PDF:</strong> Alle Tests werden zu einem Dokument zusammengefügt (zum einfachen Drucken).
+</p>
+
+<p style="margin-top:2rem;">
+  <a href="/tests/builder">&larr; Zurück zum Testgenerator</a>
+</p>
+
+<style>
+.btn-secondary {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+}
+.btn-secondary:hover {
+  background-color: var(--border);
+}
+.download-options form {
+  margin: 0;
+}
+</style>
+{% endblock %}

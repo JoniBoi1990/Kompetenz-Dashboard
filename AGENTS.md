@@ -409,6 +409,56 @@ WantedBy=default.target
 
 ---
 
+## PDF Test Generator (Bulk Mode)
+
+Lehrkräfte können Tests für mehrere Schüler oder die gesamte Klasse gleichzeitig erstellen.
+
+### Flow
+
+1. **Test Builder** (`/tests/builder`):
+   - Klasse auswählen → Schüler-Liste wird geladen
+   - Schüler via Checkboxen auswählen (Alle/Keine/Invertieren)
+   - Optional: Manuelle Namenseingabe für externe Schüler
+   - Kompetenzen auswählen
+   - Submit → Batch-Preview
+
+2. **Batch Preview** (`/tests/preview/batch/{batch_id}`):
+   - Übersicht aller Schüler mit Fragen-Anzahl
+   - Einzelne Tests können bearbeitet werden (Fragen auswählen)
+   - Download-Optionen:
+     - **ZIP**: Einzelne PDFs pro Schüler
+     - **Merged**: Alle Tests in einem PDF (zum einfachen Drucken)
+
+3. **Single Preview** (`/tests/preview/{pid}`):
+   - Für einzelne Schüler im Batch: Fragen bearbeiten
+   - "Zurück zur Batch-Übersicht" Link
+
+### Datenstruktur
+
+```python
+_TEST_PREVIEWS[batch_id] = {
+    "type": "batch",
+    "student_names": [...],
+    "preview_ids": [...],  # Einzel-Preview IDs
+    "title": "...",
+    "created_at": "...",
+}
+
+_TEST_PREVIEWS[pid] = {
+    "type": "single",  # oder implizit
+    "batch_id": "...",  # Referenz zum Batch
+    "student_name": "...",
+    "questions": [...],
+    ...
+}
+```
+
+### Limits
+- Maximal 50 Schüler pro Batch
+- Previews sind ephemeral (gehen bei Server-Restart verloren)
+
+---
+
 ## Testing
 
 **No automated test suite exists.** Testing is manual:
