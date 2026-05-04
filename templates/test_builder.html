@@ -7,8 +7,8 @@
 <h1>Testgenerator</h1>
 <p class="muted">Nur einfache Kompetenzen — Niveau-Kompetenzen werden über Nachweise nachgewiesen.</p>
 
-<form action="/tests/generate" method="post">
-  <input type="hidden" name="student_name" id="student-name-hidden">
+<form action="/tests/generate" method="post" id="test-form">
+  <input type="hidden" name="student_names" id="student-names-hidden" value="[]">
   <input type="hidden" name="class_id" id="class-id-hidden" value="{{ selected_class_id }}">
 
   <div class="form-row" style="align-items:flex-end;">
@@ -23,16 +23,35 @@
         {% endfor %}
       </select>
     </label>
-    <label>Schüler/in (aus Liste)
-      <select id="student-select" onchange="onStudentChange()" disabled>
-        <option value="">— erst Klasse wählen —</option>
-      </select>
-    </label>
-    <label>Oder: Name manuell
-      <input type="text" id="manual-name" placeholder="Name eingeben"
-        oninput="onManualName(this.value)">
-    </label>
   </div>
+
+  {# Schüler-Auswahl mit Checkboxen #}
+  <div id="student-selection-container" style="margin: 1rem 0; {% if not selected_class_id %}display:none;{% endif %}">
+    <h3>Schüler auswählen</h3>
+    <div class="student-filter-row" style="margin-bottom: 0.5rem;">
+      <button type="button" class="btn-small" onclick="selectAllStudents(true)">Alle auswählen</button>
+      <button type="button" class="btn-small" onclick="selectAllStudents(false)">Keine</button>
+      <button type="button" class="btn-small" onclick="invertStudentSelection()">Invertieren</button>
+      <span id="student-counter" class="muted" style="margin-left: 1rem;">0 Schüler ausgewählt</span>
+    </div>
+    <div id="student-list" class="student-checkbox-list" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem;">
+      <p class="muted">Bitte zuerst eine Klasse wählen...</p>
+    </div>
+    <p class="muted" style="font-size:0.85rem; margin-top:0.5rem;">
+      Oder: <a href="#" onclick="toggleManualEntry(); return false;">Namen manuell eingeben</a> (für externe Schüler)
+    </p>
+  </div>
+
+  {# Manuelle Namenseingabe (optional, für externe Schüler) #}
+  <div id="manual-entry-container" style="display:none; margin: 1rem 0;">
+    <label>Namen manuell eingeben (einer pro Zeile)
+      <textarea id="manual-names" rows="4" placeholder="Max Mustermann&#10;Anna Schmidt" style="width: 100%; font-family: inherit;"></textarea>
+    </label>
+    <p class="muted" style="font-size:0.85rem; margin-top:0.25rem;">
+      <a href="#" onclick="toggleManualEntry(); return false;">Zurück zur Klassenliste</a>
+    </p>
+  </div>
+
   <div id="student-hint" class="muted" style="font-size:0.85rem; margin-bottom:0.75rem; min-height:1.2em;"></div>
 
   <h2>Kompetenzen auswählen</h2>
@@ -43,8 +62,8 @@
   </div>
   {% endif %}
   <div class="filter-row">
-    <button type="button" onclick="selectAll(true)">Alle</button>
-    <button type="button" onclick="selectAll(false)">Keine</button>
+    <button type="button" onclick="selectAllCompetencies(true)">Alle</button>
+    <button type="button" onclick="selectAllCompetencies(false)">Keine</button>
   </div>
 
   <table class="kompetenz-table">
@@ -72,13 +91,15 @@
   </table>
 
   <button type="submit" class="btn-primary" id="btn-generate" disabled
-    title="Bitte zuerst eine Schüler/in auswählen">PDF generieren &amp; herunterladen</button>
+    title="Bitte zuerst mindestens einen Schüler auswählen">PDF generieren &amp; herunterladen</button>
 </form>
 
 <script>
 const ACTIVE_IDS_T = new Set({{ active_ids_list | safe }});
+let selectedStudents = new Map(); // id -> name
+let isManualEntry = false;
 
-function selectAll(state) {
+function selectAllCompetencies(state) {
   document.querySelectorAll('input[name=competency_ids]').forEach(cb => cb.checked = state);
 }
 function selectThema(thema, state) {
@@ -105,84 +126,182 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadStudents() {
   const classId = document.getElementById('class-select').value;
-  const sel = document.getElementById('student-select');
-  sel.innerHTML = '<option value="">Lade…</option>';
-  sel.disabled = true;
-  document.getElementById('student-name-hidden').value = '';
-  document.getElementById('btn-generate').disabled = true;
-  document.getElementById('student-hint').textContent = '';
-  selectAll(false);
-
+  const container = document.getElementById('student-list');
+  const counter = document.getElementById('student-counter');
+  const hint = document.getElementById('student-hint');
+  
+  selectedStudents.clear();
+  updateStudentCounter();
+  updateHiddenField();
+  
   if (!classId) {
-    sel.innerHTML = '<option value="">— erst Klasse wählen —</option>';
+    container.innerHTML = '<p class="muted">Bitte zuerst eine Klasse wählen...</p>';
+    document.getElementById('student-selection-container').style.display = 'none';
     return;
   }
 
+  document.getElementById('student-selection-container').style.display = 'block';
+  container.innerHTML = '<p class="muted">Lade Schüler...</p>';
+  
   try {
     const students = await fetch('/api/class-students/' + classId).then(r => r.json());
-    sel.innerHTML = '<option value="">— Schüler/in wählen —</option>';
+    
+    if (students.length === 0) {
+      container.innerHTML = '<p class="muted">Keine Schüler in dieser Klasse.</p>';
+      return;
+    }
+    
+    let html = '';
     students.forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s.id;
-      opt.textContent = s.displayName;
-      sel.appendChild(opt);
+      html += `
+        <label class="student-checkbox" style="display: block; padding: 0.25rem 0; cursor: pointer;">
+          <input type="checkbox" value="${s.id}" data-name="${s.displayName}" 
+            onchange="toggleStudent('${s.id}', '${s.displayName.replace(/'/g, "\\'")}')">
+          ${s.displayName}
+        </label>
+      `;
     });
-    sel.disabled = false;
+    container.innerHTML = html;
+    
+    // Auto-select all students by default
+    selectAllStudents(true);
+    
   } catch (e) {
-    sel.innerHTML = '<option value="">Fehler beim Laden</option>';
+    container.innerHTML = '<p class="muted" style="color: var(--danger);">Fehler beim Laden der Schüler.</p>';
   }
 }
 
-async function onStudentChange() {
-  const sel = document.getElementById('student-select');
-  const studentId = sel.value;
-  const studentName = sel.options[sel.selectedIndex]?.text || '';
-  const hint = document.getElementById('student-hint');
-
-  // Clear manual field — dropdown takes priority
-  document.getElementById('manual-name').value = '';
-  document.getElementById('student-name-hidden').value = studentName;
-  document.getElementById('btn-generate').disabled = !studentId;
-  selectAll(false);
-
-  if (!studentId) {
-    hint.textContent = '';
-    return;
-  }
-
-  hint.textContent = 'Lade Kompetenzen…';
-  const data = await fetch('/api/student-competencies?student_id=' + studentId).then(r => r.json());
-  const proven = new Set(data.proven_einfach_ids);  // String IDs: "e.901"
-
-  document.querySelectorAll('input[name=competency_ids]').forEach(cb => {
-    const id = cb.value;  // String ID like "e.901"
-    cb.checked = !proven.has(id) && (ACTIVE_IDS_T.size === 0 || ACTIVE_IDS_T.has(id));
-  });
-
-  // Zähle nur einfache Kompetenzen im Unterrichtsstand
-  const activeEinfach = Array.from(ACTIVE_IDS_T).filter(id => id.startsWith('e.'));
-  const provenInActive = activeEinfach.filter(id => proven.has(id)).length;
-  const fehlend = activeEinfach.length - provenInActive;
-  
-  hint.textContent = `${studentName}: ${provenInActive} von ${activeEinfach.length} einfachen Kompetenzen nachgewiesen, ${fehlend} fehlend im Unterrichtsstand.`;
-}
-
-function onManualName(value) {
-  const hint = document.getElementById('student-hint');
-  if (value.trim()) {
-    // Manual entry overrides dropdown — reset dropdown, no pre-selection
-    document.getElementById('student-select').value = '';
-    document.getElementById('student-name-hidden').value = value.trim();
-    document.getElementById('btn-generate').disabled = false;
-    selectAll(false);
-    hint.textContent = 'Manueller Name — bitte Kompetenzen selbst auswählen.';
+function toggleStudent(id, name) {
+  const checkbox = document.querySelector(`input[value="${id}"]`);
+  if (checkbox.checked) {
+    selectedStudents.set(id, name);
   } else {
-    document.getElementById('student-name-hidden').value = '';
-    document.getElementById('btn-generate').disabled = true;
-    hint.textContent = '';
+    selectedStudents.delete(id);
+  }
+  updateStudentCounter();
+  updateHiddenField();
+  updateGenerateButton();
+}
+
+function selectAllStudents(state) {
+  document.querySelectorAll('#student-list input[type="checkbox"]').forEach(cb => {
+    cb.checked = state;
+    const name = cb.getAttribute('data-name');
+    const id = cb.value;
+    if (state) {
+      selectedStudents.set(id, name);
+    } else {
+      selectedStudents.delete(id);
+    }
+  });
+  updateStudentCounter();
+  updateHiddenField();
+  updateGenerateButton();
+}
+
+function invertStudentSelection() {
+  document.querySelectorAll('#student-list input[type="checkbox"]').forEach(cb => {
+    cb.checked = !cb.checked;
+    const name = cb.getAttribute('data-name');
+    const id = cb.value;
+    if (cb.checked) {
+      selectedStudents.set(id, name);
+    } else {
+      selectedStudents.delete(id);
+    }
+  });
+  updateStudentCounter();
+  updateHiddenField();
+  updateGenerateButton();
+}
+
+function updateStudentCounter() {
+  const count = isManualEntry ? getManualNames().length : selectedStudents.size;
+  document.getElementById('student-counter').textContent = count + ' Schüler ausgewählt';
+}
+
+function updateHiddenField() {
+  if (isManualEntry) {
+    const names = getManualNames();
+    document.getElementById('student-names-hidden').value = JSON.stringify(names);
+  } else {
+    const names = Array.from(selectedStudents.values());
+    document.getElementById('student-names-hidden').value = JSON.stringify(names);
   }
 }
+
+function updateGenerateButton() {
+  const btn = document.getElementById('btn-generate');
+  let count;
+  if (isManualEntry) {
+    count = getManualNames().length;
+  } else {
+    count = selectedStudents.size;
+  }
+  btn.disabled = count === 0;
+  btn.title = count === 0 ? 'Bitte zuerst mindestens einen Schüler auswählen' : `${count} Schüler - Test generieren`;
+}
+
+function toggleManualEntry() {
+  isManualEntry = !isManualEntry;
+  const listContainer = document.getElementById('student-selection-container');
+  const manualContainer = document.getElementById('manual-entry-container');
+  
+  if (isManualEntry) {
+    listContainer.style.display = 'none';
+    manualContainer.style.display = 'block';
+  } else {
+    listContainer.style.display = 'block';
+    manualContainer.style.display = 'none';
+  }
+  updateStudentCounter();
+  updateHiddenField();
+  updateGenerateButton();
+}
+
+function getManualNames() {
+  const text = document.getElementById('manual-names').value;
+  return text.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+}
+
+document.getElementById('manual-names').addEventListener('input', function() {
+  updateStudentCounter();
+  updateHiddenField();
+  updateGenerateButton();
+});
+
+// Form submission validation
+document.getElementById('test-form').addEventListener('submit', function(e) {
+  const competencies = document.querySelectorAll('input[name="competency_ids"]:checked');
+  if (competencies.length === 0) {
+    e.preventDefault();
+    alert('Bitte mindestens eine Kompetenz auswählen.');
+    return false;
+  }
+  
+  const studentCount = isManualEntry ? getManualNames().length : selectedStudents.size;
+  if (studentCount === 0) {
+    e.preventDefault();
+    alert('Bitte mindestens einen Schüler auswählen.');
+    return false;
+  }
+  
+  return true;
+});
 </script>
+
+<style>
+.student-checkbox-list label:hover {
+  background-color: var(--bg-secondary);
+}
+.student-checkbox input {
+  margin-right: 0.5rem;
+}
+.student-filter-row button {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+}
+</style>
 
 {% else %}
 {# ===================== SCHÜLER-ANSICHT ===================== #}
