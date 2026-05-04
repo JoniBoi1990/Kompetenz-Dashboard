@@ -21,11 +21,11 @@
 {# Status overview #}
 <div class="score-display" style="margin-bottom:1.5rem;gap:1.5rem;">
   <span class="score-pts">{{ total_einfach }}</span>
-  <span class="score-pct">einfache Kompetenzen</span>
+  <span class="score-pct">Unterrichtskompetenzen</span>
   <span class="score-pts">{{ with_thema }}</span>
   <span class="score-pct">davon mit Thema</span>
   <span class="score-pts">{{ total_niveau }}</span>
-  <span class="score-pct">Niveau-Kompetenzen</span>
+  <span class="score-pct">Projektkompetenzen</span>
   <span class="score-pts">{{ with_questions }}</span>
   <span class="score-pct">mit Testfragen</span>
 </div>
@@ -34,7 +34,7 @@
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
 
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
-    <h2 style="margin-top:0">Einfache Kompetenzen (ibK)</h2>
+    <h2 style="margin-top:0">Unterricht (ibK)</h2>
     <p class="muted" style="margin-bottom:.75rem;font-size:.85rem;">
       Format: <code>ID;BP-Nummer;Kompetenz;Thema;Anmerkungen</code> (Semikolon, UTF-8)
     </p>
@@ -47,12 +47,12 @@
       </div>
     </form>
     <p style="margin-top:.75rem;font-size:.875rem;">
-      <a href="/admin/kompetenzen#einfach">Einfache Kompetenzen bearbeiten &rarr;</a>
+      <a href="/admin/kompetenzen#einfach">Unterricht bearbeiten &rarr;</a>
     </p>
   </div>
 
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
-    <h2 style="margin-top:0">Niveau-Kompetenzen (pbK)</h2>
+    <h2 style="margin-top:0">Projekte (pbK)</h2>
     <p class="muted" style="margin-bottom:.75rem;font-size:.85rem;">
       Format: <code>ID;Nummer;pbk;Möglichkeit1;Möglichkeit2;Möglichkeit3;Hinweise</code> (Semikolon, UTF-8)
     </p>
@@ -65,7 +65,7 @@
       </div>
     </form>
     <p style="margin-top:.75rem;font-size:.875rem;">
-      <a href="/admin/kompetenzen#niveau">Niveau-Kompetenzen bearbeiten &rarr;</a>
+      <a href="/admin/kompetenzen#niveau">Projekte bearbeiten &rarr;</a>
     </p>
   </div>
 

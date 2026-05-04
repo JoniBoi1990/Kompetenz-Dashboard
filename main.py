@@ -537,6 +537,22 @@ async def auth_callback(request: Request, code: str = "", error: str = ""):
     except ValueError as e:
         return HTMLResponse(f"<h1>Token-Fehler</h1><p>{e}</p>", status_code=400)
     user_info = auth.build_user_info(token_response)
+    
+    # Save refresh token for teachers (for auto-sync)
+    # Get refresh_token directly from token_response (not from user_info - it's too large for cookie)
+    refresh_token = token_response.get("refresh_token")
+    if user_info["is_teacher"] and refresh_token:
+        from datetime import datetime, timedelta, timezone
+        access_token = user_info.get("access_token", "")
+        # Access token typically valid for 1 hour
+        expires_at = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
+        db.save_teacher_token(
+            teacher_id=user_info["upn"],
+            refresh_token=refresh_token,
+            access_token=access_token,
+            expires_at=expires_at,
+        )
+    
     response = RedirectResponse(url="/teacher" if user_info["is_teacher"] else "/", status_code=302)
     auth.set_session(response, user_info)
     return response
@@ -789,9 +805,59 @@ async def teacher_class(class_id: str, request: Request, user: dict = Depends(au
     members = db.get_class_members(class_id)
     onenote_config = db.get_onenote_sync_config(class_id)
     
+    # Noten für alle Schüler berechnen
+    student_grades = []
+    for member in members:
+        student_id = member["id"]
+        
+        # Klassen-spezifische Kompetenzen laden
+        class_einfach, class_niveau, active_ids, _ = _get_student_competencies(student_id)
+        class_comps = class_einfach + class_niveau
+        
+        if not class_comps:
+            # Fallback zu Default-Kompetenzen wenn keine Klasse zugeordnet
+            class_comps = _EINFACH + _NIVEAU
+            active_ids = db.get_active_ids()
+        
+        # Schülerdaten laden
+        einfach_map, nachweise_by_comp, _, _ = _load_student_data(user.get("access_token", ""), student_id)
+        
+        # Filter auf Klassen-Kompetenzen
+        class_comp_ids = {c["id"] for c in class_comps}
+        einfach_map_filtered = {k: v for k, v in einfach_map.items() if k in class_comp_ids}
+        nachweise_filtered = {k: v for k, v in nachweise_by_comp.items() if k in class_comp_ids}
+        
+        # Bereits nachgewiesene Kompetenzen
+        proven_ids = (
+            {cid for cid, r in einfach_map_filtered.items() if r.get("achieved")}
+            | {cid for cid, entries in nachweise_filtered.items()
+               if any(e.get("niveau_level", 0) > 0 for e in entries)}
+        )
+        
+        # 1. Note für Unterrichtsstand (aktive IDs + nachgewiesene)
+        if active_ids:
+            basis_ids = active_ids | proven_ids
+            basis_comps = [k for k in class_comps if k["id"] in basis_ids]
+        else:
+            basis_comps = class_comps
+        
+        records_basis = _build_grade_records(einfach_map_filtered, nachweise_filtered, basis_comps)
+        grade_basis = calculate_grade(records_basis, basis_comps)
+        
+        # 2. Note für Gesamtjahr (alle Kompetenzen)
+        records_all = _build_grade_records(einfach_map_filtered, nachweise_filtered, class_comps)
+        grade_all = calculate_grade(records_all, class_comps)
+        
+        student_grades.append({
+            "student": member,
+            "grade_basis": grade_basis,
+            "grade_all": grade_all,
+        })
+    
     return templates.TemplateResponse("class_detail.html", {
         "request": request, "user": user, "class_id": class_id, "members": members,
-        "onenote_config": onenote_config,
+        "onenote_config": onenote_config, "student_grades": student_grades,
+        "grading_scale": _GRADING_SCALE,
     })
 
 
@@ -1585,6 +1651,9 @@ async def teacher_coverage(
     
     active_ids = db.get_active_ids(class_id) if class_id is not None else db.get_active_ids()
     
+    # Get class members for bulk assignment modal
+    class_members = db.get_class_members(class_id) if class_id else []
+    
     return templates.TemplateResponse("coverage.html", {
         "request": request, 
         "user": user, 
@@ -1593,6 +1662,7 @@ async def teacher_coverage(
         "selected_class_id": class_id,
         "einfach_kompetenzen": einfach,
         "niveau_kompetenzen": niveau,
+        "class_members": class_members,
     })
 
 
@@ -1609,6 +1679,33 @@ async def teacher_coverage_update(
         db.set_active_ids(ids, class_id)
     else:
         db.set_active_ids(ids)
+    
+    return RedirectResponse(url=f"/teacher/coverage?class_id={class_id}", status_code=302)
+
+
+@app.post("/teacher/coverage/bulk-assign")
+async def teacher_coverage_bulk_assign(
+    request: Request,
+    class_id: str = Form(...),
+    competency_id: str = Form(...),
+    student_ids: list[str] = Form(default=[]),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Assign a competency to multiple students at once."""
+    # Get class members for names
+    members = db.get_class_members(class_id)
+    member_map = {m["id"]: m["displayName"] for m in members}
+    
+    # Assign competency to each selected student
+    for student_id in student_ids:
+        student_name = member_map.get(student_id, student_id)
+        db.upsert_einfach(
+            student_id=student_id,
+            student_name=student_name,
+            competency_id=competency_id,
+            achieved=True,
+            updated_by=user["upn"],
+        )
     
     return RedirectResponse(url=f"/teacher/coverage?class_id={class_id}", status_code=302)
 
@@ -3061,6 +3158,7 @@ async def onenote_sync_scheduler():
     """
     Hintergrund-Task für automatische tägliche OneNote-Syncs.
     Läuft um 02:00 Uhr nachts.
+    Nutzt gespeicherte Refresh Tokens von Lehrern.
     """
     while True:
         try:
@@ -3078,20 +3176,79 @@ async def onenote_sync_scheduler():
             # Sync für alle aktivierten Klassen
             print("[OneNote Sync] Starte automatischen Sync...")
             
-            # Hinweis: Für automatische Syncs brauchen wir einen Service-Account
-            # oder Refresh Token. Hier loggen wir nur, dass der Sync anstehen würde.
-            # In Produktion müsste hier ein App-Token oder Refresh-Token genutzt werden.
-            
             configs = db.get_enabled_onenote_sync_configs()
             print(f"[OneNote Sync] {len(configs)} aktivierte Klassen gefunden")
             
-            for config in configs:
-                try:
+            if not configs:
+                continue
+            
+            # Get all teacher tokens
+            teacher_tokens = db.get_all_teacher_tokens()
+            if not teacher_tokens:
+                print("[OneNote Sync] Keine gespeicherten Teacher-Tokens gefunden")
+                for config in configs:
                     db.update_onenote_sync_status(
                         config["class_id"],
                         "error",
-                        "Automatischer Sync erfordert Service-Account-Konfiguration",
+                        "Kein Lehrer mit gespeichertem Token. Bitte einmalig anmelden.",
                     )
+                continue
+            
+            # Build a map of teacher_id -> access_token
+            teacher_access_tokens = {}
+            for token_data in teacher_tokens:
+                teacher_id = token_data["teacher_id"]
+                access_token = auth.get_access_token_for_teacher(teacher_id)
+                if access_token:
+                    teacher_access_tokens[teacher_id] = access_token
+            
+            if not teacher_access_tokens:
+                print("[OneNote Sync] Keine gültigen Access Tokens verfügbar")
+                for config in configs:
+                    db.update_onenote_sync_status(
+                        config["class_id"],
+                        "error",
+                        "Token abgelaufen. Bitte erneut anmelden.",
+                    )
+                continue
+            
+            # Get class creators to determine which teacher to use
+            for config in configs:
+                try:
+                    cls = db.get_class(config["class_id"])
+                    if not cls:
+                        continue
+                    
+                    # Try to find a teacher token for this class
+                    # Priority: class creator, then any available teacher
+                    creator = cls.get("created_by", "")
+                    access_token = None
+                    
+                    if creator and creator in teacher_access_tokens:
+                        access_token = teacher_access_tokens[creator]
+                    else:
+                        # Use any available teacher token
+                        access_token = list(teacher_access_tokens.values())[0]
+                    
+                    if not access_token:
+                        db.update_onenote_sync_status(
+                            config["class_id"],
+                            "error",
+                            "Kein gültiges Token für diese Klasse verfügbar",
+                        )
+                        continue
+                    
+                    # Run sync
+                    import onenote_sync
+                    result = await onenote_sync.run_sync_for_class(
+                        class_id=config["class_id"],
+                        access_token=access_token,
+                        triggered_by="auto",
+                    )
+                    
+                    if result["status"] != "success":
+                        print(f"[OneNote Sync] Fehler bei Klasse {config['class_id']}: {result.get('error')}")
+                
                 except Exception as e:
                     print(f"[OneNote Sync] Fehler bei Klasse {config['class_id']}: {e}")
             
