@@ -14,7 +14,7 @@
     <strong>{{ a.student_name }}</strong>
     <span class="muted" style="font-size:.85rem">{{ a.competency_name }} (ID {{ a.competency_id }})</span>
     <span class="muted" style="font-size:.8rem">eingereicht {{ a.created_at|to_local_time("%d.%m.%Y") }}</span>
-    <span class="niveau-badge niveau-0" style="font-size:.75rem">{{ "einfach" if a.typ == "einfach" else "Niveau" }}</span>
+    <span class="niveau-badge niveau-0" style="font-size:.75rem">{{ "Unterricht" if a.typ == "einfach" else "Projekt" }}</span>
   </div>
 
   {% if a.typ == "einfach" %}

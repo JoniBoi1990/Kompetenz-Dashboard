@@ -53,7 +53,7 @@
   <div class="two-columns">
 
     <div>
-      <h3>Einfache Kompetenzen (Planung)</h3>
+      <h3>Unterricht (Planung)</h3>
       <table class="kompetenz-table">
         <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Erreicht</th></tr></thead>
         <tbody>
@@ -85,9 +85,9 @@
     </div>
 
     <div>
-      <h3>Niveau-Kompetenzen (Planung)</h3>
+      <h3>Projekte (Planung)</h3>
       <table class="kompetenz-table">
-        <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Niveau</th></tr></thead>
+        <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Projektniveau</th></tr></thead>
         <tbody>
           {% for k in niveau_kompetenzen %}
           {% set best = best_nachweis_by_comp.get(k.id) %}
@@ -117,9 +117,9 @@
 
 <div class="two-columns">
 
-  {# --- Einfache Kompetenzen --- #}
+  {# --- Unterricht --- #}
   <div>
-    <h2>Einfache Kompetenzen</h2>
+    <h2>Unterricht</h2>
     <table class="kompetenz-table">
       <thead><tr><th style="width:2.5rem">#</th><th>Name</th><th>Erreicht</th></tr></thead>
       <tbody>
@@ -155,9 +155,9 @@
     </table>
   </div>
 
-  {# --- Niveau-Kompetenzen --- #}
+  {# --- Projekte --- #}
   <div>
-    <h2>Niveau-Kompetenzen</h2>
+    <h2>Projekte</h2>
     <table class="kompetenz-table">
       <thead>
         <tr>

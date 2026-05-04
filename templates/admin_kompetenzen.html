@@ -13,8 +13,8 @@
     <button type="submit" class="btn-primary" style="margin-top:0">Alle Änderungen speichern</button>
   </div>
 
-  {# ---- Einfache Kompetenzen ---- #}
-  <h2 id="einfach">Einfache Kompetenzen ({{ einfach_kompetenzen | length }})</h2>
+  {# ---- Unterricht ---- #}
+  <h2 id="einfach">Unterricht ({{ einfach_kompetenzen | length }})</h2>
   <table class="kompetenz-table" style="margin-bottom:.5rem;">
     <thead>
       <tr>
@@ -37,8 +37,8 @@
         <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
         <td>
           <select name="typ_{{ k.id }}" style="width:100%">
-            <option value="einfach" selected>einfach</option>
-            <option value="niveau">niveau</option>
+            <option value="einfach" selected>Unterricht</option>
+            <option value="niveau">Projekt</option>
           </select>
         </td>
         <td>
@@ -67,8 +67,8 @@
     </tbody>
   </table>
 
-  {# ---- Niveau-Kompetenzen ---- #}
-  <h2 id="niveau" style="margin-top:1.5rem">Niveau-Kompetenzen ({{ niveau_kompetenzen | length }})</h2>
+  {# ---- Projekte ---- #}
+  <h2 id="niveau" style="margin-top:1.5rem">Projekte ({{ niveau_kompetenzen | length }})</h2>
   <table class="kompetenz-table" style="margin-bottom:.5rem;">
     <thead>
       <tr>
@@ -87,8 +87,8 @@
         <td class="muted" style="font-size:.8rem">{{ k.id }}</td>
         <td>
           <select name="typ_{{ k.id }}" style="width:100%">
-            <option value="einfach">einfach</option>
-            <option value="niveau" selected>niveau</option>
+            <option value="einfach">Unterricht</option>
+            <option value="niveau" selected>Projekt</option>
           </select>
         </td>
         <td>
@@ -140,7 +140,7 @@
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem;">
 
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;">
-    <h3 style="margin:0 0 .75rem">Einfache Kompetenz hinzufügen</h3>
+    <h3 style="margin:0 0 .75rem">Unterrichtskompetenz hinzufügen</h3>
     <form action="/admin/kompetenzen/add" method="post">
       <input type="hidden" name="typ" value="einfach">
       <div class="form-row" style="align-items:flex-end;gap:.5rem;">
@@ -162,7 +162,7 @@
   </div>
 
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;">
-    <h3 style="margin:0 0 .75rem">Niveau-Kompetenz hinzufügen</h3>
+    <h3 style="margin:0 0 .75rem">Projektkompetenz hinzufügen</h3>
     <form action="/admin/kompetenzen/add" method="post">
       <input type="hidden" name="typ" value="niveau">
       <div class="form-row" style="align-items:flex-end;gap:.5rem;">

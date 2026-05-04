@@ -15,7 +15,7 @@
     {% if system_lists %}
     <table class="kompetenz-table" style="font-size:.9rem;">
       <thead>
-        <tr><th>Name</th><th>Stufe</th><th>Einfach</th><th>Niveau</th><th>System-Fragen</th></tr>
+        <tr><th>Name</th><th>Stufe</th><th>Unterricht</th><th>Projekte</th><th>System-Fragen</th></tr>
       </thead>
       <tbody>
         {% for lst in system_lists %}
@@ -109,8 +109,8 @@
             Typ
             <select name="typ" required style="width:100%;margin-top:.25rem;padding:.35rem .5rem;">
               <option value="">-- wählen --</option>
-              <option value="einfach">Einfach</option>
-              <option value="niveau">Niveau</option>
+              <option value="einfach">Unterricht</option>
+              <option value="niveau">Projekt</option>
             </select>
           </label>
           <label style="font-size:.875rem;">
@@ -140,8 +140,8 @@
       </form>
       <p class="muted" style="font-size:.8rem;margin-top:.75rem;">
         <strong>Formate:</strong><br>
-        Einfach: <code>ID;Kompetenz;Thema;Anmerkungen</code><br>
-        Niveau: <code>ID;Nummer;pbk;Möglichkeit1;Möglichkeit2;Möglichkeit3;Hinweise</code><br>
+        Unterricht: <code>ID;Kompetenz;Thema;Anmerkungen</code><br>
+        Projekt: <code>ID;Nummer;pbk;Möglichkeit1;Möglichkeit2;Möglichkeit3;Hinweise</code><br>
         Spaltenformat: <code>1;2;3</code> + Zeilen mit Fragen<br>Zeilenformat: <code>competency_id;frage</code><br>JSON: <code>{"e.901": ["Frage 1"]}</code>
       </p>
     </div>

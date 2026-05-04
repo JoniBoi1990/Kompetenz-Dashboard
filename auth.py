@@ -15,6 +15,7 @@ import db
 
 AUTHORITY = f"https://login.microsoftonline.com/{settings.AZURE_TENANT_ID}"
 # User.Read for identity + Notes.Read.All for OneNote sync
+# offline_access is automatically added by MSAL when using acquire_token_by_authorization_code
 SCOPES = ["User.Read", "Notes.Read.All"]
 
 
@@ -122,7 +123,83 @@ def build_user_info(token_response: dict) -> dict:
         "roles": claims.get("roles", []),
         "is_teacher": is_teacher(claims),
         "access_token": token_response.get("access_token", ""),
+        # Note: refresh_token is NOT stored in cookie (too large)
+        # It is saved to database in auth_callback instead
     }
+
+
+def acquire_token_by_refresh_token(refresh_token: str) -> dict | None:
+    """Acquire a new access token using a refresh token.
+    
+    Returns the full token response or None if refresh failed.
+    """
+    try:
+        result = _msal_app().acquire_token_by_refresh_token(
+            refresh_token,
+            scopes=SCOPES,
+        )
+        if "error" in result:
+            print(f"[Auth] Token refresh failed: {result.get('error_description', result['error'])}")
+            return None
+        return result
+    except Exception as e:
+        print(f"[Auth] Token refresh exception: {e}")
+        return None
+
+
+def get_access_token_for_teacher(teacher_id: str) -> str | None:
+    """Get a valid access token for a teacher (using refresh token if needed).
+    
+    Returns the access token or None if no valid token can be obtained.
+    Also updates the stored token if refreshed.
+    """
+    token_data = db.get_teacher_token(teacher_id)
+    if not token_data:
+        return None
+    
+    # Check if we have a cached access token that's still valid
+    expires_at = token_data.get("expires_at")
+    access_token = token_data.get("access_token")
+    
+    if access_token and expires_at:
+        from datetime import datetime, timezone
+        try:
+            exp = datetime.fromisoformat(expires_at)
+            # Token is valid if it expires in more than 5 minutes
+            if exp > datetime.now(timezone.utc).replace(tzinfo=timezone.utc):
+                return access_token
+        except:
+            pass
+    
+    # Need to refresh
+    refresh_token = token_data.get("refresh_token")
+    if not refresh_token:
+        return None
+    
+    result = acquire_token_by_refresh_token(refresh_token)
+    if not result:
+        return None
+    
+    # Update stored tokens
+    new_access = result.get("access_token", "")
+    new_refresh = result.get("refresh_token", "")
+    
+    # Calculate expiry (typically 1 hour from now)
+    expires_in = result.get("expires_in", 3600)
+    from datetime import datetime, timedelta, timezone
+    new_expires = (datetime.now(timezone.utc) + timedelta(seconds=expires_in)).isoformat()
+    
+    # Use new refresh token if provided, otherwise keep old one
+    refresh_to_store = new_refresh if new_refresh else refresh_token
+    
+    db.save_teacher_token(
+        teacher_id=teacher_id,
+        refresh_token=refresh_to_store,
+        access_token=new_access,
+        expires_at=new_expires,
+    )
+    
+    return new_access
 
 
 # ---------------------------------------------------------------------------
