@@ -1820,48 +1820,132 @@ async def generate_test(request: Request, user: dict = Depends(auth.require_teac
     if not selected_ids:
         raise HTTPException(status_code=400, detail="Keine Kompetenzen ausgewählt")
 
-    # Parse student names from JSON array
-    student_names_json = form.get("student_names", "[]")
+    # Parse student data from JSON array
+    student_data_json = form.get("student_data", "[]")
     try:
-        student_names = json.loads(student_names_json)
+        student_data = json.loads(student_data_json)
     except json.JSONDecodeError:
-        student_names = []
+        student_data = []
     
-    if not student_names or not isinstance(student_names, list):
-        raise HTTPException(status_code=400, detail="Kein Schülername angegeben")
+    if not student_data or not isinstance(student_data, list):
+        raise HTTPException(status_code=400, detail="Kein Schüler angegeben")
     
     # Limit check
-    if len(student_names) > 50:
+    if len(student_data) > 50:
         raise HTTPException(status_code=400, detail="Maximal 50 Schüler pro Batch erlaubt")
 
     title = form.get("title", "Kompetenztest")
     class_id = form.get("class_id", "")
     
-    # Single student: use existing flow
-    if len(student_names) == 1:
-        pid = _create_preview(student_names[0], title, selected_ids, class_id=class_id or None)
+    # Single student: use existing flow with preview
+    if len(student_data) == 1:
+        student = student_data[0]
+        student_name = student.get("name", "Unbekannt")
+        pid = _create_preview(student_name, title, selected_ids, class_id=class_id or None)
         return RedirectResponse(f"/tests/preview/{pid}", status_code=303)
     
-    # Multiple students: create batch
+    # Multiple students: generate PDFs directly for each student based on their competency status
     batch_id = str(uuid.uuid4())
-    preview_ids = []
+    generated_pdfs = {}  # student_name -> pdf_bytes
+    errors = []
     
-    for student_name in student_names:
-        pid = _create_preview(student_name, title, selected_ids, class_id=class_id or None, batch_id=batch_id)
-        preview_ids.append(pid)
+    # Load competency questions
+    competency_map = _KOMPETENZ_MAP.copy()
+    questions_dict = _QUESTIONS.copy()
     
-    # Store batch info
+    if class_id:
+        cls = db.get_class(class_id)
+        if cls:
+            einfach_list_id = cls.get("einfach_list_id") or cls.get("competency_list_id")
+            einfach_list_source = cls.get("einfach_list_source") or cls.get("list_source", "system")
+            if einfach_list_id:
+                try:
+                    if einfach_list_source == "teacher":
+                        teacher_list = db.get_teacher_list(einfach_list_id)
+                        if teacher_list:
+                            data = teacher_list.get("data", {})
+                            comps = data.get("competencies", [])
+                            competency_map = {c["id"]: c for c in comps if c.get("typ") == "einfach"}
+                            questions_dict = teacher_list.get("questions", {})
+                    else:
+                        comps, system_questions = _load_competency_list(einfach_list_id, "system")
+                        competency_map = {c["id"]: c for c in comps if c.get("typ") == "einfach"}
+                        questions_dict = system_questions
+                except FileNotFoundError:
+                    pass
+    
+    # Get active IDs for the class
+    active_ids = db.get_active_ids(class_id) if class_id else set()
+    
+    for student in student_data:
+        student_name = student.get("name", "Unbekannt")
+        student_id = student.get("id")
+        
+        # Determine which competencies this student needs
+        if student_id:
+            # Load student's competency status
+            try:
+                student_class = db.get_student_class(student_id)
+                einfach_map, _, _, _ = _load_student_data(user.get("access_token", ""), student_id)
+                proven_ids = {cid for cid, r in einfach_map.items() if r.get("achieved")}
+                
+                # Filter selected_ids to only those not proven and in active set
+                needed_ids = [cid for cid in selected_ids 
+                             if cid not in proven_ids 
+                             and (not active_ids or cid in active_ids)
+                             and cid.startswith("e.")]
+            except Exception:
+                # Fallback: use all selected_ids
+                needed_ids = [cid for cid in selected_ids if cid.startswith("e.")]
+        else:
+            # Manual entry: use all selected einfach competencies
+            needed_ids = [cid for cid in selected_ids if cid.startswith("e.")]
+        
+        if not needed_ids:
+            errors.append(f"{student_name}: Keine fehlenden Kompetenzen ausgewählt")
+            continue
+        
+        # Generate questions for this student
+        questions = []
+        for cid in needed_ids:
+            k = competency_map.get(cid)
+            if not k:
+                continue
+            opts = questions_dict.get(str(cid)) or [k["name"]]
+            selected_text = random.choice(opts)
+            questions.append({"kid": str(cid), "text": selected_text})
+        
+        if not questions:
+            errors.append(f"{student_name}: Keine Fragen generierbar")
+            continue
+        
+        # Generate PDF
+        try:
+            pdf_bytes = create_pdf(
+                questions=questions,
+                name=student_name,
+                datum=date.today().strftime("%d.%m.%Y"),
+                zusatzinfo=title,
+            )
+            generated_pdfs[student_name] = pdf_bytes
+        except Exception as e:
+            errors.append(f"{student_name}: PDF-Fehler - {e}")
+    
+    if not generated_pdfs:
+        raise HTTPException(status_code=500, detail="Keine PDFs konnten erstellt werden: " + "; ".join(errors))
+    
+    # Store batch for download
     _TEST_PREVIEWS[batch_id] = {
-        "type": "batch",
+        "type": "direct_download",
         "id": batch_id,
-        "student_names": student_names,
-        "preview_ids": preview_ids,
+        "student_names": list(generated_pdfs.keys()),
+        "pdfs": generated_pdfs,
         "title": title,
-        "class_id": class_id,
+        "errors": errors,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     
-    return RedirectResponse(f"/tests/preview/batch/{batch_id}", status_code=303)
+    return RedirectResponse(f"/tests/download/{batch_id}", status_code=303)
 
 
 @app.post("/tests/request", response_class=HTMLResponse)
@@ -2038,36 +2122,77 @@ async def finalize_test(pid: str, request: Request, user: dict = Depends(auth.re
     )
 
 
-@app.get("/tests/preview/batch/{batch_id}", response_class=HTMLResponse)
-async def test_batch_preview(batch_id: str, request: Request, user: dict = Depends(auth.require_teacher_user)):
-    """Show batch preview with all students and download options."""
+@app.get("/tests/download/{batch_id}", response_class=HTMLResponse)
+async def test_download_page(batch_id: str, request: Request, user: dict = Depends(auth.require_teacher_user)):
+    """Show download page for multi-select generated PDFs."""
     batch = _TEST_PREVIEWS.get(batch_id)
-    if not batch or batch.get("type") != "batch":
-        raise HTTPException(status_code=404, detail="Batch nicht gefunden oder abgelaufen")
+    if not batch or batch.get("type") != "direct_download":
+        raise HTTPException(status_code=404, detail="Download nicht gefunden oder abgelaufen")
     
-    # Build preview info for each student
-    previews = []
-    for pid in batch.get("preview_ids", []):
-        preview = _TEST_PREVIEWS.get(pid)
-        if preview:
-            questions_with_options = sum(1 for q in preview["questions"] if len(q.get("options", [])) > 1)
-            previews.append({
-                "id": pid,
-                "student_name": preview["student_name"],
-                "question_count": len(preview["questions"]),
-                "questions_with_options": questions_with_options,
-            })
-    
-    return templates.TemplateResponse("test_batch_preview.html", {
+    return templates.TemplateResponse("test_download.html", {
         "request": request,
         "user": user,
         "batch": {
             "id": batch_id,
             "title": batch["title"],
-            "student_count": len(previews),
-            "previews": previews,
+            "student_count": len(batch["student_names"]),
+            "student_names": batch["student_names"],
+            "errors": batch.get("errors", []),
         },
     })
+
+
+@app.post("/tests/download/{batch_id}")
+async def test_download(batch_id: str, request: Request, user: dict = Depends(auth.require_teacher_user)):
+    """Download generated PDFs as ZIP or merged PDF."""
+    batch = _TEST_PREVIEWS.get(batch_id)
+    if not batch or batch.get("type") != "direct_download":
+        raise HTTPException(status_code=404, detail="Download nicht gefunden oder abgelaufen")
+    
+    form = await request.form()
+    download_format = form.get("format", "zip")
+    
+    pdfs = batch["pdfs"]
+    title = batch["title"]
+    
+    if download_format == "merged":
+        # Merge all PDFs into one
+        pdf_list = [pdfs[name] for name in batch["student_names"]]
+        merged_pdf = merge_pdfs(pdf_list)
+        
+        # Clean up
+        del _TEST_PREVIEWS[batch_id]
+        
+        safe_title = title.replace(" ", "_")
+        return Response(
+            content=merged_pdf,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="{safe_title}_Alle.pdf"'},
+        )
+    else:
+        # Create ZIP file
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for student_name in batch["student_names"]:
+                pdf_bytes = pdfs[student_name]
+                safe_name = student_name.replace(" ", "_")
+                zip_file.writestr(f"{safe_name}_Kompetenznachweis.pdf", pdf_bytes)
+            # Add error log if there were errors
+            if batch.get("errors"):
+                error_text = "Fehler bei der Generierung:\n\n" + "\n".join(batch["errors"])
+                zip_file.writestr("_FEHLER.txt", error_text.encode('utf-8'))
+        
+        zip_buffer.seek(0)
+        
+        # Clean up
+        del _TEST_PREVIEWS[batch_id]
+        
+        safe_title = title.replace(" ", "_")
+        return Response(
+            content=zip_buffer.read(),
+            media_type="application/zip",
+            headers={"Content-Disposition": f'attachment; filename="{safe_title}_Tests.zip"'},
+        )
 
 
 @app.post("/tests/finalize/batch/{batch_id}")

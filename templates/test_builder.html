@@ -8,7 +8,7 @@
 <p class="muted">Nur einfache Kompetenzen — Niveau-Kompetenzen werden über Nachweise nachgewiesen.</p>
 
 <form action="/tests/generate" method="post" id="test-form">
-  <input type="hidden" name="student_names" id="student-names-hidden" value="[]">
+  <input type="hidden" name="student_data" id="student-data-hidden" value="[]">
   <input type="hidden" name="class_id" id="class-id-hidden" value="{{ selected_class_id }}">
 
   <div class="form-row" style="align-items:flex-end;">
@@ -96,7 +96,7 @@
 
 <script>
 const ACTIVE_IDS_T = new Set({{ active_ids_list | safe }});
-let selectedStudents = new Map(); // id -> name
+let selectedStudents = new Map(); // id -> {name: string, id: string}
 let studentCompetencyData = new Map(); // id -> {proven_einfach_ids: Set, name: string}
 let isManualEntry = false;
 let lastSelectionWasSingle = false;
@@ -180,7 +180,7 @@ async function toggleStudent(id, name) {
   const hint = document.getElementById('student-hint');
   
   if (checkbox.checked) {
-    selectedStudents.set(id, name);
+    selectedStudents.set(id, {name: name, id: id});
     
     // Load competency data for this student if not cached
     if (!studentCompetencyData.has(id)) {
@@ -229,7 +229,7 @@ async function loadStudentCompetencies(studentId) {
 
 function updateCompetencySelectionSingle() {
   // Get the single selected student
-  const [studentId, studentName] = selectedStudents.entries().next().value;
+  const [studentId, studentData] = selectedStudents.entries().next().value;
   const data = studentCompetencyData.get(studentId);
   
   if (!data) return;
@@ -260,7 +260,8 @@ function updateHint() {
   
   if (selectedStudents.size === 1) {
     // Single-Student: Detailed info
-    const [studentId, studentName] = selectedStudents.entries().next().value;
+    const [studentId, studentData] = selectedStudents.entries().next().value;
+    const studentName = studentData.name;
     const data = studentCompetencyData.get(studentId);
     if (!data) {
       hint.textContent = `${studentName}: Lade Kompetenzstand...`;
@@ -277,7 +278,8 @@ function updateHint() {
     // Multi-Student: List each student's stats
     let html = '';
     
-    for (const [studentId, studentName] of selectedStudents) {
+    for (const [studentId, studentData] of selectedStudents) {
+      const studentName = studentData.name;
       const data = studentCompetencyData.get(studentId);
       if (!data) {
         html += `<div>${studentName}: Lade Kompetenzstand...</div>`;
@@ -305,7 +307,7 @@ async function selectAllStudents(state) {
     const name = cb.getAttribute('data-name');
     const id = cb.value;
     if (state) {
-      selectedStudents.set(id, name);
+      selectedStudents.set(id, {name: name, id: id});
     } else {
       selectedStudents.delete(id);
     }
@@ -314,7 +316,7 @@ async function selectAllStudents(state) {
   // Load competency data for all selected students
   if (state) {
     document.getElementById('student-hint').textContent = 'Lade Kompetenzstände...';
-    for (const [id, name] of selectedStudents) {
+    for (const [id, studentData] of selectedStudents) {
       if (!studentCompetencyData.has(id)) {
         await loadStudentCompetencies(id);
       }
@@ -342,7 +344,7 @@ async function invertStudentSelection() {
     const name = cb.getAttribute('data-name');
     const id = cb.value;
     if (cb.checked) {
-      selectedStudents.set(id, name);
+      selectedStudents.set(id, {name: name, id: id});
     } else {
       selectedStudents.delete(id);
     }
@@ -350,7 +352,7 @@ async function invertStudentSelection() {
   
   // Load data for newly selected students
   document.getElementById('student-hint').textContent = 'Lade Kompetenzstände...';
-  for (const [id, name] of selectedStudents) {
+  for (const [id, studentData] of selectedStudents) {
     if (!studentCompetencyData.has(id)) {
       await loadStudentCompetencies(id);
     }
@@ -380,11 +382,14 @@ function updateStudentCounter() {
 
 function updateHiddenField() {
   if (isManualEntry) {
+    // For manual entry, create objects with null id
     const names = getManualNames();
-    document.getElementById('student-names-hidden').value = JSON.stringify(names);
+    const studentData = names.map(name => ({name: name, id: null}));
+    document.getElementById('student-data-hidden').value = JSON.stringify(studentData);
   } else {
-    const names = Array.from(selectedStudents.values());
-    document.getElementById('student-names-hidden').value = JSON.stringify(names);
+    // Store array of {name, id} objects
+    const studentData = Array.from(selectedStudents.values());
+    document.getElementById('student-data-hidden').value = JSON.stringify(studentData);
   }
 }
 
