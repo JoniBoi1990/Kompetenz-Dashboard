@@ -360,12 +360,40 @@ Manual sync uses the triggering teacher's access token. Automatic scheduled sync
 
 ### Uberspace Deployment
 
+**Using deploy.sh (recommended):**
+
+A deploy script is available at `~/Kompetenz-Dashboard/deploy.sh`:
+
+```bash
+# On the server
+ssh bhof@larissa.uberspace.de
+~/Kompetenz-Dashboard/deploy.sh
+```
+
+The script performs:
+1. `git checkout agent-dev`
+2. `git pull origin agent-dev`
+3. `pip install -r requirements.txt` (from virtualenv)
+4. `systemctl --user restart kompetenz`
+
+**Manual deployment:**
+
 ```bash
 # Deploy update (after user merges agent-dev → main)
 ssh bhof@larissa.uberspace.de "cd ~/Kompetenz-Dashboard && git pull && systemctl --user restart kompetenz"
 
 # View logs
 ssh bhof@larissa.uberspace.de "journalctl --user -u kompetenz -f"
+```
+
+**Important:** Always run `pip install -r requirements.txt` from the virtual environment when new dependencies are added:
+
+```bash
+ssh bhof@larissa.uberspace.de
+cd ~/Kompetenz-Dashboard
+source .venv/bin/activate
+pip install -r requirements.txt
+systemctl --user restart kompetenz
 ```
 
 ### Service Configuration
