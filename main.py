@@ -2015,14 +2015,9 @@ async def finalize_test(pid: str, request: Request, user: dict = Depends(auth.re
     if req_id:
         db.update_test_request_status(req_id, "done")
 
-    del _TEST_PREVIEWS[pid]
-
-    safe_name = preview["student_name"].replace(" ", "_")
-    
     # Check if this preview is part of a batch - if so, redirect back to batch
     batch_id = preview.get("batch_id")
-    
-    del _TEST_PREVIEWS[pid]
+    safe_name = preview["student_name"].replace(" ", "_")
     
     # If part of batch, redirect to batch preview instead of returning PDF
     if batch_id and batch_id in _TEST_PREVIEWS:
@@ -2030,7 +2025,11 @@ async def finalize_test(pid: str, request: Request, user: dict = Depends(auth.re
         if "generated_pdfs" not in _TEST_PREVIEWS[batch_id]:
             _TEST_PREVIEWS[batch_id]["generated_pdfs"] = {}
         _TEST_PREVIEWS[batch_id]["generated_pdfs"][preview["student_name"]] = pdf_bytes
+        del _TEST_PREVIEWS[pid]
         return RedirectResponse(f"/tests/preview/batch/{batch_id}", status_code=303)
+    
+    # Single PDF - delete preview and return PDF directly
+    del _TEST_PREVIEWS[pid]
     
     return Response(
         content=pdf_bytes,
