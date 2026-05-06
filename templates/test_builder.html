@@ -97,7 +97,9 @@
 <script>
 const ACTIVE_IDS_T = new Set({{ active_ids_list | safe }});
 let selectedStudents = new Map(); // id -> name
+let studentCompetencyData = new Map(); // id -> {proven_einfach_ids: Set, name: string}
 let isManualEntry = false;
+let lastSelectionWasSingle = false;
 
 function selectAllCompetencies(state) {
   document.querySelectorAll('input[name=competency_ids]').forEach(cb => cb.checked = state);
@@ -127,12 +129,14 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadStudents() {
   const classId = document.getElementById('class-select').value;
   const container = document.getElementById('student-list');
-  const counter = document.getElementById('student-counter');
-  const hint = document.getElementById('student-hint');
   
   selectedStudents.clear();
+  studentCompetencyData.clear();
+  lastSelectionWasSingle = false;
+  selectAllCompetencies(false);
   updateStudentCounter();
   updateHiddenField();
+  updateHint();
   
   if (!classId) {
     container.innerHTML = '<p class="muted">Bitte zuerst eine Klasse wählen...</p>';
@@ -164,27 +168,140 @@ async function loadStudents() {
     container.innerHTML = html;
     
     // Auto-select all students by default
-    selectAllStudents(true);
+    await selectAllStudents(true);
     
   } catch (e) {
     container.innerHTML = '<p class="muted" style="color: var(--danger);">Fehler beim Laden der Schüler.</p>';
   }
 }
 
-function toggleStudent(id, name) {
+async function toggleStudent(id, name) {
   const checkbox = document.querySelector(`input[value="${id}"]`);
+  const hint = document.getElementById('student-hint');
+  
   if (checkbox.checked) {
     selectedStudents.set(id, name);
+    
+    // Load competency data for this student if not cached
+    if (!studentCompetencyData.has(id)) {
+      hint.textContent = 'Lade Kompetenzstand...';
+      await loadStudentCompetencies(id);
+    }
   } else {
     selectedStudents.delete(id);
   }
+  
+  // Single-Select: Auto-select missing competencies
+  // Multi-Select: Just update stats, don't change checkboxes
+  if (selectedStudents.size === 1) {
+    lastSelectionWasSingle = true;
+    updateCompetencySelectionSingle();
+  } else if (selectedStudents.size > 1) {
+    // Multi-select: clear auto-selection if coming from single
+    if (lastSelectionWasSingle) {
+      selectAllCompetencies(false);
+      lastSelectionWasSingle = false;
+    }
+  } else {
+    // No students selected
+    selectAllCompetencies(false);
+    lastSelectionWasSingle = false;
+  }
+  
   updateStudentCounter();
   updateHiddenField();
   updateGenerateButton();
+  updateHint();
 }
 
-function selectAllStudents(state) {
-  document.querySelectorAll('#student-list input[type="checkbox"]').forEach(cb => {
+async function loadStudentCompetencies(studentId) {
+  try {
+    const data = await fetch('/api/student-competencies?student_id=' + studentId).then(r => r.json());
+    studentCompetencyData.set(studentId, {
+      proven_einfach_ids: new Set(data.proven_einfach_ids),
+      name: data.student_name || ''
+    });
+  } catch (e) {
+    console.error('Fehler beim Laden der Kompetenzen:', e);
+    studentCompetencyData.set(studentId, {proven_einfach_ids: new Set(), name: ''});
+  }
+}
+
+function updateCompetencySelectionSingle() {
+  // Get the single selected student
+  const [studentId, studentName] = selectedStudents.entries().next().value;
+  const data = studentCompetencyData.get(studentId);
+  
+  if (!data) return;
+  
+  const proven = data.proven_einfach_ids;
+  
+  // Select all competencies that are:
+  // 1. In the active set (or all if no active set)
+  // 2. NOT proven by this student
+  document.querySelectorAll('input[name=competency_ids]').forEach(cb => {
+    const cid = cb.value;
+    // Only for einfach competencies in Unterrichtsstand
+    const isActive = ACTIVE_IDS_T.size === 0 || ACTIVE_IDS_T.has(cid);
+    const isEinfach = cid.startsWith('e.');
+    const isProven = proven.has(cid);
+    
+    cb.checked = isEinfach && isActive && !isProven;
+  });
+}
+
+function updateHint() {
+  const hint = document.getElementById('student-hint');
+  
+  if (selectedStudents.size === 0) {
+    hint.textContent = '';
+    return;
+  }
+  
+  if (selectedStudents.size === 1) {
+    // Single-Student: Detailed info
+    const [studentId, studentName] = selectedStudents.entries().next().value;
+    const data = studentCompetencyData.get(studentId);
+    if (!data) {
+      hint.textContent = `${studentName}: Lade Kompetenzstand...`;
+      return;
+    }
+    
+    const proven = data.proven_einfach_ids;
+    const activeEinfach = Array.from(ACTIVE_IDS_T).filter(id => id.startsWith('e.'));
+    const provenInActive = activeEinfach.filter(id => proven.has(id)).length;
+    const fehlend = activeEinfach.length - provenInActive;
+    
+    hint.textContent = `${studentName}: ${provenInActive} von ${activeEinfach.length} einfachen Kompetenzen nachgewiesen, ${fehlend} fehlend im Unterrichtsstand.`;
+  } else {
+    // Multi-Student: Summary stats
+    let totalProven = 0;
+    let totalActive = 0;
+    let studentCount = 0;
+    
+    for (const [studentId, studentName] of selectedStudents) {
+      const data = studentCompetencyData.get(studentId);
+      if (data) {
+        const proven = data.proven_einfach_ids;
+        const activeEinfach = Array.from(ACTIVE_IDS_T).filter(id => id.startsWith('e.'));
+        totalActive += activeEinfach.length;
+        totalProven += activeEinfach.filter(id => proven.has(id)).length;
+        studentCount++;
+      }
+    }
+    
+    const avgProven = studentCount > 0 ? Math.round(totalProven / studentCount) : 0;
+    const avgTotal = studentCount > 0 ? Math.round(totalActive / studentCount) : 0;
+    
+    hint.textContent = `${selectedStudents.size} Schüler ausgewählt. Durchschnitt: ${avgProven}/${avgTotal} Kompetenzen nachgewiesen.`;
+  }
+}
+
+async function selectAllStudents(state) {
+  const checkboxes = document.querySelectorAll('#student-list input[type="checkbox"]');
+  
+  // First update the selection
+  checkboxes.forEach(cb => {
     cb.checked = state;
     const name = cb.getAttribute('data-name');
     const id = cb.value;
@@ -194,13 +311,34 @@ function selectAllStudents(state) {
       selectedStudents.delete(id);
     }
   });
+  
+  // Load competency data for all selected students
+  if (state) {
+    document.getElementById('student-hint').textContent = 'Lade Kompetenzstände...';
+    for (const [id, name] of selectedStudents) {
+      if (!studentCompetencyData.has(id)) {
+        await loadStudentCompetencies(id);
+      }
+    }
+    
+    // Multi-select: don't auto-select competencies, just clear
+    selectAllCompetencies(false);
+    lastSelectionWasSingle = false;
+  } else {
+    selectAllCompetencies(false);
+    lastSelectionWasSingle = false;
+  }
+  
   updateStudentCounter();
   updateHiddenField();
   updateGenerateButton();
+  updateHint();
 }
 
-function invertStudentSelection() {
-  document.querySelectorAll('#student-list input[type="checkbox"]').forEach(cb => {
+async function invertStudentSelection() {
+  const checkboxes = document.querySelectorAll('#student-list input[type="checkbox"]');
+  
+  checkboxes.forEach(cb => {
     cb.checked = !cb.checked;
     const name = cb.getAttribute('data-name');
     const id = cb.value;
@@ -210,9 +348,30 @@ function invertStudentSelection() {
       selectedStudents.delete(id);
     }
   });
+  
+  // Load data for newly selected students
+  document.getElementById('student-hint').textContent = 'Lade Kompetenzstände...';
+  for (const [id, name] of selectedStudents) {
+    if (!studentCompetencyData.has(id)) {
+      await loadStudentCompetencies(id);
+    }
+  }
+  
+  // Handle competency selection based on count
+  if (selectedStudents.size === 1) {
+    lastSelectionWasSingle = true;
+    updateCompetencySelectionSingle();
+  } else {
+    if (lastSelectionWasSingle) {
+      selectAllCompetencies(false);
+    }
+    lastSelectionWasSingle = false;
+  }
+  
   updateStudentCounter();
   updateHiddenField();
   updateGenerateButton();
+  updateHint();
 }
 
 function updateStudentCounter() {
@@ -250,9 +409,17 @@ function toggleManualEntry() {
   if (isManualEntry) {
     listContainer.style.display = 'none';
     manualContainer.style.display = 'block';
+    // Clear competency selection and hint when switching to manual
+    selectAllCompetencies(false);
+    document.getElementById('student-hint').textContent = 'Manuelle Eingabe — bitte Kompetenzen selbst auswählen.';
   } else {
     listContainer.style.display = 'block';
     manualContainer.style.display = 'none';
+    document.getElementById('student-hint').textContent = '';
+    // Re-select all students and load their data
+    if (selectedStudents.size > 0) {
+      selectAllStudents(true);
+    }
   }
   updateStudentCounter();
   updateHiddenField();
