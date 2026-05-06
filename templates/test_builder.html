@@ -272,28 +272,27 @@ function updateHint() {
     const provenInActive = activeEinfach.filter(id => proven.has(id)).length;
     const fehlend = activeEinfach.length - provenInActive;
     
-    hint.textContent = `${studentName}: ${provenInActive} von ${activeEinfach.length} einfachen Kompetenzen nachgewiesen, ${fehlend} fehlend im Unterrichtsstand.`;
+    hint.innerHTML = `${studentName}: ${provenInActive} von ${activeEinfach.length} einfachen Kompetenzen nachgewiesen, ${fehlend} fehlend im Unterrichtsstand.`;
   } else {
-    // Multi-Student: Summary stats
-    let totalProven = 0;
-    let totalActive = 0;
-    let studentCount = 0;
+    // Multi-Student: List each student's stats
+    let html = '';
     
     for (const [studentId, studentName] of selectedStudents) {
       const data = studentCompetencyData.get(studentId);
-      if (data) {
-        const proven = data.proven_einfach_ids;
-        const activeEinfach = Array.from(ACTIVE_IDS_T).filter(id => id.startsWith('e.'));
-        totalActive += activeEinfach.length;
-        totalProven += activeEinfach.filter(id => proven.has(id)).length;
-        studentCount++;
+      if (!data) {
+        html += `<div>${studentName}: Lade Kompetenzstand...</div>`;
+        continue;
       }
+      
+      const proven = data.proven_einfach_ids;
+      const activeEinfach = Array.from(ACTIVE_IDS_T).filter(id => id.startsWith('e.'));
+      const provenInActive = activeEinfach.filter(id => proven.has(id)).length;
+      const fehlend = activeEinfach.length - provenInActive;
+      
+      html += `<div>${studentName}: ${provenInActive} von ${activeEinfach.length} einfachen Kompetenzen nachgewiesen, ${fehlend} fehlend im Unterrichtsstand.</div>`;
     }
     
-    const avgProven = studentCount > 0 ? Math.round(totalProven / studentCount) : 0;
-    const avgTotal = studentCount > 0 ? Math.round(totalActive / studentCount) : 0;
-    
-    hint.textContent = `${selectedStudents.size} Schüler ausgewählt. Durchschnitt: ${avgProven}/${avgTotal} Kompetenzen nachgewiesen.`;
+    hint.innerHTML = html;
   }
 }
 
@@ -467,6 +466,12 @@ document.getElementById('test-form').addEventListener('submit', function(e) {
 .student-filter-row button {
   font-size: 0.8rem;
   padding: 0.25rem 0.5rem;
+}
+#student-hint div {
+  margin-bottom: 0.25rem;
+}
+#student-hint div:last-child {
+  margin-bottom: 0;
 }
 </style>
 
