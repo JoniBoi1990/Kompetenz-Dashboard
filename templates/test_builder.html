@@ -192,16 +192,19 @@ async function toggleStudent(id, name) {
   }
   
   // Single-Select: Auto-select missing competencies
-  // Multi-Select: Just update stats, don't change checkboxes
+  // Multi-Select: Select all active (backend filters per student)
   if (selectedStudents.size === 1) {
     lastSelectionWasSingle = true;
     updateCompetencySelectionSingle();
   } else if (selectedStudents.size > 1) {
-    // Multi-select: clear auto-selection if coming from single
-    if (lastSelectionWasSingle) {
-      selectAllCompetencies(false);
-      lastSelectionWasSingle = false;
-    }
+    // Multi-select: select all active competencies (backend filters per student)
+    document.querySelectorAll('input[name=competency_ids]').forEach(cb => {
+      const cid = cb.value;
+      const isActive = ACTIVE_IDS_T.size === 0 || ACTIVE_IDS_T.has(cid);
+      const isEinfach = cid.startsWith('e.');
+      cb.checked = isEinfach && isActive;
+    });
+    lastSelectionWasSingle = false;
   } else {
     // No students selected
     selectAllCompetencies(false);
@@ -322,8 +325,13 @@ async function selectAllStudents(state) {
       }
     }
     
-    // Multi-select: don't auto-select competencies, just clear
-    selectAllCompetencies(false);
+    // Multi-select: select all active competencies (backend will filter per student)
+    document.querySelectorAll('input[name=competency_ids]').forEach(cb => {
+      const cid = cb.value;
+      const isActive = ACTIVE_IDS_T.size === 0 || ACTIVE_IDS_T.has(cid);
+      const isEinfach = cid.startsWith('e.');
+      cb.checked = isEinfach && isActive;
+    });
     lastSelectionWasSingle = false;
   } else {
     selectAllCompetencies(false);
@@ -362,10 +370,17 @@ async function invertStudentSelection() {
   if (selectedStudents.size === 1) {
     lastSelectionWasSingle = true;
     updateCompetencySelectionSingle();
+  } else if (selectedStudents.size > 1) {
+    // Multi-select: select all active competencies (backend will filter per student)
+    document.querySelectorAll('input[name=competency_ids]').forEach(cb => {
+      const cid = cb.value;
+      const isActive = ACTIVE_IDS_T.size === 0 || ACTIVE_IDS_T.has(cid);
+      const isEinfach = cid.startsWith('e.');
+      cb.checked = isEinfach && isActive;
+    });
+    lastSelectionWasSingle = false;
   } else {
-    if (lastSelectionWasSingle) {
-      selectAllCompetencies(false);
-    }
+    selectAllCompetencies(false);
     lastSelectionWasSingle = false;
   }
   
