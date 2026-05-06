@@ -2155,10 +2155,23 @@ async def test_download(batch_id: str, request: Request, user: dict = Depends(au
     pdfs = batch["pdfs"]
     title = batch["title"]
     
+    if not pdfs:
+        raise HTTPException(status_code=500, detail="Keine PDFs zum Download verfügbar")
+    
     if download_format == "merged":
-        # Merge all PDFs into one
-        pdf_list = [pdfs[name] for name in batch["student_names"]]
-        merged_pdf = merge_pdfs(pdf_list)
+        # Merge all PDFs into one - iterate in order of student_names
+        pdf_list = []
+        for name in batch["student_names"]:
+            if name in pdfs:
+                pdf_list.append(pdfs[name])
+        
+        if not pdf_list:
+            raise HTTPException(status_code=500, detail="Keine PDFs zum Zusammenführen verfügbar")
+        
+        try:
+            merged_pdf = merge_pdfs(pdf_list)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Fehler beim Zusammenführen der PDFs: {e}")
         
         # Clean up
         del _TEST_PREVIEWS[batch_id]
@@ -2174,9 +2187,10 @@ async def test_download(batch_id: str, request: Request, user: dict = Depends(au
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             for student_name in batch["student_names"]:
-                pdf_bytes = pdfs[student_name]
-                safe_name = student_name.replace(" ", "_")
-                zip_file.writestr(f"{safe_name}_Kompetenznachweis.pdf", pdf_bytes)
+                if student_name in pdfs:
+                    pdf_bytes = pdfs[student_name]
+                    safe_name = student_name.replace(" ", "_")
+                    zip_file.writestr(f"{safe_name}_Kompetenznachweis.pdf", pdf_bytes)
             # Add error log if there were errors
             if batch.get("errors"):
                 error_text = "Fehler bei der Generierung:\n\n" + "\n".join(batch["errors"])
