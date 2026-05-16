@@ -199,6 +199,46 @@
   padding: 1rem;
 }
 
+/* Assign student button styles */
+.assign-student-btn {
+  width: 100%;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border: none;
+  background: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.15s;
+}
+.assign-student-btn:last-child {
+  border-bottom: none;
+}
+.assign-student-btn:hover {
+  background: #f0f8ff;
+}
+.assign-student-btn:hover .assign-icon {
+  opacity: 1;
+}
+.assign-student-btn.assigned {
+  opacity: 0.5;
+  background: #e8f5e9;
+  cursor: default;
+}
+.assign-student-btn.assigned .assign-icon {
+  content: "✓";
+  color: var(--green);
+}
+.assign-icon {
+  color: var(--green);
+  font-weight: bold;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+}
+
 /* Modal styles */
 .modal {
   position: fixed;
@@ -380,9 +420,14 @@ document.addEventListener('keydown', function(e) {
 
 // Missing students data from server
 const missingStudentsData = {{ missing_students | tojson }};
+const classId = {{ selected_class_id | tojson }};
+let currentCompId = '';
+let currentCompName = '';
 
 // Missing students modal functions
 function openMissingModal(compId, compName) {
+  currentCompId = compId;
+  currentCompName = compName;
   const students = missingStudentsData[compId] || [];
   document.getElementById('missing-comp-display').textContent = compId + ' – ' + compName;
   const listEl = document.getElementById('missing-students-list');
@@ -391,11 +436,57 @@ function openMissingModal(compId, compName) {
     listEl.innerHTML = '<p class="empty-message">✓ Alle Schüler haben diese Kompetenz erworben</p>';
   } else {
     listEl.innerHTML = students.map(s => 
-      `<div class="missing-student-item">${s.name}</div>`
+      `<button type="button" class="assign-student-btn" data-student-id="${s.id}" onclick="assignStudent('${s.id}', '${s.name.replace(/'/g, "\\'")}')">
+        <span>${s.name}</span>
+        <span class="assign-icon">+</span>
+      </button>`
     ).join('');
   }
   
   document.getElementById('missing-modal').style.display = 'flex';
+}
+
+async function assignStudent(studentId, studentName) {
+  const btn = document.querySelector(`button[data-student-id="${studentId}"]`);
+  if (btn.classList.contains('assigned')) return;
+  
+  if (!confirm(`${studentName} die Kompetenz ${currentCompId} zuweisen?`)) return;
+  
+  btn.style.opacity = '0.5';
+  
+  try {
+    const formData = new FormData();
+    formData.append('class_id', classId);
+    formData.append('competency_id', currentCompId);
+    formData.append('student_id', studentId);
+    
+    const response = await fetch('/teacher/coverage/assign-single', {
+      method: 'POST',
+      body: formData,
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      btn.classList.add('assigned');
+      btn.querySelector('.assign-icon').textContent = '✓';
+      btn.onclick = null;
+      
+      // Also update the checkbox in the table if visible
+      const checkbox = document.querySelector(`tr[data-comp-id="${currentCompId}"] input[type="checkbox"]`);
+      if (checkbox && !checkbox.checked) {
+        checkbox.checked = true;
+        checkbox.closest('tr').classList.remove('comp-not-covered');
+        checkbox.closest('tr').classList.add('comp-covered');
+      }
+    } else {
+      alert('Fehler beim Zuweisen');
+      btn.style.opacity = '1';
+    }
+  } catch (err) {
+    alert('Fehler: ' + err.message);
+    btn.style.opacity = '1';
+  }
 }
 
 function closeMissingModal() {

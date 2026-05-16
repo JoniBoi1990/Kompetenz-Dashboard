@@ -1,0 +1,239 @@
+# Git Workflow Anleitung
+
+## Die drei Branches
+
+| Branch | Zweck | Wann verwenden? |
+|--------|-------|-----------------|
+| `main` | **Live-Version** | Läuft auf dem Server, immer stabil |
+| `agent-dev` | **Test-Version** | Zum Testen auf dem Server deployen |
+| `feature/arbeitsbranch-basis` | **Arbeits-Branch** | Hier entwickelst du ALLE neuen Features |
+
+---
+
+## Das Prinzip
+
+Du hast **immer nur einen Feature-Branch** (`feature/arbeitsbranch-basis`). Hier sammelst du alle neuen Features, während `agent-dev` eventuell in einer Testphase ist.
+
+```
+main (live)
+   ↑
+agent-dev (Test-Phase)
+   ↑           ↑
+   └───────────┘
+      merge
+   ↑
+feature/arbeitsbranch-basis (dein Arbeitsplatz)
+   ├── Commit: Feature A
+   ├── Commit: Feature B  
+   └── Commit: Feature C (WIP)
+```
+
+---
+
+## Der Workflow Schritt für Schritt
+
+### 1. NEUES FEATURE AUF DEM ARBEITS-BRANCH
+
+Du bist auf `feature/arbeitsbranch-basis` und entwickelst ein neues Feature:
+
+```bash
+# Sicherstellen, dass du auf dem Arbeits-Branch bist
+git checkout feature/arbeitsbranch-basis
+
+# ... entwickeln ...
+git add .
+git commit -m "agent: Neues Feature implementiert"
+```
+
+### 2. FEATURE ZUM TESTEN AUF AGENT-DEV
+
+Wenn das Feature fertig ist, bringst du es auf `agent-dev`:
+
+```bash
+# Zu agent-dev wechseln
+git checkout agent-dev
+git pull origin agent-dev
+
+# Arbeits-Branch mergen
+git merge feature/arbeitsbranch-basis
+
+# Auf GitHub pushen
+git push origin agent-dev
+```
+
+🚀 **Jetzt deployest du `agent-dev` und testest!**
+
+### 3. WEITERENTWICKELN WÄHREND DES TESTENS
+
+**Wichtig:** Während `agent-dev` auf dem Server getestet wird, arbeitest du **weiter auf dem Arbeits-Branch**:
+
+```bash
+# Zurück zum Arbeits-Branch
+git checkout feature/arbeitsbranch-basis
+
+# ... nächstes Feature entwickeln ...
+git add .
+git commit -m "agent: Nächstes Feature begonnen"
+```
+
+💡 **So kannst du parallel arbeiten**, ohne den Test zu blockieren!
+
+### 4. RELEASE AUF MAIN (nach erfolgreichem Test)
+
+Der Test war erfolgreich? Dann release auf `main`:
+
+```bash
+# Zu main wechseln
+git checkout main
+git pull origin main
+
+# Agent-dev mergen (enthält nur das getestete Feature)
+git merge agent-dev
+
+# Auf GitHub pushen
+git push origin main
+```
+
+✅ **Das Feature ist jetzt live!**
+
+### 5. NÄCHSTE RUNDE
+
+Nach dem Release kannst du wieder mit frischen Branches arbeiten:
+
+```bash
+# Arbeits-Branch löschen und neu erstellen (sauberer Start)
+git checkout agent-dev
+git branch -D feature/arbeitsbranch-basis
+git checkout -b feature/arbeitsbranch-basis
+
+# Oder: Einfach auf dem bestehenden Branch weiterarbeiten
+git checkout feature/arbeitsbranch-basis
+```
+
+---
+
+## Wichtige Regeln
+
+| ❌ Nicht tun | ✅ Stattdessen |
+|-------------|---------------|
+| Sub-Branches erstellen | Alle Features auf `feature/arbeitsbranch-basis` |
+| Direkt auf `agent-dev` entwickeln | Auf `feature/` entwickeln, dann mergen |
+| Ungetestetes auf `main` pushen | Nur über `agent-dev` → getestet → `main` |
+
+---
+
+## Beispiel: Kompletter Durchlauf
+
+```bash
+# ════════════════════════════════════════════════════
+# START: Du hast einen stabilen agent-dev
+# ════════════════════════════════════════════════════
+
+# Arbeits-Branch erstellen (oder existiert schon)
+git checkout agent-dev
+git checkout -b feature/arbeitsbranch-basis
+
+# ════════════════════════════════════════════════════
+# FEATURE A ENTWICKELN
+# ════════════════════════════════════════════════════
+git checkout feature/arbeitsbranch-basis
+# ... Code für Feature A schreiben ...
+git add .
+git commit -m "agent: Feature A - Popup verbessert"
+
+# ════════════════════════════════════════════════════
+# FEATURE A TESTEN
+# ════════════════════════════════════════════════════
+git checkout agent-dev
+git merge feature/arbeitsbranch-basis
+git push origin agent-dev
+# → Deploy agent-dev auf Server
+# → Teste Feature A
+
+# ════════════════════════════════════════════════════
+# WÄHREND DES TESTENS: FEATURE B ENTWICKELN
+# ════════════════════════════════════════════════════
+git checkout feature/arbeitsbranch-basis
+# ... Code für Feature B schreiben ...
+git add .
+git commit -m "agent: Feature B - Export funktion"
+# (Feature A wird gerade auf agent-dev getestet,
+#  aber du kannst schon an Feature B arbeiten!)
+
+# ════════════════════════════════════════════════════
+# FEATURE A WAR ERFOLGREICH → RELEASE
+# ════════════════════════════════════════════════════
+git checkout main
+git merge agent-dev          # Nur Feature A!
+git push origin main
+
+# ════════════════════════════════════════════════════
+# FEATURE B TESTEN (nächste Runde)
+# ════════════════════════════════════════════════════
+git checkout agent-dev
+git merge feature/arbeitsbranch-basis
+git push origin agent-dev
+# → Deploy & teste Feature B
+# (und du kannst schon Feature C entwickeln...)
+```
+
+---
+
+## Hilfreiche Befehle
+
+### Status prüfen
+```bash
+git status                    # Wo bin ich? Was ist geändert?
+git branch                    # Alle Branches anzeigen
+git log --oneline -5          # Letzte 5 Commits
+```
+
+### Arbeits-Branch aktualisieren
+```bash
+# Wenn agent-dev vorwärts gegangen ist:
+git checkout feature/arbeitsbranch-basis
+git merge agent-dev           # Agent-dev Änderungen übernehmen
+```
+
+### Arbeits-Branch neu aufsetzen
+```bash
+# Nach einem Release (sauberer Start)
+git checkout agent-dev
+git branch -D feature/arbeitsbranch-basis
+git checkout -b feature/arbeitsbranch-basis
+```
+
+---
+
+## FAQ
+
+**Q: Erstelle ich für jedes Feature einen neuen Branch?**  
+A: Nein! Du hast EINEN Arbeits-Branch (`feature/arbeitsbranch-basis`) für ALLE Features.
+
+**Q: Was ist, wenn ich ein Feature nicht fertig habe, aber deployen will?**  
+A: Das ist genau der Sinn! Fertige Features auf `agent-dev` deployen, unfertige bleiben auf `feature/`.
+
+**Q: Kann ich mehrere Features gleichzeitig auf agent-dev testen?**  
+A: Ja! Wenn Feature A fertig ist, merge auf `agent-dev`, deploy. Dann Feature B auf `feature/` weiterentwickeln. Wenn A OK ist, merge B auch auf `agent-dev`.
+
+**Q: Was passiert mit unfertigen Features, wenn ich release?**  
+A: Sie bleiben auf `feature/arbeitsbranch-basis`. Beim nächsten `git merge` kommen sie automatisch mit.
+
+**Q: Muss ich den Feature-Branch nach Release löschen?**  
+A: Nicht zwingend, aber es ist sauberer. Die Commits sind ja dann in `main` und `agent-dev`.
+
+---
+
+## Zusammenfassung
+
+| Schritt | Wo? | Befehle |
+|---------|-----|---------|
+| Entwickeln | `feature/arbeitsbranch-basis` | `git add . && git commit` |
+| Testen | `agent-dev` | `git checkout agent-dev && git merge feature/... && git push` |
+| Release | `main` | `git checkout main && git merge agent-dev && git push` |
+| Neu beginnen | `feature/arbeitsbranch-basis` | Branch löschen & neu erstellen |
+
+**Merksatz:** 
+- `feature/` = Dein Schreibtisch (immer chaotisch erlaubt)
+- `agent-dev` = Prüfung (nur fertiges, getestetes Zeug)
+- `main` = Museum (nur bewährte, stabile Versionen)
