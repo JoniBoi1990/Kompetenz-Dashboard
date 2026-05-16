@@ -1657,6 +1657,39 @@ async def teacher_coverage(
     # Get class members for bulk assignment modal
     class_members = db.get_class_members(class_id) if class_id else []
     
+    # Calculate missing students for each competency
+    missing_students = {}
+    if class_id:
+        student_records = db.get_all_student_records_for_class(class_id)
+        
+        # For einfach competencies: students who haven't achieved them
+        for k in einfach:
+            comp_id = k["id"]
+            missing = []
+            for student_id, records in student_records.items():
+                einfach_records = records.get("einfach", {})
+                comp_record = einfach_records.get(comp_id)
+                if not comp_record or not comp_record.get("achieved"):
+                    missing.append({
+                        "id": student_id,
+                        "name": records.get("student_name", student_id)
+                    })
+            missing_students[comp_id] = missing
+        
+        # For niveau competencies: students who have no nachweis
+        for k in niveau:
+            comp_id = k["id"]
+            missing = []
+            for student_id, records in student_records.items():
+                niveau_records = records.get("niveau", {})
+                nachweise_list = niveau_records.get(comp_id, [])
+                if not nachweise_list:
+                    missing.append({
+                        "id": student_id,
+                        "name": records.get("student_name", student_id)
+                    })
+            missing_students[comp_id] = missing
+    
     return templates.TemplateResponse("coverage.html", {
         "request": request, 
         "user": user, 
@@ -1666,6 +1699,7 @@ async def teacher_coverage(
         "einfach_kompetenzen": einfach,
         "niveau_kompetenzen": niveau,
         "class_members": class_members,
+        "missing_students": missing_students,
     })
 
 
