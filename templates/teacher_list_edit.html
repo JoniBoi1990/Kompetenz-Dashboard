@@ -35,7 +35,7 @@
         {% for comp in list.data.competencies %}
         <tr data-index="{{ loop.index0 }}">
           <td>
-            <input type="number" name="comp_{{ loop.index0 }}_id" value="{{ comp.id }}" required style="width:100%;padding:.25rem;">
+            <input type="text" name="comp_{{ loop.index0 }}_id" value="{{ comp.id }}" required style="width:100%;padding:.25rem;">
           </td>
           <td>
             <input type="text" name="comp_{{ loop.index0 }}_name" value="{{ comp.name }}" required style="width:100%;padding:.25rem;">
@@ -85,7 +85,7 @@ function addRow() {
   
   if (isEinfach) {
     tr.innerHTML = `
-      <td><input type="number" name="comp_${rowCount}_id" required style="width:100%;padding:.25rem;"></td>
+      <td><input type="text" name="comp_${rowCount}_id" required style="width:100%;padding:.25rem;"></td>
       <td><input type="text" name="comp_${rowCount}_name" required style="width:100%;padding:.25rem;"></td>
       <td><input type="number" name="comp_${rowCount}_thema" style="width:100%;padding:.25rem;"></td>
       <td><input type="text" name="comp_${rowCount}_anmerkungen" style="width:100%;padding:.25rem;"></td>
@@ -93,7 +93,7 @@ function addRow() {
     `;
   } else {
     tr.innerHTML = `
-      <td><input type="number" name="comp_${rowCount}_id" required style="width:100%;padding:.25rem;"></td>
+      <td><input type="text" name="comp_${rowCount}_id" required style="width:100%;padding:.25rem;"></td>
       <td><input type="text" name="comp_${rowCount}_name" required style="width:100%;padding:.25rem;"></td>
       <td><input type="text" name="comp_${rowCount}_bp_nummer" style="width:100%;padding:.25rem;"></td>
       <td><input type="text" name="comp_${rowCount}_moeglichkeiten" placeholder="Option1; Option2; Option3" style="width:100%;padding:.25rem;"></td>
