@@ -167,3 +167,23 @@ def create_pdf(questions: list, name: str, datum: str, zusatzinfo: str) -> bytes
     c.save()
     buf.seek(0)
     return buf.read()
+
+
+def merge_pdfs(pdf_bytes_list: list[bytes]) -> bytes:
+    """
+    Fügt mehrere PDF-Byte-Strings zu einem einzigen PDF zusammen.
+    Nutzt pypdf für die Zusammenführung.
+    """
+    from pypdf import PdfWriter
+    
+    writer = PdfWriter()
+    
+    for pdf_bytes in pdf_bytes_list:
+        reader_stream = io.BytesIO(pdf_bytes)
+        writer.append(reader_stream)
+    
+    output = io.BytesIO()
+    writer.write(output)
+    writer.close()
+    output.seek(0)
+    return output.read()
