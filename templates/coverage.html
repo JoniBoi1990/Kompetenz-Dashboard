@@ -80,10 +80,7 @@
                 {% if k.id in active_ids %}checked{% endif %}>
             </td>
             <td>{{ k.id }}</td>
-            <td>
-              {{ k.name }}
-              <span class="missing-hint" onclick="event.stopPropagation(); openMissingModal('{{ k.id }}', '{{ k.name | replace("'", "\\'") }}')" title="Wer hat diese Kompetenz noch nicht?">❓</span>
-            </td>
+            <td>{{ k.name }}</td>
           </tr>
           {% endfor %}
         </tbody>
