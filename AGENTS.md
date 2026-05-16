@@ -360,12 +360,40 @@ Manual sync uses the triggering teacher's access token. Automatic scheduled sync
 
 ### Uberspace Deployment
 
+**Using deploy.sh (recommended):**
+
+A deploy script is available at `~/Kompetenz-Dashboard/deploy.sh`:
+
+```bash
+# On the server
+ssh bhof@larissa.uberspace.de
+~/Kompetenz-Dashboard/deploy.sh
+```
+
+The script performs:
+1. `git checkout agent-dev`
+2. `git pull origin agent-dev`
+3. `pip install -r requirements.txt` (from virtualenv)
+4. `systemctl --user restart kompetenz`
+
+**Manual deployment:**
+
 ```bash
 # Deploy update (after user merges agent-dev → main)
 ssh bhof@larissa.uberspace.de "cd ~/Kompetenz-Dashboard && git pull && systemctl --user restart kompetenz"
 
 # View logs
 ssh bhof@larissa.uberspace.de "journalctl --user -u kompetenz -f"
+```
+
+**Important:** Always run `pip install -r requirements.txt` from the virtual environment when new dependencies are added:
+
+```bash
+ssh bhof@larissa.uberspace.de
+cd ~/Kompetenz-Dashboard
+source .venv/bin/activate
+pip install -r requirements.txt
+systemctl --user restart kompetenz
 ```
 
 ### Service Configuration
@@ -406,6 +434,56 @@ WantedBy=default.target
 - Competency IDs validated as strings with `e.` or `n.` prefix
 - File uploads restricted to CSV/JSON
 - Backup file paths validated to stay within `_backup/` directory
+
+---
+
+## PDF Test Generator (Bulk Mode)
+
+Lehrkräfte können Tests für mehrere Schüler oder die gesamte Klasse gleichzeitig erstellen.
+
+### Flow
+
+1. **Test Builder** (`/tests/builder`):
+   - Klasse auswählen → Schüler-Liste wird geladen
+   - Schüler via Checkboxen auswählen (Alle/Keine/Invertieren)
+   - Optional: Manuelle Namenseingabe für externe Schüler
+   - Kompetenzen auswählen
+   - Submit → Batch-Preview
+
+2. **Batch Preview** (`/tests/preview/batch/{batch_id}`):
+   - Übersicht aller Schüler mit Fragen-Anzahl
+   - Einzelne Tests können bearbeitet werden (Fragen auswählen)
+   - Download-Optionen:
+     - **ZIP**: Einzelne PDFs pro Schüler
+     - **Merged**: Alle Tests in einem PDF (zum einfachen Drucken)
+
+3. **Single Preview** (`/tests/preview/{pid}`):
+   - Für einzelne Schüler im Batch: Fragen bearbeiten
+   - "Zurück zur Batch-Übersicht" Link
+
+### Datenstruktur
+
+```python
+_TEST_PREVIEWS[batch_id] = {
+    "type": "batch",
+    "student_names": [...],
+    "preview_ids": [...],  # Einzel-Preview IDs
+    "title": "...",
+    "created_at": "...",
+}
+
+_TEST_PREVIEWS[pid] = {
+    "type": "single",  # oder implizit
+    "batch_id": "...",  # Referenz zum Batch
+    "student_name": "...",
+    "questions": [...],
+    ...
+}
+```
+
+### Limits
+- Maximal 50 Schüler pro Batch
+- Previews sind ephemeral (gehen bei Server-Restart verloren)
 
 ---
 

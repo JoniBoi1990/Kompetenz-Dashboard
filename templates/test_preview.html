@@ -52,6 +52,10 @@
 </form>
 
 <p style="margin-top:0.75rem;">
-  <a href="/tests/builder">&larr; Zurück zum Testgenerator</a>
+  {% if preview.batch_id %}
+    <a href="/tests/preview/batch/{{ preview.batch_id }}">&larr; Zurück zur Batch-Übersicht</a>
+  {% else %}
+    <a href="/tests/builder">&larr; Zurück zum Testgenerator</a>
+  {% endif %}
 </p>
 {% endblock %}
