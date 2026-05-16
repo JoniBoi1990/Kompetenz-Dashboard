@@ -226,6 +226,26 @@ Teachers can assign "Unterricht" (einfach) competencies to multiple students sim
 - Template: `templates/coverage.html` (modal with inline JavaScript/CSS)
 - Only "Unterricht" (einfach) competencies support bulk assignment (Projekt/niveau requires evidence URL)
 
+### Missing Students Indicator
+
+From the **Unterrichtsstand** page, teachers can quickly see which students have not yet achieved a competency:
+
+1. Click the ❓ icon next to any "Unterricht" competency
+2. A modal shows all students who haven't achieved this competency
+3. Click on a student name to assign the competency immediately (AJAX, no page reload)
+
+**Features:**
+- Only shown for "Unterricht" (einfach) competencies
+- Real-time assignment without page reload
+- Visual feedback: ✓ appears after successful assignment
+- Automatic checkbox update in the background
+
+**Implementation:**
+- Data: `missing_students` dictionary calculated in `teacher_coverage()` route
+- Endpoint: `POST /teacher/coverage/assign-single` (AJAX endpoint for single assignment)
+- Template: `templates/coverage.html` (missing students modal with inline JavaScript/CSS)
+- JavaScript: `openMissingModal()`, `assignStudent()` functions
+
 ### XP Progress Bar
 
 RPG-style progress indicator displayed in:
@@ -526,6 +546,25 @@ _TEST_PREVIEWS[pid] = {
 
 Upload CSV via `Admin → Notenschlüssel` or place in `grading_scales/`.
 
+### Editing Teacher Competency Lists
+
+Teachers can edit their uploaded competency lists via `Lehrer → Listen verwalten → [Liste] → Bearbeiten`:
+
+**Features:**
+- Edit competency IDs, names, themes, and notes
+- Add new competencies to the list
+- Delete competencies from the list
+- IDs are strings with prefix (e.g., `e.901`, `n.989`)
+
+**Important:** 
+- System lists cannot be edited (only teacher-uploaded lists)
+- Competency IDs must follow the format: `e.` prefix for Unterricht, `n.` prefix for Projekte
+
+**Implementation:**
+- Route: `GET/POST /teacher/competency-lists/{list_id}/edit`
+- Update Route: `POST /teacher/competency-lists/{list_id}/update`
+- Template: `templates/teacher_list_edit.html`
+
 ### Creating a Backup
 
 ```python
@@ -594,4 +633,4 @@ Der Skill analysiert Python-Code und erstellt konkrete Verbesserungsvorschläge 
 
 ---
 
-*Last updated: 2026-04-17 by AI agent analysis*
+*Last updated: 2026-05-16 by AI agent analysis*
