@@ -1435,7 +1435,7 @@ async def teacher_competency_list_update(
     competencies = []
     comp_index = 0
     while f"comp_{comp_index}_id" in form:
-        comp_id = int(form[f"comp_{comp_index}_id"])
+        comp_id = form[f"comp_{comp_index}_id"]
         comp_name = form.get(f"comp_{comp_index}_name", "")
         
         if not comp_name:  # Skip empty rows
