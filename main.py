@@ -1720,11 +1720,15 @@ async def teacher_coverage(
             if einfach_list_id:
                 comps, _ = _load_competency_list(einfach_list_id, einfach_list_source)
                 einfach = [c for c in comps if c["typ"] == "einfach"]
+                # Sort by theme (None/null last), then by ID
+                einfach.sort(key=lambda k: (k.get("thema") is None, k.get("thema") or 0, k["id"]))
             
             # Load niveau competencies  
             if niveau_list_id:
                 comps, _ = _load_competency_list(niveau_list_id, niveau_list_source)
                 niveau = [c for c in comps if c["typ"] == "niveau"]
+                # Sort by theme (None/null last), then by ID
+                niveau.sort(key=lambda k: (k.get("thema") is None, k.get("thema") or 0, k["id"]))
         except FileNotFoundError:
             pass  # Keep fallback values
     
