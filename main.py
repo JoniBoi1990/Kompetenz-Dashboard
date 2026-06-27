@@ -743,6 +743,7 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
     
     # Check if student is authorized (member of a class)
     upn = user.get("upn", "").lower()
+    student_id = upn  # Student identity is UPN-based, not OID
     is_birklehof_teacher = upn.endswith("@birklehof.de") and not upn.endswith("@s.birklehof.de")
     is_birklehof_student = upn.endswith("@s.birklehof.de")
     
@@ -757,7 +758,7 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
     
     # If @s.birklehof.de but not in any class -> unauthorized
     if is_birklehof_student:
-        if not db.is_student_in_any_class(user["oid"]):
+        if not db.is_student_in_any_class(student_id):
             avg_progress = calculate_average_progress()
             return templates.TemplateResponse("unauthorized.html", {
                 "request": request,
@@ -766,11 +767,11 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
             })
 
     einfach_map, nachweise_by_comp, best_nachweis_by_comp, _ = _load_student_data(
-        user["access_token"], user["oid"]
+        user["access_token"], student_id
     )
     
     # Get class-specific competencies
-    class_einfach, class_niveau, active_ids, class_id = _get_student_competencies(user["oid"])
+    class_einfach, class_niveau, active_ids, class_id = _get_student_competencies(student_id)
     
     # Build competency lookup for this class
     class_comp_ids = {c["id"] for c in class_einfach + class_niveau}
@@ -819,7 +820,7 @@ async def student_dashboard(request: Request, user: dict = Depends(auth.require_
     pending_antraege_by_comp: dict[str, dict] = {}
     rejected_niveau_antraege_by_comp: dict[str, dict] = {}
     for a in db.get_all_kompetenzantraege().values():
-        if a["student_id"] != user["oid"]:
+        if a["student_id"] != student_id:
             continue
         # competency_id is now always a string (e.901, n.989)
         cid = a["competency_id"]
@@ -1583,11 +1584,13 @@ async def antraege_submit(
     if typ not in ("einfach", "niveau"):
         raise HTTPException(status_code=400, detail="Ungültiger Typ")
 
+    student_id = user.get("upn", "").lower()
+
     # competency_id is already in format "e.901" or "n.989"
     comp_id_full = competency_id
 
     # Must not already be proven
-    einfach_map, nachweise_by_comp, _, _ = _load_student_data(user["access_token"], user["oid"])
+    einfach_map, nachweise_by_comp, _, _ = _load_student_data(user["access_token"], student_id)
     if typ == "einfach":
         if einfach_map.get(comp_id_full, {}).get("achieved"):
             raise HTTPException(status_code=400, detail="Bereits nachgewiesen")
@@ -1602,13 +1605,13 @@ async def antraege_submit(
 
     # No existing pending antrag for this competency
     for a in db.get_all_kompetenzantraege().values():
-        if a["student_id"] == user["oid"] and a["competency_id"] == comp_id_full and a["status"] == "pending":
+        if a["student_id"] == student_id and a["competency_id"] == comp_id_full and a["status"] == "pending":
             raise HTTPException(status_code=400, detail="Antrag bereits gestellt")
 
     antrag_id = str(uuid.uuid4())
     antrag = {
         "id": antrag_id,
-        "student_id": user["oid"],
+        "student_id": student_id,
         "student_name": user["display_name"],
         "competency_id": comp_id_full,  # Store as string (e.901, n.989)
         "typ": typ,
@@ -1917,7 +1920,8 @@ async def test_builder(
     
     else:
         # Student: use their class
-        student_class = db.get_student_class(user["oid"])
+        student_id = user.get("upn", "").lower()
+        student_class = db.get_student_class(student_id)
         if student_class:
             # Use new separate lists (fallback to legacy if not set)
             einfach_list_id = student_class.get("einfach_list_id") or student_class.get("competency_list_id")
@@ -1941,10 +1945,10 @@ async def test_builder(
             except FileNotFoundError:
                 pass
         
-        einfach_map, _, _, _ = _load_student_data(user["access_token"], user["oid"])
+        einfach_map, _, _, _ = _load_student_data(user["access_token"], student_id)
         proven_ids = {cid for cid, r in einfach_map.items() if r.get("achieved")}
         reqs = _get_test_requests()
-        next_number = sum(1 for r in reqs.values() if r["student_id"] == user["oid"]) + 1
+        next_number = sum(1 for r in reqs.values() if r["student_id"] == student_id) + 1
         
         return templates.TemplateResponse("test_builder.html", {
             "request": request, "user": user,
@@ -2104,23 +2108,25 @@ async def student_test_request(request: Request, user: dict = Depends(auth.requi
     if user["is_teacher"]:
         raise HTTPException(status_code=403, detail="Nur für Schüler")
 
+    student_id = user.get("upn", "").lower()
+
     form = await request.form()
     selected_ids = [v for k, v in form.multi_items() if k == "competency_ids"]
     if not selected_ids:
         raise HTTPException(status_code=400, detail="Keine Kompetenzen ausgewählt")
 
     # Backend validation: silently drop competency IDs that are already proven
-    einfach_map, _, _, _ = _load_student_data(user["access_token"], user["oid"])
+    einfach_map, _, _, _ = _load_student_data(user["access_token"], student_id)
     proven_ids = {cid for cid, r in einfach_map.items() if r.get("achieved")}
     selected_ids = [cid for cid in selected_ids if cid not in proven_ids]
     if not selected_ids:
         raise HTTPException(status_code=400, detail="Alle gewählten Kompetenzen bereits nachgewiesen")
 
     reqs = _get_test_requests()
-    number = sum(1 for r in reqs.values() if r["student_id"] == user["oid"]) + 1
+    number = sum(1 for r in reqs.values() if r["student_id"] == student_id) + 1
     req = {
         "id": str(uuid.uuid4()),
-        "student_id": user["oid"],
+        "student_id": student_id,
         "student_name": user["display_name"],
         "competency_ids": selected_ids,
         "title": f"Kompetenznachweis Nr. {number}",
@@ -2522,7 +2528,8 @@ async def grade_calculator(
             selected_class_id = classes[0]["id"]
     else:
         # Students: use their own class
-        student_class = db.get_student_class(user["oid"])
+        student_id = user.get("upn", "").lower()
+        student_class = db.get_student_class(student_id)
         if student_class:
             selected_class_id = student_class["id"]
     
@@ -2546,7 +2553,7 @@ async def grade_calculator(
     # Build record map (for students, load their records)
     record_map: dict = {}
     if not user["is_teacher"]:
-        einfach_map, nachweise_by_comp, _, _ = _load_student_data(user["access_token"], user["oid"])
+        einfach_map, nachweise_by_comp, _, _ = _load_student_data(user["access_token"], student_id)
         for k in einfach_list:
             r = einfach_map.get(k["id"])
             if r:
@@ -2576,7 +2583,8 @@ async def calculate_grade_form(request: Request, user: dict = Depends(auth.requi
     
     # Determine class_id for students
     if not user["is_teacher"]:
-        student_class = db.get_student_class(user["oid"])
+        student_id = user.get("upn", "").lower()
+        student_class = db.get_student_class(student_id)
         if student_class:
             class_id = student_class["id"]
     
