@@ -1435,7 +1435,7 @@ async def teacher_competency_list_update(
     competencies = []
     comp_index = 0
     while f"comp_{comp_index}_id" in form:
-        comp_id = int(form[f"comp_{comp_index}_id"])
+        comp_id = form[f"comp_{comp_index}_id"]
         comp_name = form.get(f"comp_{comp_index}_name", "")
         
         if not comp_name:  # Skip empty rows
@@ -1745,6 +1745,36 @@ async def teacher_coverage_bulk_assign(
         )
     
     return RedirectResponse(url=f"/teacher/coverage?class_id={class_id}", status_code=302)
+
+
+@app.post("/teacher/coverage/assign-single")
+async def teacher_coverage_assign_single(
+    request: Request,
+    class_id: str = Form(...),
+    competency_id: str = Form(...),
+    student_id: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Assign a competency to a single student via AJAX."""
+    # Get class members for names
+    members = db.get_class_members(class_id)
+    member_map = {m["id"]: m["displayName"] for m in members}
+    
+    student_name = member_map.get(student_id, student_id)
+    db.upsert_einfach(
+        student_id=student_id,
+        student_name=student_name,
+        competency_id=competency_id,
+        achieved=True,
+        updated_by=user["upn"],
+    )
+    
+    return JSONResponse({
+        "success": True,
+        "student_id": student_id,
+        "student_name": student_name,
+        "competency_id": competency_id,
+    })
 
 
 # ---------------------------------------------------------------------------
