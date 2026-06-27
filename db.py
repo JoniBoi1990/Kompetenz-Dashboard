@@ -65,6 +65,10 @@ def init_db() -> None:
             status         TEXT NOT NULL DEFAULT 'pending',
             created_at     TEXT NOT NULL DEFAULT ''
         );
+        CREATE TABLE IF NOT EXISTS test_counters (
+            student_id     TEXT PRIMARY KEY,
+            last_number    INTEGER NOT NULL DEFAULT 0
+        );
         CREATE TABLE IF NOT EXISTS kompetenzantraege (
             id   TEXT PRIMARY KEY,
             data TEXT NOT NULL DEFAULT '{}'
@@ -474,6 +478,47 @@ def update_test_request_status(req_id: str, status: str) -> None:
 def delete_test_request(req_id: str) -> None:
     with _conn() as con:
         con.execute("DELETE FROM test_requests WHERE id=?", (req_id,))
+
+
+# ---------------------------------------------------------------------------
+# Test counters (for consistent test numbering)
+# ---------------------------------------------------------------------------
+
+def get_next_test_number(student_id: str) -> int:
+    """Get the next test number for a student and increment the counter."""
+    with _conn() as con:
+        # Try to get current number
+        row = con.execute(
+            "SELECT last_number FROM test_counters WHERE student_id=?",
+            (student_id,)
+        ).fetchone()
+        
+        if row:
+            current = row["last_number"]
+        else:
+            current = 0
+        
+        new_number = current + 1
+        
+        # Insert or update
+        con.execute(
+            """INSERT OR REPLACE INTO test_counters(student_id, last_number)
+               VALUES(?, ?)""",
+            (student_id, new_number)
+        )
+        
+        return new_number
+
+
+def get_current_test_number(student_id: str) -> int:
+    """Get the current test number for a student without incrementing."""
+    with _conn() as con:
+        row = con.execute(
+            "SELECT last_number FROM test_counters WHERE student_id=?",
+            (student_id,)
+        ).fetchone()
+        
+        return row["last_number"] if row else 0
 
 
 # ---------------------------------------------------------------------------

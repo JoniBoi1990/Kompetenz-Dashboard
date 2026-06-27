@@ -255,6 +255,82 @@ _reload_grading_scale()
 # Ephemeral store for in-progress test previews (per-process, intentionally lost on restart)
 _TEST_PREVIEWS: dict = {}
 
+
+# ---------------------------------------------------------------------------
+# Test naming helper functions
+# ---------------------------------------------------------------------------
+
+def _int_to_roman(n: int) -> str:
+    """Convert an integer to a Roman numeral (1-10)."""
+    roman_map = {
+        1: "I", 2: "II", 3: "III", 4: "IV", 5: "V",
+        6: "VI", 7: "VII", 8: "VIII", 9: "IX", 10: "X"
+    }
+    return roman_map.get(n, str(n))
+
+
+def _generate_zusatzinfo(
+    student_id: str,
+    competency_ids: list[str],
+    creation_type: str,  # "A", "E", "B"
+    class_id: str | None = None
+) -> str:
+    """
+    Generate consistent test naming info.
+    Format: Nr.X [A|E|B] II_3,III_2
+    - X: test number (per student, incrementing)
+    - [A|E|B]: creation type (Angefordert, Einzeln, Bulk)
+    - II_3,III_2: count of competencies per theme (roman numeral_theme, arabic count)
+    """
+    # Get next test number for this student
+    number = db.get_next_test_number(student_id)
+    
+    # Load competencies to get theme information
+    competency_map = _KOMPETENZ_MAP.copy()
+    
+    if class_id:
+        cls = db.get_class(class_id)
+        if cls:
+            einfach_list_id = cls.get("einfach_list_id") or cls.get("competency_list_id")
+            einfach_list_source = cls.get("einfach_list_source") or cls.get("list_source", "system")
+            if einfach_list_id:
+                try:
+                    if einfach_list_source == "teacher":
+                        teacher_list = db.get_teacher_list(einfach_list_id)
+                        if teacher_list:
+                            data = teacher_list.get("data", {})
+                            comps = data.get("competencies", [])
+                            competency_map = {c["id"]: c for c in comps}
+                    else:
+                        comps, _ = _load_competency_list(einfach_list_id, "system")
+                        competency_map = {c["id"]: c for c in comps}
+                except FileNotFoundError:
+                    pass
+    
+    # Count competencies per theme
+    theme_counts: dict[int, int] = {}
+    for cid in competency_ids:
+        k = competency_map.get(cid)
+        if k:
+            theme = k.get("thema")
+            # Treat None/null as theme 0
+            theme_num = theme if theme is not None else 0
+            theme_counts[theme_num] = theme_counts.get(theme_num, 0) + 1
+    
+    # Format theme counts as "II_3,III_2"
+    # Sort by theme number, put 0 (null themes) at the end
+    sorted_themes = sorted(theme_counts.keys(), key=lambda t: (t == 0, t))
+    theme_parts = []
+    for theme in sorted_themes:
+        count = theme_counts[theme]
+        roman = _int_to_roman(theme) if theme > 0 else "0"
+        theme_parts.append(f"{roman}_{count}")
+    
+    theme_str = ",".join(theme_parts) if theme_parts else "0_0"
+    
+    return f"Nr.{number} [{creation_type}] {theme_str}"
+
+
 # Dev-Mode Users
 DEV_STUDENT_OID_9   = "anna@schule.de"
 DEV_STUDENT_NAME_9  = "Anna Beispiel"
@@ -1644,11 +1720,15 @@ async def teacher_coverage(
             if einfach_list_id:
                 comps, _ = _load_competency_list(einfach_list_id, einfach_list_source)
                 einfach = [c for c in comps if c["typ"] == "einfach"]
+                # Sort by theme (None/null last), then by ID
+                einfach.sort(key=lambda k: (k.get("thema") is None, k.get("thema") or 0, k["id"]))
             
             # Load niveau competencies  
             if niveau_list_id:
                 comps, _ = _load_competency_list(niveau_list_id, niveau_list_source)
                 niveau = [c for c in comps if c["typ"] == "niveau"]
+                # Sort by theme (None/null last), then by ID
+                niveau.sort(key=lambda k: (k.get("thema") is None, k.get("thema") or 0, k["id"]))
         except FileNotFoundError:
             pass  # Keep fallback values
     
@@ -1898,13 +1978,16 @@ async def generate_test(request: Request, user: dict = Depends(auth.require_teac
     if len(student_data) > 50:
         raise HTTPException(status_code=400, detail="Maximal 50 Schüler pro Batch erlaubt")
 
-    title = form.get("title", "Kompetenztest")
+    form_title = form.get("title", "Kompetenztest")
     class_id = form.get("class_id", "")
     
     # Single student: use existing flow with preview
     if len(student_data) == 1:
         student = student_data[0]
         student_name = student.get("name", "Unbekannt")
+        student_id = student.get("id")
+        # Generate consistent title with creation type "E" (Einzeln)
+        title = _generate_zusatzinfo(student_id or student_name, selected_ids, "E", class_id=class_id or None)
         pid = _create_preview(student_name, title, selected_ids, class_id=class_id or None)
         return RedirectResponse(f"/tests/preview/{pid}", status_code=303)
     
@@ -1983,13 +2066,16 @@ async def generate_test(request: Request, user: dict = Depends(auth.require_teac
             errors.append(f"{student_name}: Keine Fragen generierbar")
             continue
         
+        # Generate consistent title with creation type "B" (Bulk) for each student
+        student_title = _generate_zusatzinfo(student_id or student_name, needed_ids, "B", class_id=class_id or None)
+        
         # Generate PDF
         try:
             pdf_bytes = create_pdf(
                 questions=questions,
                 name=student_name,
                 datum=date.today().strftime("%d.%m.%Y"),
-                zusatzinfo=title,
+                zusatzinfo=student_title,
             )
             generated_pdfs[student_name] = pdf_bytes
         except Exception as e:
@@ -2004,7 +2090,7 @@ async def generate_test(request: Request, user: dict = Depends(auth.require_teac
         "id": batch_id,
         "student_names": list(generated_pdfs.keys()),
         "pdfs": generated_pdfs,
-        "title": title,
+        "title": form_title,
         "errors": errors,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
@@ -2111,7 +2197,10 @@ async def confirm_test(req_id: str, request: Request, user: dict = Depends(auth.
     student_class = db.get_student_class(student_id)
     class_id = student_class.get("id") if student_class else None
 
-    pid = _create_preview(req["student_name"], req["title"], selected_ids, request_id=req_id, class_id=class_id)
+    # Generate consistent title for requested test (creation_type "A")
+    title = _generate_zusatzinfo(student_id, selected_ids, "A", class_id=class_id)
+
+    pid = _create_preview(req["student_name"], title, selected_ids, request_id=req_id, class_id=class_id)
     return RedirectResponse(f"/tests/preview/{pid}", status_code=303)
 
 
