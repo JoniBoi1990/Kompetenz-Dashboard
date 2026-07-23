@@ -512,8 +512,10 @@ def delete_class_backup_dirs(class_id: str) -> list[str]:
     failed: list[str] = []
     for base in (AUTO_BACKUP_DIR, MANUAL_BACKUP_DIR):
         class_dir = (base / class_id).resolve()
-        # Sicherheitsprüfung: muss innerhalb des Basis-Verzeichnisses liegen
-        if not str(class_dir).startswith(str(base.resolve())):
+        # Sicherheitsprüfung: muss strikt UNTERHALB des Basis-Verzeichnisses liegen
+        # (blockiert "", ".", ".." und Sibling-Prefixe wie "../auto_evil")
+        base_resolved = base.resolve()
+        if class_dir == base_resolved or base_resolved not in class_dir.parents:
             failed.append(str(class_dir))
             continue
         if class_dir.exists():
