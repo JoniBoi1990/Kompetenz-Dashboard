@@ -236,7 +236,7 @@ Teachers can archive a class at the end of the school year from the class backup
 
 **Privacy:** No personal data remains on the server after deletion (student names, UPNs, competency records, evidence URLs, OneNote sync config/history, backup files).
 
-**Quick delete:** The "Löschen" button on `/admin/classes` also uses the full cascade (`db.delete_class_cascade` + `backup.delete_class_backup_dirs`) — no way to half-delete a class remains. (The legacy `db.delete_class` was removed.)
+**Quick delete (admin only):** The "Löschen" button on `/admin/classes` also uses the full cascade (`db.delete_class_cascade` + `backup.delete_class_backup_dirs`) — no way to half-delete a class remains. (The legacy `db.delete_class` was removed.) It is restricted to the admin: the button is only rendered for admins and `POST /admin/classes/delete` requires `auth.require_admin_user`. **Admin = the account in `INITIAL_ADMIN_UPN`; in DEV_MODE every teacher counts as admin.** Regular teachers must use the archive flow above (backup + download before deletion).
 
 **Orphan cleanup:** `/admin/classes` shows a warning card when orphaned records exist — rows with `class_id IS NULL` or with a `class_id` pointing at a deleted class (leftovers from the legacy delete or sync races); `db.count_orphaned_records()` / `db.delete_orphaned_records()` power it.
 

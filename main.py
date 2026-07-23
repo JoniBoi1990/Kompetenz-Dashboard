@@ -3024,6 +3024,7 @@ async def admin_classes(request: Request, user: dict = Depends(auth.require_teac
     return templates.TemplateResponse("admin_classes.html", {
         "request": request, "user": user, "classes": classes,
         "orphans": orphans, "orphans_total": sum(orphans.values()),
+        "is_admin": auth.is_admin_user(user),
         "msg": request.query_params.get("msg", ""),
     })
 
@@ -3043,7 +3044,7 @@ async def admin_classes_add(
 @app.post("/admin/classes/delete")
 async def admin_classes_delete(
     class_id: str = Form(...),
-    user: dict = Depends(auth.require_teacher_user),
+    user: dict = Depends(auth.require_admin_user),
 ):
     stats = db.delete_class_cascade(class_id)
     failed = backup.delete_class_backup_dirs(class_id)

@@ -258,3 +258,18 @@ def require_teacher_user(request: Request) -> dict:
     if not user.get("is_teacher"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Nur für Lehrkräfte")
     return user
+
+
+def is_admin_user(user: dict) -> bool:
+    """Admin = INITIAL_ADMIN_UPN; im DEV_MODE gilt jede Lehrkraft als Admin."""
+    if settings.DEV_MODE:
+        return True
+    admin_upn = settings.INITIAL_ADMIN_UPN
+    return bool(admin_upn) and user.get("upn", "").lower() == admin_upn.lower()
+
+
+def require_admin_user(request: Request) -> dict:
+    user = require_teacher_user(request)
+    if not is_admin_user(user):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Nur für Admins")
+    return user

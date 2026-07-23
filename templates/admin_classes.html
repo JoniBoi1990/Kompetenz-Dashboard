@@ -63,11 +63,15 @@
         <a href="/admin/classes/{{ cls.id }}/backups" class="btn-sm">Verwalten</a>
       </td>
       <td>
+        {% if is_admin %}
         <form method="post" action="/admin/classes/delete" style="display:inline"
               onsubmit="return confirm('Klasse »{{ cls.displayName }}« ENDGÜLTIG löschen?\n\nAlle Schülerdaten und alle Backup-Dateien dieser Klasse werden unwiderruflich entfernt!\n\nTipp: Zum vorherigen Archivieren (Download) die Backup-Verwaltung nutzen.')">
           <input type="hidden" name="class_id" value="{{ cls.id }}">
           <button type="submit" class="btn-danger">Löschen</button>
         </form>
+        {% else %}
+        <span class="muted" title="Direktes Löschen ist nur für den Admin möglich. Zum Löschen bitte den Archiv-Weg über „Verwalten“ nutzen.">nur Admin</span>
+        {% endif %}
       </td>
     </tr>
     {% endfor %}
