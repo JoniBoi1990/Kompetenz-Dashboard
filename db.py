@@ -26,6 +26,125 @@ def _conn():
         con.close()
 
 
+def _count_orphaned(con) -> dict:
+    """Zählt Datensätze ohne Klassenzuordnung (Waisen)."""
+    return {
+        "einfach_records": con.execute(
+            "SELECT COUNT(*) AS c FROM einfach_records WHERE class_id IS NULL"
+        ).fetchone()["c"],
+        "nachweise": con.execute(
+            "SELECT COUNT(*) AS c FROM nachweise WHERE class_id IS NULL"
+        ).fetchone()["c"],
+        "test_requests": con.execute(
+            "SELECT COUNT(*) AS c FROM test_requests WHERE class_id IS NULL"
+        ).fetchone()["c"],
+        "kompetenzantraege": con.execute(
+            "SELECT COUNT(*) AS c FROM kompetenzantraege WHERE class_id IS NULL"
+        ).fetchone()["c"],
+        "test_counters": con.execute(
+            "SELECT COUNT(*) AS c FROM test_counters "
+            "WHERE student_id NOT IN (SELECT student_id FROM class_members)"
+        ).fetchone()["c"],
+    }
+
+
+def count_orphaned_records() -> dict:
+    """Öffentliche Variante von _count_orphaned mit eigener Connection."""
+    with _conn() as con:
+        return _count_orphaned(con)
+
+
+def delete_orphaned_records() -> dict:
+    """Löscht alle Waisen-Datensätze. Gibt die Anzahlen vor der Löschung zurück."""
+    with _conn() as con:
+        counts = _count_orphaned(con)
+        con.execute("DELETE FROM einfach_records WHERE class_id IS NULL")
+        con.execute("DELETE FROM nachweise WHERE class_id IS NULL")
+        con.execute("DELETE FROM test_requests WHERE class_id IS NULL")
+        con.execute("DELETE FROM kompetenzantraege WHERE class_id IS NULL")
+        con.execute(
+            "DELETE FROM test_counters "
+            "WHERE student_id NOT IN (SELECT student_id FROM class_members)"
+        )
+        return counts
+
+
+def _migrate_add_class_ids(con) -> None:
+    """Fügt class_id-Spalten zu den Schülerdaten-Tabellen hinzu und befüllt sie
+    aus class_members. Waisen (keine Mitgliedschaft ableitbar) bleiben NULL und
+    werden im Server-Log gemeldet."""
+    # einfach_records: Neuaufbau mit PK (student_id, class_id, competency_id)
+    cols = [
+        r["name"]
+        for r in con.execute("SELECT name FROM pragma_table_info('einfach_records')").fetchall()
+    ]
+    if "class_id" not in cols:
+        con.execute("ALTER TABLE einfach_records RENAME TO einfach_records_old")
+        con.execute("""
+            CREATE TABLE einfach_records (
+                student_id    TEXT NOT NULL,
+                class_id      TEXT,
+                student_name  TEXT NOT NULL DEFAULT '',
+                competency_id TEXT NOT NULL,
+                achieved      INTEGER NOT NULL DEFAULT 0,
+                updated_by    TEXT NOT NULL DEFAULT '',
+                updated_at    TEXT NOT NULL DEFAULT '',
+                PRIMARY KEY (student_id, class_id, competency_id)
+            )
+        """)
+        con.execute("""
+            INSERT OR IGNORE INTO einfach_records
+                (student_id, class_id, student_name, competency_id, achieved,
+                 updated_by, updated_at)
+            SELECT r.student_id,
+                   (SELECT m.class_id FROM class_members m
+                    WHERE m.student_id = r.student_id LIMIT 1),
+                   r.student_name, r.competency_id, r.achieved,
+                   r.updated_by, r.updated_at
+            FROM einfach_records_old r
+        """)
+        con.execute("DROP TABLE einfach_records_old")
+
+    # Übrige Tabellen: einfache Spalten-Erweiterung
+    for table in ("nachweise", "test_requests", "kompetenzantraege"):
+        cols = [
+            r["name"]
+            for r in con.execute(f"SELECT name FROM pragma_table_info('{table}')").fetchall()
+        ]
+        if "class_id" not in cols:
+            con.execute(f"ALTER TABLE {table} ADD COLUMN class_id TEXT")
+
+    # Backfill aus class_members (aktuell: jeder Schüler in genau einer Klasse)
+    con.execute("""
+        UPDATE nachweise SET class_id =
+            (SELECT m.class_id FROM class_members m
+             WHERE m.student_id = nachweise.student_id LIMIT 1)
+        WHERE class_id IS NULL
+    """)
+    con.execute("""
+        UPDATE test_requests SET class_id =
+            (SELECT m.class_id FROM class_members m
+             WHERE m.student_id = test_requests.student_id LIMIT 1)
+        WHERE class_id IS NULL
+    """)
+    con.execute("""
+        UPDATE kompetenzantraege SET class_id =
+            (SELECT m.class_id FROM class_members m
+             WHERE m.student_id = json_extract(kompetenzantraege.data, '$.student_id')
+             LIMIT 1)
+        WHERE class_id IS NULL
+    """)
+
+    # Waisen melden (Bereinigung erfolgt über Admin-UI, siehe Task 6/7)
+    orphans = _count_orphaned(con)
+    total = sum(orphans.values())
+    if total:
+        print(
+            f"WARNING migration class_id: {total} verwaiste Datensaetze ohne "
+            f"Klassenzuordnung: {orphans}"
+        )
+
+
 def init_db() -> None:
     """Create tables if they don't exist yet."""
     with _conn() as con:
@@ -167,6 +286,9 @@ def init_db() -> None:
         # Migration: Convert competency_id from INTEGER to TEXT with prefix
         # This requires recreating tables due to SQLite limitations
         _migrate_competency_ids_to_text(con)
+        
+        # Migration: class_id-Spalten für Schülerdaten-Tabellen
+        _migrate_add_class_ids(con)
         
         # Initialize OneNote sync tables
         init_onenote_sync_tables()
