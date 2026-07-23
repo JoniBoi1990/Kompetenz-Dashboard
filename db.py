@@ -853,6 +853,62 @@ def delete_class(class_id: str) -> None:
         con.execute("DELETE FROM classes WHERE id=?", (class_id,))
 
 
+def delete_class_cascade(class_id: str) -> dict:
+    """
+    Löscht eine Klasse vollständig in EINER Transaktion (Datenschutz-Löschung):
+    alle Schülerdaten der Klasse, active_ids, OneNote-Config/History,
+    Mitgliedschaften und die Klasse selbst. test_counters nur für Schüler,
+    die danach in keiner Klasse mehr sind.
+
+    Returns:
+        Statistik-Dict mit Anzahlen der gelöschten Zeilen
+    """
+    stats = {}
+    with _conn() as con:
+        members = [
+            r["student_id"]
+            for r in con.execute(
+                "SELECT student_id FROM class_members WHERE class_id=?", (class_id,)
+            ).fetchall()
+        ]
+        stats["einfach_records"] = con.execute(
+            "DELETE FROM einfach_records WHERE class_id=?", (class_id,)
+        ).rowcount
+        stats["nachweise"] = con.execute(
+            "DELETE FROM nachweise WHERE class_id=?", (class_id,)
+        ).rowcount
+        stats["test_requests"] = con.execute(
+            "DELETE FROM test_requests WHERE class_id=?", (class_id,)
+        ).rowcount
+        stats["kompetenzantraege"] = con.execute(
+            "DELETE FROM kompetenzantraege WHERE class_id=?", (class_id,)
+        ).rowcount
+        stats["active_ids"] = con.execute(
+            "DELETE FROM active_ids WHERE class_id=?", (class_id,)
+        ).rowcount
+        stats["onenote"] = con.execute(
+            "DELETE FROM onenote_sync_history WHERE class_id=?", (class_id,)
+        ).rowcount
+        stats["onenote"] += con.execute(
+            "DELETE FROM onenote_sync_config WHERE class_id=?", (class_id,)
+        ).rowcount
+        con.execute("DELETE FROM class_members WHERE class_id=?", (class_id,))
+        stats["members"] = len(members)
+        # test_counters nur entfernen, wenn keine weitere Mitgliedschaft besteht
+        counters_deleted = 0
+        for sid in members:
+            still_member = con.execute(
+                "SELECT 1 FROM class_members WHERE student_id=? LIMIT 1", (sid,)
+            ).fetchone()
+            if not still_member:
+                counters_deleted += con.execute(
+                    "DELETE FROM test_counters WHERE student_id=?", (sid,)
+                ).rowcount
+        stats["test_counters"] = counters_deleted
+        con.execute("DELETE FROM classes WHERE id=?", (class_id,))
+    return stats
+
+
 def get_class_members(class_id: str) -> list[dict]:
     with _conn() as con:
         rows = con.execute(
