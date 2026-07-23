@@ -163,11 +163,11 @@ When `DEV_MODE=true`:
 
 | Table | Purpose |
 |-------|---------|
-| `einfach_records` | Unterricht (basic) competency achievements (student_id, competency_id, achieved) |
-| `nachweise` | Projekt (niveau) competency proofs with evidence URLs |
+| `einfach_records` | Unterricht (basic) competency achievements (student_id, class_id, competency_id, achieved) |
+| `nachweise` | Projekt (niveau) competency proofs with evidence URLs (class_id per row) |
 | `active_ids` | Unterrichtsstand (currently teaching) per class |
-| `test_requests` | Pending student test requests |
-| `kompetenzantraege` | Student competency claims pending review |
+| `test_requests` | Pending student test requests (class_id per row) |
+| `kompetenzantraege` | Student competency claims pending review (class_id per row) |
 | `classes` | Class definitions with competency list assignments |
 | `class_members` | Student-to-class memberships |
 | `teacher_lists` | Custom competency lists uploaded by teachers |
@@ -225,6 +225,24 @@ Teachers can assign "Unterricht" (einfach) competencies to multiple students sim
 - Route: `POST /teacher/coverage/bulk-assign`
 - Template: `templates/coverage.html` (modal with inline JavaScript/CSS)
 - Only "Unterricht" (einfach) competencies support bulk assignment (Projekt/niveau requires evidence URL)
+
+### Class Archiving (Schuljahresende)
+
+Teachers can archive a class at the end of the school year from the class backups page:
+
+1. **Archiv erstellen** — creates a final backup (standard backup JSON format, includes both Unterricht/einfach and Projekte/niveau)
+2. **Archiv herunterladen** — mandatory download; unlocks deletion (tracked in-memory via `_PENDING_ARCHIVES`)
+3. **Klasse endgültig löschen** — requires typing the class name; deletes ALL class data in one transaction (`db.delete_class_cascade`) plus all backup files (`backup.delete_class_backup_dirs`)
+
+**Privacy:** No personal data remains on the server after deletion (student names, UPNs, competency records, evidence URLs, OneNote sync config/history, backup files).
+
+**Orphan cleanup:** `/admin/classes` shows a warning card when records without class assignment exist (leftovers from the legacy delete); `db.count_orphaned_records()` / `db.delete_orphaned_records()` power it.
+
+**Implementation:**
+- Routes: `POST /admin/classes/{class_id}/archive`, `GET .../archive/download`, `POST .../archive/delete`, `POST /admin/classes/orphans/delete`
+- Migration: `_migrate_add_class_ids()` in `db.py` adds `class_id` to `einfach_records` (new PK `(student_id, class_id, competency_id)`), `nachweise`, `test_requests`, `kompetenzantraege`
+- Write paths derive `class_id` from `class_members` (`_class_id_for_student`), explicit override possible
+- Templates: `templates/admin_class_backups.html`, `templates/admin_classes.html`
 
 ### Missing Students Indicator
 
