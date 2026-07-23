@@ -8,6 +8,21 @@
 <div class="success-notice">{{ msg }}</div>
 {% endif %}
 
+{% if orphans_total and orphans_total > 0 %}
+<div class="warning-notice" style="background:#fff4ce;border:1px solid #f0c36d;border-radius:.375rem;padding:.75rem 1rem;margin-bottom:1rem">
+  <strong>Verwaiste Datensätze ohne Klassenzuordnung:</strong>
+  Unterricht: {{ orphans.einfach_records }},
+  Projekte: {{ orphans.nachweise }},
+  Testanfragen: {{ orphans.test_requests }},
+  Anträge: {{ orphans.kompetenzantraege }},
+  Testzähler: {{ orphans.test_counters }}
+  <form method="post" action="/admin/classes/orphans/delete" style="display:inline;margin-left:.5rem"
+        onsubmit="return confirm('{{ orphans_total }} verwaiste Datensätze endgültig löschen? Dies kann nicht rückgängig gemacht werden.')">
+    <button type="submit" class="btn-danger btn-sm">Bereinigen</button>
+  </form>
+</div>
+{% endif %}
+
 <h2>Neue Klasse anlegen</h2>
 <form method="post" action="/admin/classes/add" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
   <input type="text" name="name" placeholder="Klassenname, z.B. 9a" required style="width:10rem">

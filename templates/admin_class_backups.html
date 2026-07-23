@@ -18,6 +18,49 @@
 </form>
 <a href="/admin/classes/{{ cls.id }}/backups/export" class="button" style="margin-left:.5rem">Als Datei exportieren</a>
 
+<h2 style="margin-top:1.5rem">Klasse archivieren (Schuljahresende)</h2>
+<div class="info-notice" style="margin-bottom:.75rem">
+  <strong>Ablauf:</strong> 1. Archiv erstellen → 2. Archiv herunterladen → 3. Klasse endgültig löschen.
+  Beim Löschen werden <strong>alle</strong> Schülerdaten und <strong>alle</strong> Backup-Dateien
+  dieser Klasse unwiderruflich vom Server entfernt (Datenschutz). Das heruntergeladene Archiv
+  bleibt nur lokal bei dir erhalten.
+</div>
+
+{% if not archive_pending %}
+<form method="post" action="/admin/classes/{{ cls.id }}/archive" style="display:inline">
+  <button type="submit">1. Archiv erstellen</button>
+</form>
+{% else %}
+<a href="/admin/classes/{{ cls.id }}/archive/download" class="button">2. Archiv herunterladen</a>
+{% if archive_pending.downloaded %}
+  <span class="badge badge-info" style="margin-left:.5rem">✓ Heruntergeladen — Löschen freigegeben</span>
+{% else %}
+  <span class="badge badge-muted" style="margin-left:.5rem">Download ausstehend — Löschen noch gesperrt</span>
+{% endif %}
+
+<form method="post" action="/admin/classes/{{ cls.id }}/archive/delete"
+      style="margin-top:1rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap"
+      onsubmit="return confirmArchiveDelete(this, {{ cls.name | tojson }})">
+  <input type="text" name="confirm_name" placeholder="Klassenname »{{ cls.name }}« eintippen"
+         required style="width:18rem">
+  <button type="submit" class="btn-danger"
+          {% if not archive_pending.downloaded %}disabled title="Erst das Archiv herunterladen"{% endif %}>
+    3. Klasse endgültig löschen
+  </button>
+</form>
+{% endif %}
+
+<script>
+function confirmArchiveDelete(form, className) {
+  if (form.confirm_name.value.trim() !== className) {
+    alert('Der eingegebene Name stimmt nicht mit dem Klassennamen »' + className + '« überein.');
+    return false;
+  }
+  return confirm('Klasse »' + className + '« wirklich ENDGÜLTIG löschen?\n\n' +
+    'Alle Schülerdaten und alle Backup-Dateien dieser Klasse werden unwiderruflich vom Server entfernt!');
+}
+</script>
+
 <h2 style="margin-top:1.5rem">Vorhandene Backups ({{ backups | length }})</h2>
 
 {% if backups %}
