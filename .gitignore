@@ -15,6 +15,9 @@ build/
 grading_scales/*.csv
 static/logo.png
 dashboard.db
+dashboard.db.backup.*
+_backup/
+backup_onenote_*.json
 
 # macOS
 .DS_Store
