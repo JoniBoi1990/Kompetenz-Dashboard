@@ -353,6 +353,7 @@ def restore_backup(
                 competency_id=comp_id,
                 achieved=True,
                 updated_by=updated_by,
+                class_id=class_id,
             )
             stats["einfach_restored"] += 1
         
@@ -384,6 +385,7 @@ def restore_backup(
                         evidence_url=nw.get("url", ""),
                         evidence_name=nw.get("name", ""),
                         updated_by=updated_by,
+                        class_id=class_id,
                     )
                     stats["nachweise_restored"] += 1
             else:
@@ -396,6 +398,7 @@ def restore_backup(
                     evidence_url="",
                     evidence_name="",
                     updated_by=updated_by,
+                    class_id=class_id,
                 )
             
             stats["niveau_restored"] += 1

@@ -289,9 +289,10 @@ def init_db() -> None:
         
         # Migration: class_id-Spalten für Schülerdaten-Tabellen
         _migrate_add_class_ids(con)
-        
-        # Initialize OneNote sync tables
-        init_onenote_sync_tables()
+
+    # Initialize OneNote sync tables (eigene Connection — muss AUSSERHALB des
+    # with-Blocks laufen, sonst "database is locked" bei offener Schreibtransaktion)
+    init_onenote_sync_tables()
 
 
 def _migrate_competency_ids_to_text(con) -> None:
@@ -462,25 +463,37 @@ def get_einfach_records(student_id: str) -> dict[str, dict]:
     return {row["competency_id"]: dict(row) for row in rows}
 
 
+def _class_id_for_student(con, student_id: str) -> str | None:
+    """Leitet die class_id eines Schülers aus class_members ab (None = Waise)."""
+    row = con.execute(
+        "SELECT class_id FROM class_members WHERE student_id = ? LIMIT 1",
+        (student_id,),
+    ).fetchone()
+    return row["class_id"] if row else None
+
+
 def upsert_einfach(
     student_id: str,
     student_name: str,
     competency_id: str,  # Format: e.901, n.989
     achieved: bool,
     updated_by: str,
+    class_id: str | None = None,
 ) -> None:
     now = datetime.now(timezone.utc).isoformat()
     with _conn() as con:
+        if class_id is None:
+            class_id = _class_id_for_student(con, student_id)
         con.execute(
             """INSERT INTO einfach_records
-               (student_id, student_name, competency_id, achieved, updated_by, updated_at)
-               VALUES (?, ?, ?, ?, ?, ?)
-               ON CONFLICT(student_id, competency_id) DO UPDATE SET
+               (student_id, class_id, student_name, competency_id, achieved, updated_by, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?)
+               ON CONFLICT(student_id, class_id, competency_id) DO UPDATE SET
                  student_name = excluded.student_name,
                  achieved     = excluded.achieved,
                  updated_by   = excluded.updated_by,
                  updated_at   = excluded.updated_at""",
-            (student_id, student_name, competency_id, int(achieved), updated_by, now),
+            (student_id, class_id, student_name, competency_id, int(achieved), updated_by, now),
         )
 
 
@@ -516,16 +529,19 @@ def add_nachweis(
     evidence_url: str,
     evidence_name: str,
     updated_by: str,
+    class_id: str | None = None,
 ) -> None:
     now = datetime.now(timezone.utc).isoformat()
     with _conn() as con:
+        if class_id is None:
+            class_id = _class_id_for_student(con, student_id)
         con.execute(
             """INSERT INTO nachweise
-               (id, student_id, student_name, competency_id, niveau_level,
+               (id, student_id, class_id, student_name, competency_id, niveau_level,
                 evidence_url, evidence_name, updated_by, updated_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
-                str(uuid.uuid4()), student_id, student_name, competency_id,
+                str(uuid.uuid4()), student_id, class_id, student_name, competency_id,
                 niveau_level, evidence_url, evidence_name or evidence_url,
                 updated_by, now,
             ),
@@ -581,10 +597,11 @@ def save_test_request(req: dict) -> None:
     r = dict(req)
     r["competency_ids"] = json.dumps(r.get("competency_ids", []))
     with _conn() as con:
+        r["class_id"] = r.get("class_id") or _class_id_for_student(con, r["student_id"])
         con.execute(
             """INSERT OR REPLACE INTO test_requests
-               (id, student_id, student_name, title, competency_ids, status, created_at)
-               VALUES (:id, :student_id, :student_name, :title,
+               (id, student_id, class_id, student_name, title, competency_ids, status, created_at)
+               VALUES (:id, :student_id, :class_id, :student_name, :title,
                        :competency_ids, :status, :created_at)""",
             r,
         )
@@ -655,9 +672,12 @@ def get_all_kompetenzantraege() -> dict[str, dict]:
 
 def save_kompetenzantrag(antrag: dict) -> None:
     with _conn() as con:
+        class_id = antrag.get("class_id") or _class_id_for_student(
+            con, antrag.get("student_id", "")
+        )
         con.execute(
-            "INSERT OR REPLACE INTO kompetenzantraege(id, data) VALUES(?, ?)",
-            (antrag["id"], json.dumps(antrag)),
+            "INSERT OR REPLACE INTO kompetenzantraege(id, class_id, data) VALUES(?, ?, ?)",
+            (antrag["id"], class_id, json.dumps(antrag)),
         )
 
 
@@ -907,6 +927,7 @@ def migrate_student(
             competency_id=comp_id,
             achieved=bool(record.get("achieved", False)),
             updated_by=updated_by,
+            class_id=class_id,
         )
     
     # 5. Transfer nachweise
@@ -919,6 +940,7 @@ def migrate_student(
             evidence_url=nw.get("evidence_url", ""),
             evidence_name=nw.get("evidence_name", ""),
             updated_by=updated_by,
+            class_id=class_id,
         )
     
     # 6. Delete old einfach_records and nachweise
@@ -1133,17 +1155,19 @@ def bulk_upsert_einfach(records: list[dict]) -> int:
     
     with _conn() as con:
         for record in records:
+            cid = record.get("class_id") or _class_id_for_student(con, record["student_id"])
             con.execute(
                 """INSERT INTO einfach_records
-                   (student_id, student_name, competency_id, achieved, updated_by, updated_at)
-                   VALUES (?, ?, ?, ?, ?, ?)
-                   ON CONFLICT(student_id, competency_id) DO UPDATE SET
+                   (student_id, class_id, student_name, competency_id, achieved, updated_by, updated_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)
+                   ON CONFLICT(student_id, class_id, competency_id) DO UPDATE SET
                      student_name = excluded.student_name,
                      achieved     = excluded.achieved,
                      updated_by   = excluded.updated_by,
                      updated_at   = excluded.updated_at""",
                 (
                     record["student_id"],
+                    cid,
                     record.get("student_name", ""),
                     record["competency_id"],
                     int(record.get("achieved", False)),
@@ -1176,14 +1200,16 @@ def bulk_add_nachweise(nachweise: list[dict]) -> int:
     
     with _conn() as con:
         for nw in nachweise:
+            cid = nw.get("class_id") or _class_id_for_student(con, nw["student_id"])
             con.execute(
                 """INSERT INTO nachweise
-                   (id, student_id, student_name, competency_id, niveau_level,
+                   (id, student_id, class_id, student_name, competency_id, niveau_level,
                     evidence_url, evidence_name, updated_by, updated_at)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     str(uuid.uuid4()),
                     nw["student_id"],
+                    cid,
                     nw.get("student_name", ""),
                     nw["competency_id"],
                     nw.get("niveau_level", 0),

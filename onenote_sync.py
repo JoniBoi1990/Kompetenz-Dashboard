@@ -432,6 +432,7 @@ class OneNoteSyncService:
                             competency_id=comp_id,
                             achieved=True,
                             updated_by=updated_by,
+                            class_id=class_id,
                         )
                         einfach_count += 1
                         student_details["einfach"].append(comp_id)
@@ -461,6 +462,7 @@ class OneNoteSyncService:
                             evidence_url=url,
                             evidence_name=url or f"OneNote Sync ({level})",
                             updated_by=updated_by,
+                            class_id=class_id,
                         )
                         niveau_count += 1
                         student_details["niveau"].append({"id": comp_id, "level": level})
