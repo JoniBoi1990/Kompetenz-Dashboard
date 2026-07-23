@@ -3045,8 +3045,15 @@ async def admin_classes_delete(
     class_id: str = Form(...),
     user: dict = Depends(auth.require_teacher_user),
 ):
-    db.delete_class(class_id)
-    return RedirectResponse("/admin/classes", status_code=303)
+    stats = db.delete_class_cascade(class_id)
+    failed = backup.delete_class_backup_dirs(class_id)
+    msg = (
+        f"Klasse und alle Daten gelöscht: {stats['members']} Schüler, "
+        f"{stats['einfach_records'] + stats['nachweise']} Kompetenz-Einträge entfernt"
+    )
+    if failed:
+        msg += f" — ACHTUNG, manuell löschen: {', '.join(failed)}"
+    return RedirectResponse(f"/admin/classes?msg={quote(msg)}", status_code=303)
 
 
 @app.get("/admin/classes/{class_id}", response_class=HTMLResponse)

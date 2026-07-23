@@ -10,7 +10,7 @@
 
 {% if orphans_total and orphans_total > 0 %}
 <div class="warning-notice" style="background:#fff4ce;border:1px solid #f0c36d;border-radius:.375rem;padding:.75rem 1rem;margin-bottom:1rem">
-  <strong>Verwaiste Datensätze ohne Klassenzuordnung:</strong>
+  <strong>Verwaiste Datensätze (keine oder veraltete Klassenzuordnung):</strong>
   Unterricht: {{ orphans.einfach_records }},
   Projekte: {{ orphans.nachweise }},
   Testanfragen: {{ orphans.test_requests }},
@@ -64,7 +64,7 @@
       </td>
       <td>
         <form method="post" action="/admin/classes/delete" style="display:inline"
-              onsubmit="return confirm('Klasse »{{ cls.displayName }}« und alle Mitglieder löschen?')">
+              onsubmit="return confirm('Klasse »{{ cls.displayName }}« ENDGÜLTIG löschen?\n\nAlle Schülerdaten und alle Backup-Dateien dieser Klasse werden unwiderruflich entfernt!\n\nTipp: Zum vorherigen Archivieren (Download) die Backup-Verwaltung nutzen.')">
           <input type="hidden" name="class_id" value="{{ cls.id }}">
           <button type="submit" class="btn-danger">Löschen</button>
         </form>

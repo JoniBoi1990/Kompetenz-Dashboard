@@ -27,19 +27,24 @@ def _conn():
 
 
 def _count_orphaned(con) -> dict:
-    """Zählt Datensätze ohne Klassenzuordnung (Waisen)."""
+    """Zählt Datensätze ohne oder mit veralteter Klassenzuordnung (Waisen).
+
+    Veraltet = class_id zeigt auf eine nicht (mehr) existierende Klasse,
+    z. B. wieder angelegt durch einen laufenden OneNote-Sync nach Klassen-Löschung.
+    """
+    stale_or_null = "class_id IS NULL OR class_id NOT IN (SELECT id FROM classes)"
     return {
         "einfach_records": con.execute(
-            "SELECT COUNT(*) AS c FROM einfach_records WHERE class_id IS NULL"
+            f"SELECT COUNT(*) AS c FROM einfach_records WHERE {stale_or_null}"
         ).fetchone()["c"],
         "nachweise": con.execute(
-            "SELECT COUNT(*) AS c FROM nachweise WHERE class_id IS NULL"
+            f"SELECT COUNT(*) AS c FROM nachweise WHERE {stale_or_null}"
         ).fetchone()["c"],
         "test_requests": con.execute(
-            "SELECT COUNT(*) AS c FROM test_requests WHERE class_id IS NULL"
+            f"SELECT COUNT(*) AS c FROM test_requests WHERE {stale_or_null}"
         ).fetchone()["c"],
         "kompetenzantraege": con.execute(
-            "SELECT COUNT(*) AS c FROM kompetenzantraege WHERE class_id IS NULL"
+            f"SELECT COUNT(*) AS c FROM kompetenzantraege WHERE {stale_or_null}"
         ).fetchone()["c"],
         "test_counters": con.execute(
             "SELECT COUNT(*) AS c FROM test_counters "
@@ -56,12 +61,13 @@ def count_orphaned_records() -> dict:
 
 def delete_orphaned_records() -> dict:
     """Löscht alle Waisen-Datensätze. Gibt die Anzahlen vor der Löschung zurück."""
+    stale_or_null = "class_id IS NULL OR class_id NOT IN (SELECT id FROM classes)"
     with _conn() as con:
         counts = _count_orphaned(con)
-        con.execute("DELETE FROM einfach_records WHERE class_id IS NULL")
-        con.execute("DELETE FROM nachweise WHERE class_id IS NULL")
-        con.execute("DELETE FROM test_requests WHERE class_id IS NULL")
-        con.execute("DELETE FROM kompetenzantraege WHERE class_id IS NULL")
+        con.execute(f"DELETE FROM einfach_records WHERE {stale_or_null}")
+        con.execute(f"DELETE FROM nachweise WHERE {stale_or_null}")
+        con.execute(f"DELETE FROM test_requests WHERE {stale_or_null}")
+        con.execute(f"DELETE FROM kompetenzantraege WHERE {stale_or_null}")
         con.execute(
             "DELETE FROM test_counters "
             "WHERE student_id NOT IN (SELECT student_id FROM class_members)"
@@ -140,8 +146,8 @@ def _migrate_add_class_ids(con) -> None:
     total = sum(orphans.values())
     if total:
         print(
-            f"WARNING migration class_id: {total} verwaiste Datensaetze ohne "
-            f"Klassenzuordnung: {orphans}"
+            f"WARNING migration class_id: {total} verwaiste Datensaetze ohne oder "
+            f"mit veralteter Klassenzuordnung: {orphans}"
         )
 
 
@@ -845,12 +851,6 @@ def update_class(class_id: str, name: str, description: str = "") -> None:
             "UPDATE classes SET name=?, description=? WHERE id=?",
             (name.strip(), description.strip(), class_id),
         )
-
-
-def delete_class(class_id: str) -> None:
-    with _conn() as con:
-        con.execute("DELETE FROM class_members WHERE class_id=?", (class_id,))
-        con.execute("DELETE FROM classes WHERE id=?", (class_id,))
 
 
 def delete_class_cascade(class_id: str) -> dict:
