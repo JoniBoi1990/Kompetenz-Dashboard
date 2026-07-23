@@ -255,6 +255,9 @@ _reload_grading_scale()
 # Ephemeral store for in-progress test previews (per-process, intentionally lost on restart)
 _TEST_PREVIEWS: dict = {}
 
+# Ausstehende Klassen-Archive (flüchtig, In-Memory): class_id -> {"path", "downloaded"}
+_PENDING_ARCHIVES: dict = {}
+
 
 # ---------------------------------------------------------------------------
 # Test naming helper functions
@@ -3017,8 +3020,10 @@ async def admin_grading_scale_upload(
 @app.get("/admin/classes", response_class=HTMLResponse)
 async def admin_classes(request: Request, user: dict = Depends(auth.require_teacher_user)):
     classes = db.get_classes_with_counts()
+    orphans = db.count_orphaned_records()
     return templates.TemplateResponse("admin_classes.html", {
         "request": request, "user": user, "classes": classes,
+        "orphans": orphans, "orphans_total": sum(orphans.values()),
         "msg": request.query_params.get("msg", ""),
     })
 
@@ -3218,6 +3223,7 @@ async def admin_class_backups(
         "user": user,
         "cls": cls,
         "backups": backups,
+        "archive_pending": _PENDING_ARCHIVES.get(class_id),
         "msg": request.query_params.get("msg", ""),
     })
 
@@ -3341,6 +3347,113 @@ async def export_backup_endpoint(
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"'
         },
+    )
+
+
+@app.post("/admin/classes/{class_id}/archive")
+async def archive_class_create(
+    class_id: str,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Schritt 1: Finales Archiv (Backup-Format) für die Klasse erstellen."""
+    cls = db.get_class(class_id)
+    if not cls:
+        raise HTTPException(status_code=404, detail="Klasse nicht gefunden")
+    filepath = backup.create_manual_backup(
+        class_id=class_id,
+        created_by=user.get("upn", "teacher"),
+    )
+    if not filepath:
+        return RedirectResponse(
+            f"/admin/classes/{class_id}/backups?msg={quote('Fehler beim Erstellen des Archivs')}",
+            status_code=303,
+        )
+    _PENDING_ARCHIVES[class_id] = {"path": str(filepath), "downloaded": False}
+    return RedirectResponse(
+        f"/admin/classes/{class_id}/backups?msg={quote('Archiv erstellt — bitte jetzt herunterladen')}",
+        status_code=303,
+    )
+
+
+@app.get("/admin/classes/{class_id}/archive/download")
+async def archive_class_download(
+    class_id: str,
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Schritt 2: Archiv herunterladen (schaltet das Löschen frei)."""
+    pending = _PENDING_ARCHIVES.get(class_id)
+    if not pending:
+        raise HTTPException(
+            status_code=404,
+            detail="Kein Archiv vorbereitet — bitte zuerst erstellen",
+        )
+    path = Path(pending["path"])
+    if not path.exists():
+        _PENDING_ARCHIVES.pop(class_id, None)
+        raise HTTPException(
+            status_code=404,
+            detail="Archiv-Datei nicht gefunden — bitte erneut erstellen",
+        )
+    cls = db.get_class(class_id)
+    filename = f"archiv_{cls['name'] if cls else class_id}_{path.name}"
+    pending["downloaded"] = True
+    return Response(
+        content=path.read_text(encoding="utf-8"),
+        media_type="application/json",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@app.post("/admin/classes/{class_id}/archive/delete")
+async def archive_class_delete(
+    class_id: str,
+    confirm_name: str = Form(...),
+    user: dict = Depends(auth.require_teacher_user),
+):
+    """Schritt 3: Klasse nach erfolgtem Download endgültig löschen (Datenschutz)."""
+    cls = db.get_class(class_id)
+    if not cls:
+        return RedirectResponse(
+            f"/admin/classes?msg={quote('Klasse nicht gefunden')}", status_code=303
+        )
+    pending = _PENDING_ARCHIVES.get(class_id)
+    if not pending or not pending.get("downloaded"):
+        return RedirectResponse(
+            f"/admin/classes/{class_id}/backups?msg={quote('Löschen blockiert: Archiv muss zuerst erstellt und heruntergeladen werden')}",
+            status_code=303,
+        )
+    if confirm_name.strip() != cls["name"]:
+        return RedirectResponse(
+            f"/admin/classes/{class_id}/backups?msg={quote('Klassenname stimmt nicht überein — Löschen abgebrochen')}",
+            status_code=303,
+        )
+
+    # DB-Löschung in einer Transaktion
+    stats = db.delete_class_cascade(class_id)
+    # Datei-Löschung erst nach erfolgreichem DB-Commit
+    failed = backup.delete_class_backup_dirs(class_id)
+
+    # In-Memory aufräumen
+    _PENDING_ARCHIVES.pop(class_id, None)
+
+    msg = (
+        f"Klasse »{cls['name']}« archiviert und gelöscht: "
+        f"{stats['members']} Schüler, {stats['einfach_records']} Unterrichts-, "
+        f"{stats['nachweise']} Projekt-Einträge, {stats['active_ids']} Unterrichtsstand-Einträge"
+    )
+    if failed:
+        msg += f" — ACHTUNG, manuell löschen: {', '.join(failed)}"
+    return RedirectResponse(f"/admin/classes?msg={quote(msg)}", status_code=303)
+
+
+@app.post("/admin/classes/orphans/delete")
+async def admin_orphans_delete(user: dict = Depends(auth.require_teacher_user)):
+    """Verwaiste Datensätze (ohne Klassenzuordnung) endgültig löschen."""
+    counts = db.delete_orphaned_records()
+    total = sum(counts.values())
+    return RedirectResponse(
+        f"/admin/classes?msg={quote(f'{total} verwaiste Datensätze gelöscht')}",
+        status_code=303,
     )
 
 
