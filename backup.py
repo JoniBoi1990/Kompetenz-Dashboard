@@ -9,6 +9,7 @@ Features:
 """
 
 import json
+import shutil
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -498,3 +499,26 @@ def delete_backup(filepath: str) -> bool:
         return True
     except Exception:
         return False
+
+
+def delete_class_backup_dirs(class_id: str) -> list[str]:
+    """
+    Löscht alle Backup-Verzeichnisse einer Klasse (auto + manual) rekursiv,
+    inklusive aller enthaltenen Backup-Dateien.
+
+    Returns:
+        Liste der Pfade, die nicht gelöscht werden konnten (leer = alles weg)
+    """
+    failed: list[str] = []
+    for base in (AUTO_BACKUP_DIR, MANUAL_BACKUP_DIR):
+        class_dir = (base / class_id).resolve()
+        # Sicherheitsprüfung: muss innerhalb des Basis-Verzeichnisses liegen
+        if not str(class_dir).startswith(str(base.resolve())):
+            failed.append(str(class_dir))
+            continue
+        if class_dir.exists():
+            try:
+                shutil.rmtree(class_dir)
+            except Exception:
+                failed.append(str(class_dir))
+    return failed
