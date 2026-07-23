@@ -49,10 +49,10 @@
 
 ```
 Kompetenz-Dashboard/
-├── main.py                   # FastAPI app + all routes (~2700 lines)
+├── main.py                   # FastAPI app + all routes (~3850 lines)
 ├── config.py                 # Pydantic settings (.env loading)
 ├── auth.py                   # MSAL + itsdangerous session cookies
-├── db.py                     # SQLite persistence layer (~1000 lines)
+├── db.py                     # SQLite persistence layer (~1725 lines)
 ├── graph.py                  # MS Graph API client (identity only in prod)
 ├── pdf_engine.py             # PDF generation with ReportLab
 ├── backup.py                 # Backup/restore system
@@ -236,7 +236,9 @@ Teachers can archive a class at the end of the school year from the class backup
 
 **Privacy:** No personal data remains on the server after deletion (student names, UPNs, competency records, evidence URLs, OneNote sync config/history, backup files).
 
-**Orphan cleanup:** `/admin/classes` shows a warning card when records without class assignment exist (leftovers from the legacy delete); `db.count_orphaned_records()` / `db.delete_orphaned_records()` power it.
+**Quick delete:** The "Löschen" button on `/admin/classes` also uses the full cascade (`db.delete_class_cascade` + `backup.delete_class_backup_dirs`) — no way to half-delete a class remains. (The legacy `db.delete_class` was removed.)
+
+**Orphan cleanup:** `/admin/classes` shows a warning card when orphaned records exist — rows with `class_id IS NULL` or with a `class_id` pointing at a deleted class (leftovers from the legacy delete or sync races); `db.count_orphaned_records()` / `db.delete_orphaned_records()` power it.
 
 **Implementation:**
 - Routes: `POST /admin/classes/{class_id}/archive`, `GET .../archive/download`, `POST .../archive/delete`, `POST /admin/classes/orphans/delete`
@@ -608,12 +610,12 @@ Backups are stored in `_backup/manual/{class_id}/`.
 
 ## File Size Reference
 
-- `main.py`: ~2700 lines (FastAPI routes)
-- `db.py`: ~1000 lines (SQLite layer)
-- `auth.py`: ~175 lines (MSAL + sessions)
-- `pdf_engine.py`: ~170 lines (ReportLab PDF)
-- `backup.py`: ~500 lines (Backup/restore)
-- `graph.py`: ~350 lines (MS Graph API)
+- `main.py`: ~3850 lines (FastAPI routes)
+- `db.py`: ~1725 lines (SQLite layer)
+- `auth.py`: ~260 lines (MSAL + sessions)
+- `pdf_engine.py`: ~190 lines (ReportLab PDF)
+- `backup.py`: ~525 lines (Backup/restore)
+- `graph.py`: ~435 lines (MS Graph API)
 
 ---
 
