@@ -157,16 +157,18 @@ def init_db() -> None:
         con.executescript("""
         CREATE TABLE IF NOT EXISTS einfach_records (
             student_id    TEXT NOT NULL,
+            class_id      TEXT,
             student_name  TEXT NOT NULL DEFAULT '',
             competency_id TEXT NOT NULL,  -- Format: e.901, n.989 (Typ.Prefix+ID)
             achieved      INTEGER NOT NULL DEFAULT 0,
             updated_by    TEXT NOT NULL DEFAULT '',
             updated_at    TEXT NOT NULL DEFAULT '',
-            PRIMARY KEY (student_id, competency_id)
+            PRIMARY KEY (student_id, class_id, competency_id)
         );
         CREATE TABLE IF NOT EXISTS nachweise (
             id            TEXT PRIMARY KEY,
             student_id    TEXT NOT NULL,
+            class_id      TEXT,
             student_name  TEXT NOT NULL DEFAULT '',
             competency_id TEXT NOT NULL,  -- Format: e.901, n.989 (Typ.Prefix+ID)
             niveau_level  INTEGER NOT NULL DEFAULT 0,
@@ -184,6 +186,7 @@ def init_db() -> None:
         CREATE TABLE IF NOT EXISTS test_requests (
             id             TEXT PRIMARY KEY,
             student_id     TEXT NOT NULL,
+            class_id       TEXT,
             student_name   TEXT NOT NULL DEFAULT '',
             title          TEXT NOT NULL DEFAULT '',
             competency_ids TEXT NOT NULL DEFAULT '[]',
@@ -195,8 +198,9 @@ def init_db() -> None:
             last_number    INTEGER NOT NULL DEFAULT 0
         );
         CREATE TABLE IF NOT EXISTS kompetenzantraege (
-            id   TEXT PRIMARY KEY,
-            data TEXT NOT NULL DEFAULT '{}'
+            id       TEXT PRIMARY KEY,
+            class_id TEXT,
+            data     TEXT NOT NULL DEFAULT '{}'
         );
         CREATE TABLE IF NOT EXISTS classes (
             id          TEXT PRIMARY KEY,
