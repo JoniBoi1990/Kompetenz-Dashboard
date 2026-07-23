@@ -40,7 +40,7 @@
 
 <form method="post" action="/admin/classes/{{ cls.id }}/archive/delete"
       style="margin-top:1rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap"
-      onsubmit="return confirmArchiveDelete(this, {{ cls.name | tojson }})">
+      onsubmit='return confirmArchiveDelete(this, {{ cls.name | tojson }})'>
   <input type="text" name="confirm_name" placeholder="Klassenname »{{ cls.name }}« eintippen"
          required style="width:18rem">
   <button type="submit" class="btn-danger"
