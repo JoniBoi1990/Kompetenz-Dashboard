@@ -509,9 +509,17 @@ def get_einfach_records(student_id: str) -> dict[str, dict]:
 
 
 def _class_id_for_student(con, student_id: str) -> str | None:
-    """Leitet die class_id eines Schülers aus class_members ab (None = Waise)."""
+    """Leitet die class_id eines Schülers aus class_members ab (None = Waise).
+
+    Bei Mehrfachmitgliedschaft (mehrere Klassen für dieselbe student_id):
+    deterministisch die kleinste class_id — nicht notwendigerweise die
+    "richtige" Klasse für einen bestimmten Schreibvorgang. Echte
+    Mehrfachmitgliedschaft im Schreibpfad (welche Klasse für welchen Eintrag)
+    ist ein separates Feature; Aufrufer mit bekannter Klasse sollten
+    class_id weiterhin explizit übergeben statt sich hierauf zu verlassen.
+    """
     row = con.execute(
-        "SELECT class_id FROM class_members WHERE student_id = ? LIMIT 1",
+        "SELECT class_id FROM class_members WHERE student_id = ? ORDER BY class_id LIMIT 1",
         (student_id,),
     ).fetchone()
     return row["class_id"] if row else None
