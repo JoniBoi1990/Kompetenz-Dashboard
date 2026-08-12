@@ -2001,7 +2001,8 @@ async def generate_test(request: Request, user: dict = Depends(auth.require_teac
     
     # Multiple students: generate PDFs directly for each student based on their competency status
     batch_id = str(uuid.uuid4())
-    generated_pdfs = {}  # student_name -> pdf_bytes
+    generated_pdfs = {}  # unique_key -> pdf_bytes (key is student_id, or name+index if unset)
+    pdf_labels = {}      # unique_key -> display name (two students can share a name)
     errors = []
     
     # Load competency questions
@@ -2032,10 +2033,13 @@ async def generate_test(request: Request, user: dict = Depends(auth.require_teac
     # Get active IDs for the class
     active_ids = db.get_active_ids(class_id) if class_id else set()
     
-    for student in student_data:
+    for idx, student in enumerate(student_data):
         student_name = student.get("name", "Unbekannt")
         student_id = student.get("id")
-        
+        # Unique key per student even if two students share a display name
+        # (student_id is already unique; fall back to name+index otherwise)
+        unique_key = student_id or f"{student_name}__{idx}"
+
         # Determine which competencies this student needs
         if student_id:
             # Load student's competency status
@@ -2085,19 +2089,21 @@ async def generate_test(request: Request, user: dict = Depends(auth.require_teac
                 datum=date.today().strftime("%d.%m.%Y"),
                 zusatzinfo=student_title,
             )
-            generated_pdfs[student_name] = pdf_bytes
+            generated_pdfs[unique_key] = pdf_bytes
+            pdf_labels[unique_key] = student_name
         except Exception as e:
             errors.append(f"{student_name}: PDF-Fehler - {e}")
-    
+
     if not generated_pdfs:
         raise HTTPException(status_code=500, detail="Keine PDFs konnten erstellt werden: " + "; ".join(errors))
-    
+
     # Store batch for download
     _TEST_PREVIEWS[batch_id] = {
         "type": "direct_download",
         "id": batch_id,
-        "student_names": list(generated_pdfs.keys()),
+        "student_names": list(pdf_labels.values()),
         "pdfs": generated_pdfs,
+        "pdf_labels": pdf_labels,
         "title": form_title,
         "errors": errors,
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -2316,18 +2322,16 @@ async def test_download(batch_id: str, request: Request, user: dict = Depends(au
     download_format = form.get("format", "zip")
     
     pdfs = batch["pdfs"]
+    pdf_labels = batch.get("pdf_labels", {})
     title = batch["title"]
-    
+
     if not pdfs:
         raise HTTPException(status_code=500, detail="Keine PDFs zum Download verfügbar")
-    
+
     if download_format == "merged":
-        # Merge all PDFs into one - iterate in order of student_names
-        pdf_list = []
-        for name in batch["student_names"]:
-            if name in pdfs:
-                pdf_list.append(pdfs[name])
-        
+        # Merge all PDFs into one - pdfs dict preserves generation order
+        pdf_list = list(pdfs.values())
+
         if not pdf_list:
             raise HTTPException(status_code=500, detail="Keine PDFs zum Zusammenführen verfügbar")
         
@@ -2349,11 +2353,16 @@ async def test_download(batch_id: str, request: Request, user: dict = Depends(au
         # Create ZIP file
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-            for student_name in batch["student_names"]:
-                if student_name in pdfs:
-                    pdf_bytes = pdfs[student_name]
-                    safe_name = student_name.replace(" ", "_")
-                    zip_file.writestr(f"{safe_name}_Kompetenznachweis.pdf", pdf_bytes)
+            used_names: dict[str, int] = {}
+            for key, pdf_bytes in pdfs.items():
+                student_name = pdf_labels.get(key, key)
+                safe_name = student_name.replace(" ", "_")
+                # Disambiguate filenames when two students share a name —
+                # otherwise the second PDF would overwrite the first in the ZIP.
+                seen = used_names.get(safe_name, 0)
+                used_names[safe_name] = seen + 1
+                suffix = f"_{seen + 1}" if seen else ""
+                zip_file.writestr(f"{safe_name}{suffix}_Kompetenznachweis.pdf", pdf_bytes)
             # Add error log if there were errors
             if batch.get("errors"):
                 error_text = "Fehler bei der Generierung:\n\n" + "\n".join(batch["errors"])
