@@ -7,6 +7,7 @@ import csv
 import io
 import json
 import random
+import re
 import secrets
 import uuid
 import zipfile
@@ -3403,7 +3404,11 @@ async def archive_class_download(
             detail="Archiv-Datei nicht gefunden — bitte erneut erstellen",
         )
     cls = db.get_class(class_id)
-    filename = f"archiv_{cls['name'] if cls else class_id}_{path.name}"
+    raw_name = cls["name"] if cls else class_id
+    # ASCII-only: Content-Disposition-filename (ohne RFC 5987 filename*=) muss
+    # header-sicher sein — Umlaute/Sonderzeichen/Anführungszeichen ersetzen.
+    safe_name = re.sub(r"[^A-Za-z0-9\-._]", "_", raw_name.replace(" ", "_"))
+    filename = f"archiv_{safe_name}_{path.name}"
     pending["downloaded"] = True
     return Response(
         content=path.read_text(encoding="utf-8"),
