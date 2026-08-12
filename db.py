@@ -151,6 +151,37 @@ def _migrate_add_class_ids(con) -> None:
         )
 
 
+def _migrate_lowercase_student_ids(con) -> None:
+    """Normalisiert student_id auf Kleinschreibung.
+
+    Login-UPN wird in main.py konsistent .lower()-normalisiert; damit
+    Bestands-Datensätze (Klassenmitglieder, CSV-Import mit beliebiger
+    Schreibung) weiterhin matchen, werden hier alle student_id-Spalten
+    einmalig auf Kleinschreibung umgestellt. Idempotent (No-Op bei
+    bereits kleingeschriebenen Werten).
+    """
+    for table in ("class_members", "einfach_records", "nachweise",
+                  "test_requests", "test_counters"):
+        try:
+            con.execute(
+                f"UPDATE {table} SET student_id = LOWER(student_id) "
+                f"WHERE student_id != LOWER(student_id)"
+            )
+        except sqlite3.IntegrityError as e:
+            # z. B. einfach_records-PK-Kollision, wenn Groß- UND Kleinschreibung
+            # derselben Person bereits als zwei Zeilen existieren (sehr selten).
+            # Nicht fatal: Zeilen bleiben unverändert, manuelle Bereinigung nötig.
+            print(f"WARNING migration lowercase_student_ids: {table}: {e}")
+    try:
+        con.execute("""
+            UPDATE kompetenzantraege SET data =
+                json_set(data, '$.student_id', LOWER(json_extract(data, '$.student_id')))
+            WHERE json_extract(data, '$.student_id') != LOWER(json_extract(data, '$.student_id'))
+        """)
+    except sqlite3.IntegrityError as e:
+        print(f"WARNING migration lowercase_student_ids: kompetenzantraege: {e}")
+
+
 def init_db() -> None:
     """Create tables if they don't exist yet."""
     with _conn() as con:
@@ -299,6 +330,10 @@ def init_db() -> None:
         
         # Migration: class_id-Spalten für Schülerdaten-Tabellen
         _migrate_add_class_ids(con)
+
+        # Migration: student_id auf Kleinschreibung normalisiert (Konsistenz
+        # mit dem .lower()-normalisierten Login-UPN)
+        _migrate_lowercase_student_ids(con)
 
     # Initialize OneNote sync tables (eigene Connection — muss AUSSERHALB des
     # with-Blocks laufen, sonst "database is locked" bei offener Schreibtransaktion)
@@ -1054,7 +1089,7 @@ def import_class_members_csv(class_id: str, rows: list[dict]) -> int:
                 """INSERT OR REPLACE INTO class_members
                    (class_id, student_id, student_name, upn)
                    VALUES(?, ?, ?, ?)""",
-                (class_id, student_id.strip(), name.strip(), upn.strip()),
+                (class_id, student_id.strip().lower(), name.strip(), upn.strip()),
             )
             count += 1
     return count

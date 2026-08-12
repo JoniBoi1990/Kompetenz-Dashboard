@@ -3082,7 +3082,7 @@ async def admin_class_member_add(
     user: dict = Depends(auth.require_teacher_user),
 ):
     if student_name.strip():
-        sid = upn.strip() or student_name.strip()
+        sid = (upn.strip() or student_name.strip()).lower()
         db.add_class_member(class_id, sid, student_name.strip(), upn.strip())
     return RedirectResponse(f"/admin/classes/{class_id}", status_code=303)
 
