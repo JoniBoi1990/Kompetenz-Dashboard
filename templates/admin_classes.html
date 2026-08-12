@@ -65,7 +65,7 @@
       <td>
         {% if is_admin %}
         <form method="post" action="/admin/classes/delete" style="display:inline"
-              onsubmit="return confirm('Klasse »{{ cls.displayName }}« ENDGÜLTIG löschen?\n\nAlle Schülerdaten und alle Backup-Dateien dieser Klasse werden unwiderruflich entfernt!\n\nTipp: Zum vorherigen Archivieren (Download) die Backup-Verwaltung nutzen.')">
+              onsubmit="return confirmClassDelete({{ cls.displayName | tojson }})">
           <input type="hidden" name="class_id" value="{{ cls.id }}">
           <button type="submit" class="btn-danger">Löschen</button>
         </form>
@@ -80,4 +80,12 @@
 {% else %}
 <p class="muted">Noch keine Klassen angelegt.</p>
 {% endif %}
+
+<script>
+function confirmClassDelete(name) {
+  return confirm('Klasse »' + name + '« ENDGÜLTIG löschen?\n\n' +
+    'Alle Schülerdaten und alle Backup-Dateien dieser Klasse werden unwiderruflich entfernt!\n\n' +
+    'Tipp: Zum vorherigen Archivieren (Download) die Backup-Verwaltung nutzen.');
+}
+</script>
 {% endblock %}
