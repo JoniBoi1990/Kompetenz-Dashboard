@@ -677,29 +677,21 @@ def delete_test_request(req_id: str) -> None:
 # ---------------------------------------------------------------------------
 
 def get_next_test_number(student_id: str) -> int:
-    """Get the next test number for a student and increment the counter."""
+    """Get the next test number for a student and increment the counter.
+
+    Read-and-write in a single atomic statement (INSERT ... ON CONFLICT ...
+    RETURNING) — avoids the race where two concurrent calls for the same
+    student both read the same last_number and end up writing the same
+    new_number (duplicate test numbering)."""
     with _conn() as con:
-        # Try to get current number
         row = con.execute(
-            "SELECT last_number FROM test_counters WHERE student_id=?",
+            """INSERT INTO test_counters(student_id, last_number)
+               VALUES (?, 1)
+               ON CONFLICT(student_id) DO UPDATE SET last_number = last_number + 1
+               RETURNING last_number""",
             (student_id,)
         ).fetchone()
-        
-        if row:
-            current = row["last_number"]
-        else:
-            current = 0
-        
-        new_number = current + 1
-        
-        # Insert or update
-        con.execute(
-            """INSERT OR REPLACE INTO test_counters(student_id, last_number)
-               VALUES(?, ?)""",
-            (student_id, new_number)
-        )
-        
-        return new_number
+        return row["last_number"]
 
 
 def get_current_test_number(student_id: str) -> int:
